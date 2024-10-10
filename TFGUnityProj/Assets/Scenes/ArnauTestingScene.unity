@@ -317,6 +317,7 @@ GameObject:
   - component: {fileID: 215744889}
   - component: {fileID: 215744888}
   - component: {fileID: 215744890}
+  - component: {fileID: 215744891}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -392,6 +393,26 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   orientation: {fileID: 1246462988}
+--- !u!114 &215744891
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 215744887}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca0ad919604f9e84581609a7582e5937, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  abilityName: DashAbility
+  damage: 0
+  cooldownDuration: 1
+  castTime: 0
+  duration: 0
+  isReady: 1
+  dashDistance: 10
+  dashSpeed: 20
 --- !u!1 &228396388
 GameObject:
   m_ObjectHideFlags: 0
@@ -560,7 +581,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!65 &1008571353
 BoxCollider:
@@ -603,7 +624,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: e376ca47d63c1954291873c6e580c358, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -708,7 +729,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: e376ca47d63c1954291873c6e580c358, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

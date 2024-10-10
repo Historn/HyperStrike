@@ -45,7 +45,7 @@ public class PlayerMovement : MonoBehaviour
         grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, groundMask);
 
         MovementInput();
-        //LimitSpeed();
+        LimitSpeed();
 
         //Handle Drag
         if (grounded)
@@ -78,10 +78,12 @@ public class PlayerMovement : MonoBehaviour
         //Calculate player movement direction
         moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
 
-        if (grounded) //Ground
-            rb.AddForce(moveDirection.normalized * movementSpeed * 10f, ForceMode.Force);
-        else if (!grounded) //Air
+        if (!grounded) //Air
+        {
             rb.AddForce(moveDirection.normalized * movementSpeed * 10f * airMultiplier, ForceMode.Force);
+            return;
+        }
+        rb.AddForce(moveDirection.normalized * movementSpeed * 10f, ForceMode.Force);
     }
 
     void LimitSpeed()
@@ -90,7 +92,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (flatVel.magnitude > movementSpeed)
         {
-            Vector3 limitedVel = flatVel * movementSpeed;
+            Vector3 limitedVel = flatVel.normalized * movementSpeed;
             rb.velocity = new Vector3(limitedVel.x, rb.velocity.y, limitedVel.z);
         }
     }
