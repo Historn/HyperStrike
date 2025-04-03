@@ -1,28 +1,16 @@
 using UnityEngine;
 
 // CLASS FOR VARIABLES AND FUNCTIONS - NOT ACTIONS/INPUTS
-public class Player : MonoBehaviour
+public class Player
 {
-
     // Related to server user
     int uniqueID = 0;
     int currentLevel = 1;
     int currenntLevelProgress = 10000; // XP
 
     // Related to match
-    int score = 0;
+    public int Score { get; set; }
+    public string CharacterName { get; set; }
     //int character = CharacterType.Tank / DPS / Healer;
     //[SerializeField] Ability[] abilities = null;
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }
