@@ -1,5 +1,6 @@
 using System.Drawing;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 //using Unity.Cinemachine;
 
@@ -25,7 +26,7 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #region "Movement Variables"
-    float speed = 1.0f;
+    float movementSpeed = 20.0f;
 
     // Jump Vars
     bool  readyToJump;
@@ -37,7 +38,7 @@ public class PlayerController : MonoBehaviour
     float characterHeight; // Change to character Data
     public LayerMask groundMask;
     [SerializeField] bool isGrounded;
-    float groundDrag = 0.03f;
+    float groundDrag = 0.25f;
     #endregion
 
     private void Start()
@@ -49,6 +50,7 @@ public class PlayerController : MonoBehaviour
         // Init Physics variables
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
+        rb.maxLinearVelocity = 15.0f;
 
         // Init Inputs
         InitInputs();
@@ -73,14 +75,17 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         //Ground Check
-        Vector3 endRayPos = new Vector3(transform.position.x, characterHeight * 0.5f + 0.2f, transform.position.z);
+        Vector3 endRayPos = new Vector3(transform.position.x, transform.position.y - (characterHeight * 0.5f + 0.2f), transform.position.z);
         Debug.DrawLine(transform.position, endRayPos, UnityEngine.Color.red);
-        //Debug.DrawLine(transform.position, new Vector3(0, 5, 0), UnityEngine.Color.red);
         isGrounded = Physics.Raycast(transform.position, Vector3.down, characterHeight * 0.5f + 0.2f);
 
         // Move
-        Vector2 moveValue = moveAction.ReadValue<Vector2>(); // Gets Input Values
-        rb.position += new Vector3(moveValue.x, 0.0f, moveValue.y) * speed * groundDrag;
+        WalkAndRun();
+        
+        // Crouch and Slide
+        // Set camera to (transform.position.y * 0.5f)
+        // If running + crouch --> Slide --> Higher velocity? or less drag
+        CrouchSlide();
 
         if (jumpAction.IsPressed() && readyToJump && isGrounded)
         {
@@ -89,26 +94,60 @@ public class PlayerController : MonoBehaviour
             Invoke(nameof(ResetJump), jumpCooldown);    //Delay for jump to reset
         }
 
-        //Handle Drag with the ground
-        if (isGrounded)
-            rb.linearDamping = groundDrag;
-        else
-            rb.linearDamping = 0;
+        //Handle Drag with the ground after all movement inputs
+        HandleDrag();
     }
 
     void InitInputs()
     {
-        moveAction = InputSystem.actions.FindAction("Move");
-        lookAction = InputSystem.actions.FindAction("Look");
-        jumpAction = InputSystem.actions.FindAction("Jump");
-        attackAction = InputSystem.actions.FindAction("Move");
-        interactAction = InputSystem.actions.FindAction("Look");
-        crouchAction = InputSystem.actions.FindAction("Jump");
+        moveAction      = InputSystem.actions.FindAction("Move");
+        lookAction      = InputSystem.actions.FindAction("Look");
+        jumpAction      = InputSystem.actions.FindAction("Jump");
+        attackAction    = InputSystem.actions.FindAction("Attack");
+        interactAction  = InputSystem.actions.FindAction("Interact");
+        crouchAction    = InputSystem.actions.FindAction("Crouch");
+        sprintAction    = InputSystem.actions.FindAction("Sprint");
+        previousAction  = InputSystem.actions.FindAction("Previous");
+        nextAction      = InputSystem.actions.FindAction("Next");
     }
 
     void DebugMovement()
     {
         return;
+    }
+
+    void WalkAndRun()
+    {
+        // Sprint
+        float speed = movementSpeed;
+        if (sprintAction.IsPressed() && isGrounded) speed = movementSpeed + 10.0f;
+        //Debug.Log(speed);
+        //Debug.Log(rb.linearVelocity.magnitude);
+
+        Vector2 moveValue = moveAction.ReadValue<Vector2>(); // Gets Input Values
+        Vector3 dir = new Vector3(moveValue.x, 0.0f, moveValue.y);
+        rb.AddForce(dir.normalized * speed, ForceMode.Force);
+    }
+
+    void CrouchSlide()
+    {
+        if (crouchAction.IsPressed())
+        {
+            Vector3 crouchedScale = Vector3.one * 0.5f;
+            transform.localScale = crouchedScale;
+            //Activate Crouch Anim
+
+
+            if (sprintAction.IsPressed())
+            {
+                // Activate Sliding Anim
+                // Higher speed
+            }
+        }
+        else
+        {
+            transform.localScale = Vector3.one;
+        }
     }
 
     void Jump()
@@ -118,9 +157,17 @@ public class PlayerController : MonoBehaviour
 
         rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
     }
+
     void ResetJump()
     {
         readyToJump = true;
     }
 
+    void HandleDrag()
+    {
+        if (isGrounded)
+            rb.linearDamping = groundDrag;
+        else
+            rb.linearDamping = 0;
+    }
 }
