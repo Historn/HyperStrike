@@ -13,6 +13,8 @@ namespace HyperStrike
         public float speed;
         public float basicDamage;
 
+        public GameObject weaponProjectile;
+
         public Ability ability_RMB;
         public Ability ability_LSHIFT;
         public Ability ability_E;

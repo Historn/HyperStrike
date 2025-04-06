@@ -27,11 +27,12 @@ public class PlayerController : MonoBehaviour
 
     #region "Movement Variables"
     float movementSpeed = 20.0f;
+    float sprintSpeed = 30.0f;
 
     // Jump Vars
-    bool  readyToJump;
+    bool readyToJump;
     float jumpCooldown = 0.0f;
-    float jumpForce    = 10.0f;
+    float jumpForce = 10.0f;
 
     // Ground Vars
     [Header("Ground Check")]
@@ -39,6 +40,12 @@ public class PlayerController : MonoBehaviour
     public LayerMask groundMask;
     [SerializeField] bool isGrounded;
     float groundDrag = 0.25f;
+
+    // Wall run
+    [SerializeField] bool isWallRunning;
+    RaycastHit wallHit;
+    float angleRoll = 25.0f; // Var to rotate camera while wallrunning
+
     #endregion
 
     private void Start()
@@ -59,7 +66,10 @@ public class PlayerController : MonoBehaviour
         readyToJump = true;
 
         characterHeight = GetComponent<CapsuleCollider>().height;
+        isWallRunning = false;
         isGrounded = false;
+
+        view.UpdateView(player);
     }
 
     private void Update()
@@ -75,24 +85,20 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         //Ground Check
-        Vector3 endRayPos = new Vector3(transform.position.x, transform.position.y - (characterHeight * 0.5f + 0.2f), transform.position.z);
+        float dist = characterHeight * 0.5f + 0.1f;
+        Vector3 endRayPos = new Vector3(transform.position.x, transform.position.y - dist, transform.position.z);
         Debug.DrawLine(transform.position, endRayPos, UnityEngine.Color.red);
-        isGrounded = Physics.Raycast(transform.position, Vector3.down, characterHeight * 0.5f + 0.2f);
+        isGrounded = Physics.Raycast(transform.position, Vector3.down, dist);
 
         // Move
         WalkAndRun();
-        
+
+        WallRun();
+
         // Crouch and Slide
-        // Set camera to (transform.position.y * 0.5f)
-        // If running + crouch --> Slide --> Higher velocity? or less drag
         CrouchSlide();
 
-        if (jumpAction.IsPressed() && readyToJump && isGrounded)
-        {
-            readyToJump = false;
-            Jump();
-            Invoke(nameof(ResetJump), jumpCooldown);    //Delay for jump to reset
-        }
+        if (isGrounded) Jump(Vector3.zero);
 
         //Handle Drag with the ground after all movement inputs
         HandleDrag();
@@ -100,15 +106,15 @@ public class PlayerController : MonoBehaviour
 
     void InitInputs()
     {
-        moveAction      = InputSystem.actions.FindAction("Move");
-        lookAction      = InputSystem.actions.FindAction("Look");
-        jumpAction      = InputSystem.actions.FindAction("Jump");
-        attackAction    = InputSystem.actions.FindAction("Attack");
-        interactAction  = InputSystem.actions.FindAction("Interact");
-        crouchAction    = InputSystem.actions.FindAction("Crouch");
-        sprintAction    = InputSystem.actions.FindAction("Sprint");
-        previousAction  = InputSystem.actions.FindAction("Previous");
-        nextAction      = InputSystem.actions.FindAction("Next");
+        moveAction = InputSystem.actions.FindAction("Move");
+        lookAction = InputSystem.actions.FindAction("Look");
+        jumpAction = InputSystem.actions.FindAction("Jump");
+        attackAction = InputSystem.actions.FindAction("Attack");
+        interactAction = InputSystem.actions.FindAction("Interact");
+        crouchAction = InputSystem.actions.FindAction("Crouch");
+        sprintAction = InputSystem.actions.FindAction("Sprint");
+        previousAction = InputSystem.actions.FindAction("Previous");
+        nextAction = InputSystem.actions.FindAction("Next");
     }
 
     void DebugMovement()
@@ -116,11 +122,12 @@ public class PlayerController : MonoBehaviour
         return;
     }
 
+    #region "Movement Mechanics Methods"
     void WalkAndRun()
     {
         // Sprint
         float speed = movementSpeed;
-        if (sprintAction.IsPressed() && isGrounded) speed = movementSpeed + 10.0f;
+        if (sprintAction.IsPressed() && isGrounded) speed = sprintSpeed;
         //Debug.Log(speed);
         //Debug.Log(rb.linearVelocity.magnitude);
 
@@ -131,6 +138,8 @@ public class PlayerController : MonoBehaviour
 
     void CrouchSlide()
     {
+        // Set scale to (transform.position.y * 0.5f)
+        // If running + crouch --> Slide --> Higher velocity? or less drag
         if (crouchAction.IsPressed())
         {
             Vector3 crouchedScale = Vector3.one * 0.5f;
@@ -150,17 +159,49 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void Jump()
+    void Jump(Vector3 jumpDir)
     {
-        //Reset Y Velocity
-        rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+        if (jumpAction.IsPressed() && readyToJump)
+        {
+            readyToJump = false;
 
-        rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
+            //Reset Y Velocity
+            rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
+            rb.AddForce((transform.up + jumpDir) * jumpForce, ForceMode.Impulse);
+
+            Invoke(nameof(ResetJump), jumpCooldown);    //Delay for jump to reset
+        }
     }
 
     void ResetJump()
     {
         readyToJump = true;
+    }
+
+    void WallRun()
+    {
+        Vector3[] directions = new Vector3[]
+            {
+            Vector3.right,
+            Vector3.right + Vector3.forward,
+            Vector3.forward,
+            Vector3.left + Vector3.forward,
+            Vector3.left
+            };
+
+        for (int i = 0; i < directions.Length; i++)
+        {
+            Debug.DrawLine(transform.position, transform.position + directions[i], UnityEngine.Color.green);
+            isWallRunning = Physics.Raycast(transform.position, directions[i], out wallHit, transform.localScale.x + 0.15f);
+            if (!isGrounded && isWallRunning && moveAction.IsPressed())
+            {
+                Physics.gravity = Physics.gravity / 3.0f; // Reduce gravity to stay more time in the wall but not infinite
+                rb.AddForce(Vector3.forward * sprintSpeed, ForceMode.Force);
+                Jump(wallHit.normal);
+            }
+        }
+
+        // Rotate camera a bit on the z-axis
     }
 
     void HandleDrag()
@@ -170,4 +211,13 @@ public class PlayerController : MonoBehaviour
         else
             rb.linearDamping = 0;
     }
+    #endregion
+
+    #region "Data Methods"
+    public void IncreaseScore(int amount)
+    {
+        player.Score += amount;
+        view.UpdateView(player);
+    }
+    #endregion
 }
