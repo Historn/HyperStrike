@@ -1,4 +1,5 @@
 using System.Drawing;
+using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -29,6 +30,13 @@ public class PlayerController : MonoBehaviour
     float movementSpeed = 20.0f;
     float sprintSpeed = 30.0f;
 
+    [Header("Cinemachine Settings")]
+    public CinemachineCamera cinemachineCamera; // Reference to the Cinemachine virtual camera
+    public CinemachineInputAxisController cinemachineAxisCamera; // Reference to the Cinemachine virtual camera
+    private Transform cameraTransform; // The transform of the Cinemachine camera's LookAt target
+    float sensitivity = 5.0f;
+    float xRotation;
+
     // Jump Vars
     bool readyToJump;
     float jumpCooldown = 0.0f;
@@ -37,7 +45,7 @@ public class PlayerController : MonoBehaviour
     // Ground Vars
     [Header("Ground Check")]
     float characterHeight; // Change to character Data
-    public LayerMask groundMask;
+    LayerMask groundMask;
     [SerializeField] bool isGrounded;
     float groundDrag = 0.25f;
 
@@ -50,9 +58,19 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
         // Init Player MVC
         player = new Player();
         view = GetComponent<PlayerView>();
+
+        // Ensure the Cinemachine camera is set up properly
+        if (cinemachineCamera != null)
+        {
+            cameraTransform = cinemachineCamera.LookAt; // Use the LookAt target for rotation
+        }
+        UpdateCameraSensitivity();
 
         // Init Physics variables
         rb = GetComponent<Rigidbody>();
@@ -90,6 +108,11 @@ public class PlayerController : MonoBehaviour
         Debug.DrawLine(transform.position, endRayPos, UnityEngine.Color.red);
         isGrounded = Physics.Raycast(transform.position, Vector3.down, dist);
 
+        if (cameraTransform != null)
+        {
+            RotatePlayerWithCamera();
+        }
+
         // Move
         WalkAndRun();
 
@@ -123,6 +146,25 @@ public class PlayerController : MonoBehaviour
     }
 
     #region "Movement Mechanics Methods"
+    void RotatePlayerWithCamera()
+    {
+        Vector2 lookValue = lookAction.ReadValue<Vector2>();
+
+        // Get mouse input
+        float mouseX = lookValue.x * sensitivity * Time.fixedDeltaTime;
+        float mouseY = lookValue.y * sensitivity * Time.fixedDeltaTime;
+
+        // Adjust xRotation for vertical rotation and clamp it
+        xRotation -= mouseY;
+        xRotation = Mathf.Clamp(xRotation, -90f, 90f);
+
+        // Update the Cinemachine camera's rotation
+        //cameraTransform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+
+        // Apply horizontal rotation to the player
+        transform.Rotate(Vector3.up * mouseX);
+    }
+
     void WalkAndRun()
     {
         // Sprint
@@ -132,7 +174,7 @@ public class PlayerController : MonoBehaviour
         //Debug.Log(rb.linearVelocity.magnitude);
 
         Vector2 moveValue = moveAction.ReadValue<Vector2>(); // Gets Input Values
-        Vector3 dir = new Vector3(moveValue.x, 0.0f, moveValue.y);
+        Vector3 dir = transform.forward*moveValue.y + transform.right*moveValue.x;
         rb.AddForce(dir.normalized * speed, ForceMode.Force);
     }
 
@@ -218,6 +260,23 @@ public class PlayerController : MonoBehaviour
     {
         player.Score += amount;
         view.UpdateView(player);
+    }
+    #endregion
+
+    #region "Controller Settings"
+    private void UpdateCameraSensitivity()
+    {
+        foreach (var c in cinemachineAxisCamera.Controllers)
+        {
+            if (c.Name == "Look X (Pan)")
+            {
+                c.Input.Gain *= sensitivity;
+            }
+            if (c.Name == "Look Y (Tilt)")
+            {
+                c.Input.Gain *= sensitivity;
+            }
+        }
     }
     #endregion
 }
