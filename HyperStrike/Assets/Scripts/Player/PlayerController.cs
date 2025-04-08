@@ -70,7 +70,7 @@ public class PlayerController : MonoBehaviour
         {
             cameraTransform = cinemachineCamera.LookAt; // Use the LookAt target for rotation
         }
-        UpdateCameraSensitivity();
+        
 
         // Init Physics variables
         rb = GetComponent<Rigidbody>();
@@ -121,6 +121,7 @@ public class PlayerController : MonoBehaviour
         // Crouch and Slide
         CrouchSlide();
 
+        // Jump
         if (isGrounded) Jump(Vector3.zero);
 
         //Handle Drag with the ground after all movement inputs
@@ -159,7 +160,7 @@ public class PlayerController : MonoBehaviour
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);
 
         // Update the Cinemachine camera's rotation
-        //cameraTransform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+        cameraTransform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
 
         // Apply horizontal rotation to the player
         transform.Rotate(Vector3.up * mouseX);
@@ -174,7 +175,7 @@ public class PlayerController : MonoBehaviour
         //Debug.Log(rb.linearVelocity.magnitude);
 
         Vector2 moveValue = moveAction.ReadValue<Vector2>(); // Gets Input Values
-        Vector3 dir = transform.forward*moveValue.y + transform.right*moveValue.x;
+        Vector3 dir = transform.forward * moveValue.y + transform.right * moveValue.x;
         rb.AddForce(dir.normalized * speed, ForceMode.Force);
     }
 
@@ -224,11 +225,11 @@ public class PlayerController : MonoBehaviour
     {
         Vector3[] directions = new Vector3[]
             {
-            Vector3.right,
-            Vector3.right + Vector3.forward,
-            Vector3.forward,
-            Vector3.left + Vector3.forward,
-            Vector3.left
+            transform.right,
+            transform.right + transform.forward,
+            transform.forward,
+            -transform.right + transform.forward,
+            -transform.right
             };
 
         for (int i = 0; i < directions.Length; i++)
@@ -238,7 +239,7 @@ public class PlayerController : MonoBehaviour
             if (!isGrounded && isWallRunning && moveAction.IsPressed())
             {
                 Physics.gravity = Physics.gravity / 3.0f; // Reduce gravity to stay more time in the wall but not infinite
-                rb.AddForce(Vector3.forward * sprintSpeed, ForceMode.Force);
+                rb.AddForce(transform.forward * sprintSpeed, ForceMode.Force);
                 Jump(wallHit.normal);
             }
         }
@@ -260,23 +261,6 @@ public class PlayerController : MonoBehaviour
     {
         player.Score += amount;
         view.UpdateView(player);
-    }
-    #endregion
-
-    #region "Controller Settings"
-    private void UpdateCameraSensitivity()
-    {
-        foreach (var c in cinemachineAxisCamera.Controllers)
-        {
-            if (c.Name == "Look X (Pan)")
-            {
-                c.Input.Gain *= sensitivity;
-            }
-            if (c.Name == "Look Y (Tilt)")
-            {
-                c.Input.Gain *= sensitivity;
-            }
-        }
     }
     #endregion
 }
