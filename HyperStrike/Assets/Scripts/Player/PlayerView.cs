@@ -1,11 +1,20 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 // UI Layer || Visual components display
 public class PlayerView : MonoBehaviour
 {
-    public Text scoreText;
-    public Text characterNameText;
+    [Header("UI Settings")]
+    [SerializeField] GameObject leaderboardPanel;
+
+    public TextMeshPro scoreText;
+    public TextMeshPro characterNameText;
+
+    private void Start()
+    {
+        //MatchManager.OnUpdateMatchScore += UpdateView;
+    }
 
     public void UpdateView(Player player)
     {
