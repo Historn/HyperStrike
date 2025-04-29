@@ -3233,6 +3233,7 @@ GameObject:
   - component: {fileID: 1501754048}
   - component: {fileID: 1501754051}
   - component: {fileID: 1501754049}
+  - component: {fileID: 1501754052}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -3378,6 +3379,7 @@ MonoBehaviour:
   cinemachineAxisCamera: {fileID: 0}
   isGrounded: 0
   isWallRunning: 0
+  character: {fileID: 0}
 --- !u!114 &1501754051
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3393,6 +3395,21 @@ MonoBehaviour:
   leaderboardPanel: {fileID: 0}
   scoreText: {fileID: 0}
   characterNameText: {fileID: 0}
+--- !u!114 &1501754052
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1501754042}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: faeb8f8da6afce04e96fc63f8d8dd559, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  abilitySlots:
+  - ability: {fileID: 0}
+    activationKey: 0
 --- !u!1 &1523829627
 GameObject:
   m_ObjectHideFlags: 0

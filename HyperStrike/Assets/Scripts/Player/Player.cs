@@ -1,3 +1,4 @@
+using HyperStrike;
 using UnityEngine;
 
 // CLASS FOR VARIABLES AND FUNCTIONS - NOT ACTIONS/INPUTS
@@ -10,7 +11,5 @@ public class Player
 
     // Related to match
     public int Score { get; set; }
-    public string CharacterName { get; set; }
-    //int character = CharacterType.Tank / DPS / Healer;
-    //[SerializeField] Ability[] abilities = null;
+    public Character character;
 }

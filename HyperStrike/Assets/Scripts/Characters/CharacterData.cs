@@ -15,9 +15,9 @@ namespace HyperStrike
 
         public GameObject weaponProjectile;
 
-        public Ability ability_RMB;
-        public Ability ability_LSHIFT;
-        public Ability ability_E;
-        public Ability ability_Q;
+        [Header("Character Abilities")]
+        public Ability ability1;
+        public Ability ability2;
+        public Ability ability3;
     }
 }

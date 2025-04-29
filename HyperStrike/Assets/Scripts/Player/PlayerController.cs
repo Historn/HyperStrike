@@ -1,9 +1,6 @@
-using System.Drawing;
 using Unity.Cinemachine;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
-//using Unity.Cinemachine;
 
 public class PlayerController : MonoBehaviour
 {
@@ -19,6 +16,8 @@ public class PlayerController : MonoBehaviour
     InputAction lookAction;
     InputAction jumpAction;
     InputAction attackAction;
+    InputAction ability1Action;
+    InputAction ability2Action;
     InputAction interactAction;
     InputAction crouchAction;
     InputAction sprintAction;
@@ -134,6 +133,11 @@ public class PlayerController : MonoBehaviour
         lookAction = InputSystem.actions.FindAction("Look");
         jumpAction = InputSystem.actions.FindAction("Jump");
         attackAction = InputSystem.actions.FindAction("Attack");
+        attackAction.started += _ => Shoot();
+        ability1Action = InputSystem.actions.FindAction("Attack");
+        ability1Action.started += _ => ActivateAbility(player.character.ability1);
+        ability2Action = InputSystem.actions.FindAction("Attack");
+        ability2Action.started += _ => ActivateAbility(player.character.ability2);
         interactAction = InputSystem.actions.FindAction("Interact");
         crouchAction = InputSystem.actions.FindAction("Crouch");
         sprintAction = InputSystem.actions.FindAction("Sprint");
@@ -256,7 +260,20 @@ public class PlayerController : MonoBehaviour
     }
     #endregion
 
-    #region "Data Methods"
+    #region "Attacks and Abilities"
+    void Shoot()
+    {
+        return;
+    }
+
+    void ActivateAbility(Ability ability)
+    {
+        
+    }
+
+    #endregion
+
+    #region "Player Data Visualization Methods"
     public void IncreaseScore(int amount)
     {
         player.Score += amount;
