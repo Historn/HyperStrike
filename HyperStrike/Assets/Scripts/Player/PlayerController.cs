@@ -2,6 +2,8 @@ using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+// PLAYER STATE????
+
 public class PlayerController : MonoBehaviour
 {
     Rigidbody rb;
@@ -64,6 +66,9 @@ public class PlayerController : MonoBehaviour
         player = new Player();
         view = GetComponent<PlayerView>();
 
+        player.Score = 0;
+        view.UpdateView(player);
+
         // Ensure the Cinemachine camera is set up properly
         if (cinemachineCamera != null)
         {
@@ -85,8 +90,6 @@ public class PlayerController : MonoBehaviour
         characterHeight = GetComponent<CapsuleCollider>().height;
         isWallRunning = false;
         isGrounded = false;
-
-        view.UpdateView(player);
     }
 
     private void Update()
@@ -132,12 +135,16 @@ public class PlayerController : MonoBehaviour
         moveAction = InputSystem.actions.FindAction("Move");
         lookAction = InputSystem.actions.FindAction("Look");
         jumpAction = InputSystem.actions.FindAction("Jump");
+
         attackAction = InputSystem.actions.FindAction("Attack");
         attackAction.started += _ => Shoot();
+
         ability1Action = InputSystem.actions.FindAction("Attack");
-        ability1Action.started += _ => ActivateAbility(player.character.ability1);
+        ability1Action.started += _ => ActivateAbility(player.Character.ability1);
+
         ability2Action = InputSystem.actions.FindAction("Attack");
-        ability2Action.started += _ => ActivateAbility(player.character.ability2);
+        ability2Action.started += _ => ActivateAbility(player.Character.ability2);
+
         interactAction = InputSystem.actions.FindAction("Interact");
         crouchAction = InputSystem.actions.FindAction("Crouch");
         sprintAction = InputSystem.actions.FindAction("Sprint");
@@ -268,9 +275,8 @@ public class PlayerController : MonoBehaviour
 
     void ActivateAbility(Ability ability)
     {
-        
+        return;
     }
-
     #endregion
 
     #region "Player Data Visualization Methods"

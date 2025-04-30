@@ -11,5 +11,5 @@ public class Player
 
     // Related to match
     public int Score { get; set; }
-    public Character character;
+    public Character Character;
 }

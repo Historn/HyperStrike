@@ -6,17 +6,27 @@ using TMPro;
 public class PlayerView : MonoBehaviour
 {
     [Header("UI Settings")]
-    [SerializeField] GameObject leaderboardPanel;
+    [SerializeField] private GameObject leaderboardPanel;
 
-    public TextMeshPro scoreText;
-    public TextMeshPro characterNameText;
+    [Header("UI Match Display")]
+    [SerializeField] private TextMeshProUGUI timerText;
+    [SerializeField] private TextMeshProUGUI localScoreText;
+    [SerializeField] private TextMeshProUGUI visitantScoreText;
+
+    public TextMeshProUGUI scoreText;
+    public TextMeshProUGUI characterNameText;
 
     private void Start()
     {
-        //MatchManager.OnUpdateMatchScore += UpdateView;
+        MatchManager.Instance.OnUpdateMatchScore += UpdateView;
     }
 
     public void UpdateView(Player player)
+    {
+        //scoreText.text = "Score: " + player.Score;
+        //characterNameText.text = "Character: " + player.CharacterName;
+    }
+    public void UpdateView()
     {
         //scoreText.text = "Score: " + player.Score;
         //characterNameText.text = "Character: " + player.CharacterName;
