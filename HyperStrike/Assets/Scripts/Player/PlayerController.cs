@@ -1,6 +1,8 @@
+using HyperStrike;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Timeline;
 
 // PLAYER STATE????
 
@@ -11,6 +13,7 @@ public class PlayerController : MonoBehaviour
     #region "Model-View Player"
     private Player player;
     private PlayerView view;
+    public Character characterSO;
     #endregion
 
     #region "Movement Inputs"
@@ -57,6 +60,12 @@ public class PlayerController : MonoBehaviour
 
     #endregion
 
+    #region "Attack Variables"
+
+    private bool shootReady;
+
+    #endregion
+
     private void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
@@ -64,6 +73,7 @@ public class PlayerController : MonoBehaviour
 
         // Init Player MVC
         player = new Player();
+        player.Character = characterSO;
         view = GetComponent<PlayerView>();
 
         player.Score = 0;
@@ -90,6 +100,9 @@ public class PlayerController : MonoBehaviour
         characterHeight = GetComponent<CapsuleCollider>().height;
         isWallRunning = false;
         isGrounded = false;
+
+        // Init Attack Variables
+        shootReady = true;
     }
 
     private void Update()
@@ -139,11 +152,11 @@ public class PlayerController : MonoBehaviour
         attackAction = InputSystem.actions.FindAction("Attack");
         attackAction.started += _ => Shoot();
 
-        ability1Action = InputSystem.actions.FindAction("Attack");
-        ability1Action.started += _ => ActivateAbility(player.Character.ability1);
+        //ability1Action = InputSystem.actions.FindAction("Attack");
+        //ability1Action.started += _ => ActivateAbility(player.Character.ability1);
 
-        ability2Action = InputSystem.actions.FindAction("Attack");
-        ability2Action.started += _ => ActivateAbility(player.Character.ability2);
+        //ability2Action = InputSystem.actions.FindAction("Attack");
+        //ability2Action.started += _ => ActivateAbility(player.Character.ability2);
 
         interactAction = InputSystem.actions.FindAction("Interact");
         crouchAction = InputSystem.actions.FindAction("Crouch");
@@ -270,7 +283,19 @@ public class PlayerController : MonoBehaviour
     #region "Attacks and Abilities"
     void Shoot()
     {
-        return;
+        if (shootReady && (player.Character.projectileSpawnOffset != null && player.Character.projectilePrefab != null))
+        {
+            shootReady = false;
+
+            GameObject projectileGO = Instantiate(player.Character.projectilePrefab, player.Character.projectileSpawnOffset.position + cameraTransform.forward * player.Character.shootOffset, cameraTransform.rotation);
+
+            Invoke(nameof(ResetShoot), player.Character.shootCooldown);    //Delay for attack to reset
+        }
+    }
+
+    void ResetShoot()
+    {
+        shootReady = true;
     }
 
     void ActivateAbility(Ability ability)

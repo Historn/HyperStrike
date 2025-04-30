@@ -21,7 +21,7 @@ public class MatchManager : MonoBehaviour
 
     public Action OnUpdateMatchScore;
 
-    MatchState matchState;
+    [SerializeField] private MatchState matchState;
 
     private IEnumerator waitTimerCoroutine;
     private IEnumerator matchTimerCoroutine;

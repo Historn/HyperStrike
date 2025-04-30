@@ -35,7 +35,7 @@ namespace HyperStrike
 #endif
         }
 
-        private GameState gameState = GameState.MENU;
+        [SerializeField] private GameState gameState = GameState.MENU;
 
         void GameStateBehavior()
         {
@@ -45,6 +45,7 @@ namespace HyperStrike
                     gameState = GameState.TITLE;
                     break;
                 case GameState.TITLE:
+                    SceneManager.LoadScene("Title");
                     // Execute intro?
                     // After all finished->Press Enter or A in controller to go to main menu?
                     break;
