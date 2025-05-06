@@ -15,7 +15,6 @@ namespace HyperStrike
 
         [Header("Character Shoot Attack")]
         public GameObject projectilePrefab;
-        public Transform projectileSpawnOffset;
         public float shootCooldown;
         public float shootOffset; // Forward offset for the projectile spawn
 

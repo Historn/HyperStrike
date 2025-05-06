@@ -31,15 +31,15 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #region "Movement Variables"
-    float movementSpeed = 20.0f;
-    float sprintSpeed = 30.0f;
-
     [Header("Cinemachine Settings")]
     public CinemachineCamera cinemachineCamera; // Reference to the Cinemachine virtual camera
     public CinemachineInputAxisController cinemachineAxisCamera; // Reference to the Cinemachine virtual camera
     private Transform cameraTransform; // The transform of the Cinemachine camera's LookAt target
     float sensitivity = 5.0f;
     float xRotation;
+
+    float movementSpeed = 20.0f;
+    float sprintSpeed = 30.0f;
 
     // Jump Vars
     bool readyToJump;
@@ -61,7 +61,8 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #region "Attack Variables"
-
+    [Header("Shooting Variables")]
+    public Transform projectileSpawnOffset;
     private bool shootReady;
 
     #endregion
@@ -285,11 +286,11 @@ public class PlayerController : MonoBehaviour
     #region "Attacks and Abilities"
     void Shoot()
     {
-        if (shootReady && player.Character != null && (player.Character.projectileSpawnOffset != null && player.Character.projectilePrefab != null))
+        if (shootReady && player.Character != null && (projectileSpawnOffset != null && player.Character.projectilePrefab != null))
         {
             shootReady = false;
 
-            GameObject projectileGO = Instantiate(player.Character.projectilePrefab, player.Character.projectileSpawnOffset.position + cameraTransform.forward * player.Character.shootOffset, cameraTransform.rotation);
+            GameObject projectileGO = Instantiate(player.Character.projectilePrefab, projectileSpawnOffset.position + cameraTransform.forward * player.Character.shootOffset, cameraTransform.rotation);
 
             Invoke(nameof(ResetShoot), player.Character.shootCooldown);    //Delay for attack to reset
         }
