@@ -23,11 +23,11 @@ public abstract class Ability : ScriptableObject
     public bool isReady { get; private set; }
 
     // Core methods that each ability will implement
-    public abstract bool CanUseAbility(AbilityUser user);
-    public abstract void InitiateAbility(AbilityUser user);
-    public abstract void ExecuteAbility(AbilityUser user);
-    public abstract void EndAbility(AbilityUser user);
+    public abstract bool CanUseAbility(AbilityHolder user);
+    public abstract void InitiateAbility(AbilityHolder user);
+    public abstract void ExecuteAbility(AbilityHolder user);
+    public abstract void EndAbility(AbilityHolder user);
 
     // Optional override for ability update logic (continuous effects)
-    public virtual void UpdateAbility(AbilityUser user) { }
+    public virtual void UpdateAbility(AbilityHolder user) { }
 }

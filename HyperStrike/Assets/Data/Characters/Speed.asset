@@ -19,7 +19,7 @@ MonoBehaviour:
   projectilePrefab: {fileID: 4480140288178342511, guid: 4bb923ba4b889c64da67ffff59974caa, type: 3}
   projectileSpawnOffset: {fileID: 6794479477638587342, guid: 4bb923ba4b889c64da67ffff59974caa, type: 3}
   shootCooldown: 0.5
-  shootOffset: 0.2
+  shootOffset: 0.5
   ability1: {fileID: 11400000, guid: c63efe8cb4f7fb8489cb63f4eca8c40f, type: 2}
   ability2: {fileID: 11400000, guid: c63efe8cb4f7fb8489cb63f4eca8c40f, type: 2}
   ability3: {fileID: 11400000, guid: c63efe8cb4f7fb8489cb63f4eca8c40f, type: 2}

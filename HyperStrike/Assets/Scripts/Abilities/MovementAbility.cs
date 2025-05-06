@@ -13,27 +13,27 @@ public class MovementAbility : Ability
     private Vector3 dashDirection;
     private float dashProgress;
 
-    public override bool CanUseAbility(AbilityUser user)
+    public override bool CanUseAbility(AbilityHolder user)
     {
         // Check for obstacles, valid direction, etc.
         // Could trace the path to ensure it's valid
         return true;
     }
 
-    public override void InitiateAbility(AbilityUser user)
+    public override void InitiateAbility(AbilityHolder user)
     {
         // Store the direction to dash in
         dashDirection = user.transform.forward;
         dashProgress = 0f;
     }
 
-    public override void ExecuteAbility(AbilityUser user)
+    public override void ExecuteAbility(AbilityHolder user)
     {
         // This will be called if it's an instant ability,
         // but for movement, we usually want to use UpdateAbility
     }
 
-    public override void UpdateAbility(AbilityUser user)
+    public override void UpdateAbility(AbilityHolder user)
     {
         // Move the character over time during cast time
         CharacterController controller = user.GetComponent<CharacterController>();
@@ -67,7 +67,7 @@ public class MovementAbility : Ability
         }
     }
 
-    public override void EndAbility(AbilityUser user)
+    public override void EndAbility(AbilityHolder user)
     {
         // Apply ending effects, momentum reduction, etc.
     }

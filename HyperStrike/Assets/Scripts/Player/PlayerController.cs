@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviour
     #region "Model-View Player"
     private Player player;
     private PlayerView view;
-    public Character characterSO;
+    public Character characterData;
     #endregion
 
     #region "Movement Inputs"
@@ -73,7 +73,7 @@ public class PlayerController : MonoBehaviour
 
         // Init Player MVC
         player = new Player();
-        player.Character = characterSO;
+        player.Character = characterData;
         view = GetComponent<PlayerView>();
 
         player.Score = 0;
@@ -152,7 +152,7 @@ public class PlayerController : MonoBehaviour
         attackAction = InputSystem.actions.FindAction("Attack");
         attackAction.started += _ => Shoot();
 
-        //ability1Action = InputSystem.actions.FindAction("Attack");
+        //ability1Action = InputSystem.actions.FindAction("Ability1");
         //ability1Action.started += _ => ActivateAbility(player.Character.ability1);
 
         //ability2Action = InputSystem.actions.FindAction("Attack");
@@ -167,6 +167,8 @@ public class PlayerController : MonoBehaviour
 
     void DebugMovement()
     {
+        // SHOW RAYCASTS
+        // SHOW SPEED AND OTHER MOVEMENT STATS
         return;
     }
 
@@ -283,7 +285,7 @@ public class PlayerController : MonoBehaviour
     #region "Attacks and Abilities"
     void Shoot()
     {
-        if (shootReady && (player.Character.projectileSpawnOffset != null && player.Character.projectilePrefab != null))
+        if (shootReady && player.Character != null && (player.Character.projectileSpawnOffset != null && player.Character.projectilePrefab != null))
         {
             shootReady = false;
 

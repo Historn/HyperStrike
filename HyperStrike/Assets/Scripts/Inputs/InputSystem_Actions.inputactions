@@ -87,7 +87,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Activate Ability 1",
+                    "name": "Ability1",
                     "type": "Button",
                     "id": "c34fc22e-77c4-434e-a672-c4248543811c",
                     "expectedControlType": "",
@@ -96,7 +96,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Activate Ultimate",
+                    "name": "Ultimate",
                     "type": "Button",
                     "id": "88871cdf-5872-49a3-90a2-0d657147f231",
                     "expectedControlType": "",
@@ -328,17 +328,6 @@
                 },
                 {
                     "name": "",
-                    "id": "b3c1c7f0-bd20-4ee7-a0f1-899b24bca6d7",
-                    "path": "<Keyboard>/enter",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard&Mouse",
-                    "action": "Attack",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "cbac6039-9c09-46a1-b5f2-4e5124ccb5ed",
                     "path": "<Keyboard>/2",
                     "interactions": "",
@@ -498,7 +487,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "Activate Ability 1",
+                    "action": "Ability1",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -509,7 +498,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Activate Ability 1",
+                    "action": "Ability1",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -520,7 +509,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "Activate Ultimate",
+                    "action": "Ultimate",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -531,7 +520,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Activate Ultimate",
+                    "action": "Ultimate",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

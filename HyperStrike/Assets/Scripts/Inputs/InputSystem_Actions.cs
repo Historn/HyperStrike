@@ -173,7 +173,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Activate Ability 1"",
+                    ""name"": ""Ability1"",
                     ""type"": ""Button"",
                     ""id"": ""c34fc22e-77c4-434e-a672-c4248543811c"",
                     ""expectedControlType"": """",
@@ -182,7 +182,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Activate Ultimate"",
+                    ""name"": ""Ultimate"",
                     ""type"": ""Button"",
                     ""id"": ""88871cdf-5872-49a3-90a2-0d657147f231"",
                     ""expectedControlType"": """",
@@ -414,17 +414,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""b3c1c7f0-bd20-4ee7-a0f1-899b24bca6d7"",
-                    ""path"": ""<Keyboard>/enter"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Attack"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
                     ""id"": ""cbac6039-9c09-46a1-b5f2-4e5124ccb5ed"",
                     ""path"": ""<Keyboard>/2"",
                     ""interactions"": """",
@@ -584,7 +573,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""Activate Ability 1"",
+                    ""action"": ""Ability1"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -595,7 +584,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Activate Ability 1"",
+                    ""action"": ""Ability1"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -606,7 +595,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""Activate Ultimate"",
+                    ""action"": ""Ultimate"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -617,7 +606,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Activate Ultimate"",
+                    ""action"": ""Ultimate"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1214,8 +1203,8 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Player_Previous = m_Player.FindAction("Previous", throwIfNotFound: true);
         m_Player_Next = m_Player.FindAction("Next", throwIfNotFound: true);
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
-        m_Player_ActivateAbility1 = m_Player.FindAction("Activate Ability 1", throwIfNotFound: true);
-        m_Player_ActivateUltimate = m_Player.FindAction("Activate Ultimate", throwIfNotFound: true);
+        m_Player_Ability1 = m_Player.FindAction("Ability1", throwIfNotFound: true);
+        m_Player_Ultimate = m_Player.FindAction("Ultimate", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1318,8 +1307,8 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Previous;
     private readonly InputAction m_Player_Next;
     private readonly InputAction m_Player_Sprint;
-    private readonly InputAction m_Player_ActivateAbility1;
-    private readonly InputAction m_Player_ActivateUltimate;
+    private readonly InputAction m_Player_Ability1;
+    private readonly InputAction m_Player_Ultimate;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1368,13 +1357,13 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @Sprint => m_Wrapper.m_Player_Sprint;
         /// <summary>
-        /// Provides access to the underlying input action "Player/ActivateAbility1".
+        /// Provides access to the underlying input action "Player/Ability1".
         /// </summary>
-        public InputAction @ActivateAbility1 => m_Wrapper.m_Player_ActivateAbility1;
+        public InputAction @Ability1 => m_Wrapper.m_Player_Ability1;
         /// <summary>
-        /// Provides access to the underlying input action "Player/ActivateUltimate".
+        /// Provides access to the underlying input action "Player/Ultimate".
         /// </summary>
-        public InputAction @ActivateUltimate => m_Wrapper.m_Player_ActivateUltimate;
+        public InputAction @Ultimate => m_Wrapper.m_Player_Ultimate;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1428,12 +1417,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Sprint.started += instance.OnSprint;
             @Sprint.performed += instance.OnSprint;
             @Sprint.canceled += instance.OnSprint;
-            @ActivateAbility1.started += instance.OnActivateAbility1;
-            @ActivateAbility1.performed += instance.OnActivateAbility1;
-            @ActivateAbility1.canceled += instance.OnActivateAbility1;
-            @ActivateUltimate.started += instance.OnActivateUltimate;
-            @ActivateUltimate.performed += instance.OnActivateUltimate;
-            @ActivateUltimate.canceled += instance.OnActivateUltimate;
+            @Ability1.started += instance.OnAbility1;
+            @Ability1.performed += instance.OnAbility1;
+            @Ability1.canceled += instance.OnAbility1;
+            @Ultimate.started += instance.OnUltimate;
+            @Ultimate.performed += instance.OnUltimate;
+            @Ultimate.canceled += instance.OnUltimate;
         }
 
         /// <summary>
@@ -1472,12 +1461,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Sprint.started -= instance.OnSprint;
             @Sprint.performed -= instance.OnSprint;
             @Sprint.canceled -= instance.OnSprint;
-            @ActivateAbility1.started -= instance.OnActivateAbility1;
-            @ActivateAbility1.performed -= instance.OnActivateAbility1;
-            @ActivateAbility1.canceled -= instance.OnActivateAbility1;
-            @ActivateUltimate.started -= instance.OnActivateUltimate;
-            @ActivateUltimate.performed -= instance.OnActivateUltimate;
-            @ActivateUltimate.canceled -= instance.OnActivateUltimate;
+            @Ability1.started -= instance.OnAbility1;
+            @Ability1.performed -= instance.OnAbility1;
+            @Ability1.canceled -= instance.OnAbility1;
+            @Ultimate.started -= instance.OnUltimate;
+            @Ultimate.performed -= instance.OnUltimate;
+            @Ultimate.canceled -= instance.OnUltimate;
         }
 
         /// <summary>
@@ -1842,19 +1831,19 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnSprint(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "Activate Ability 1" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "Ability1" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnActivateAbility1(InputAction.CallbackContext context);
+        void OnAbility1(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "Activate Ultimate" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "Ultimate" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnActivateUltimate(InputAction.CallbackContext context);
+        void OnUltimate(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

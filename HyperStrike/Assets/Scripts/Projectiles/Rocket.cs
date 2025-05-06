@@ -36,7 +36,6 @@ public class Rocket : Projectile
         if (other != null)
         {
             SpawnParticles(explosionFX, 3f, true, other);
-            //if (NetworkManager.Instance.nm_IsHost) Explode(other);
             Explode(other);
             Destroy(gameObject);
         }
@@ -60,10 +59,10 @@ public class Rocket : Projectile
 
                 rb.AddForce(dir.normalized * explosionForce, ForceMode.Impulse);
             }
-            if (collider.CompareTag("Ball"))
-            {
-                //collider.GetComponent<BallController>().Packet.LastHitPlayerId = Packet.ShooterId;
-            }
+            //if (collider.CompareTag("Ball"))
+            //{
+            //    //collider.GetComponent<BallController>().Packet.LastHitPlayerId = Packet.ShooterId;
+            //}
         }
     }
 

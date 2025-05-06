@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class AbilityUser : MonoBehaviour
+public class AbilityHolder : MonoBehaviour
 {
     [SerializeField] private List<AbilitySlot> abilitySlots = new List<AbilitySlot>();
 
