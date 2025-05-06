@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d8b07d2e65637e4899ad7f00722b1a5, type: 3}
+  m_Name: Speed
+  m_EditorClassIdentifier: 
+  characterName: Speed
+  health: 100
+  speed: 50
+  basicDamage: 1
+  projectilePrefab: {fileID: 4480140288178342511, guid: 4bb923ba4b889c64da67ffff59974caa, type: 3}
+  projectileSpawnOffset: {fileID: 6794479477638587342, guid: 4bb923ba4b889c64da67ffff59974caa, type: 3}
+  shootCooldown: 0.5
+  shootOffset: 0.5
+  ability1: {fileID: 11400000, guid: c63efe8cb4f7fb8489cb63f4eca8c40f, type: 2}
+  ability2: {fileID: 11400000, guid: c63efe8cb4f7fb8489cb63f4eca8c40f, type: 2}
+  ability3: {fileID: 11400000, guid: c63efe8cb4f7fb8489cb63f4eca8c40f, type: 2}

@@ -1,9 +1,10 @@
-using System.Drawing;
+using HyperStrike;
 using Unity.Cinemachine;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
-//using Unity.Cinemachine;
+using UnityEngine.Timeline;
+
+// PLAYER STATE????
 
 public class PlayerController : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class PlayerController : MonoBehaviour
     #region "Model-View Player"
     private Player player;
     private PlayerView view;
+    public Character characterData;
     #endregion
 
     #region "Movement Inputs"
@@ -19,6 +21,8 @@ public class PlayerController : MonoBehaviour
     InputAction lookAction;
     InputAction jumpAction;
     InputAction attackAction;
+    InputAction ability1Action;
+    InputAction ability2Action;
     InputAction interactAction;
     InputAction crouchAction;
     InputAction sprintAction;
@@ -56,6 +60,12 @@ public class PlayerController : MonoBehaviour
 
     #endregion
 
+    #region "Attack Variables"
+
+    private bool shootReady;
+
+    #endregion
+
     private void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
@@ -63,7 +73,11 @@ public class PlayerController : MonoBehaviour
 
         // Init Player MVC
         player = new Player();
+        player.Character = characterData;
         view = GetComponent<PlayerView>();
+
+        player.Score = 0;
+        view.UpdateView(player);
 
         // Ensure the Cinemachine camera is set up properly
         if (cinemachineCamera != null)
@@ -87,7 +101,8 @@ public class PlayerController : MonoBehaviour
         isWallRunning = false;
         isGrounded = false;
 
-        view.UpdateView(player);
+        // Init Attack Variables
+        shootReady = true;
     }
 
     private void Update()
@@ -133,7 +148,16 @@ public class PlayerController : MonoBehaviour
         moveAction = InputSystem.actions.FindAction("Move");
         lookAction = InputSystem.actions.FindAction("Look");
         jumpAction = InputSystem.actions.FindAction("Jump");
+
         attackAction = InputSystem.actions.FindAction("Attack");
+        attackAction.started += _ => Shoot();
+
+        //ability1Action = InputSystem.actions.FindAction("Ability1");
+        //ability1Action.started += _ => ActivateAbility(player.Character.ability1);
+
+        //ability2Action = InputSystem.actions.FindAction("Attack");
+        //ability2Action.started += _ => ActivateAbility(player.Character.ability2);
+
         interactAction = InputSystem.actions.FindAction("Interact");
         crouchAction = InputSystem.actions.FindAction("Crouch");
         sprintAction = InputSystem.actions.FindAction("Sprint");
@@ -143,6 +167,8 @@ public class PlayerController : MonoBehaviour
 
     void DebugMovement()
     {
+        // SHOW RAYCASTS
+        // SHOW SPEED AND OTHER MOVEMENT STATS
         return;
     }
 
@@ -256,7 +282,31 @@ public class PlayerController : MonoBehaviour
     }
     #endregion
 
-    #region "Data Methods"
+    #region "Attacks and Abilities"
+    void Shoot()
+    {
+        if (shootReady && player.Character != null && (player.Character.projectileSpawnOffset != null && player.Character.projectilePrefab != null))
+        {
+            shootReady = false;
+
+            GameObject projectileGO = Instantiate(player.Character.projectilePrefab, player.Character.projectileSpawnOffset.position + cameraTransform.forward * player.Character.shootOffset, cameraTransform.rotation);
+
+            Invoke(nameof(ResetShoot), player.Character.shootCooldown);    //Delay for attack to reset
+        }
+    }
+
+    void ResetShoot()
+    {
+        shootReady = true;
+    }
+
+    void ActivateAbility(Ability ability)
+    {
+        return;
+    }
+    #endregion
+
+    #region "Player Data Visualization Methods"
     public void IncreaseScore(int amount)
     {
         player.Score += amount;

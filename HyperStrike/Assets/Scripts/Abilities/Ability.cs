@@ -2,101 +2,32 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-enum AbilityType
-{
-    ACTIVE,
-    PASSIVE,
-    ULTIMATE
-}
-
-enum EffectType
-{
-    AREA,
-    PROJECTILE,
-    RAYSHOT,
-    TARGETED,
-    MOVEMENT
-}
-
-enum CastType
-{
-    CHANNELED,
-    UNSTOPPABLE,
-}
-
-[CreateAssetMenu(fileName = "New Character", menuName = "HyperStrike/Character Data")]
+//[CreateAssetMenu(fileName = "New Ability", menuName = "HyperStrike/Ability Data")]
 public abstract class Ability : ScriptableObject
 {
+    [Header("Basic Info")]
     public string abilityName;
-    public float damage;
-    public float cooldownDuration = 5f;
-    public float castTime = 0f;    // Time to cast the ability
-    public float duration = 0f;    // Time the ability lasts, if applicable
-    public bool isReady = true;    // Ability is ready when not on cooldown
-    protected float cooldownTimer = 0f; // Timer to track cooldown
-    AbilityType abilityType;
-    EffectType effectType;
-    CastType castType;
+    public Sprite abilityIcon;
+    public string description;
 
-    // This method is called to trigger the ability
-    public void UseAbility()
-    {
-        //if (isReady)
-        //{
-        //    StartCoroutine(CastAbility());
-        //}
-        //else
-        //{
-        //    Debug.Log(abilityName + " is on cooldown.");
-        //}
-    }
+    [Header("Timing")]
+    public float cooldownDuration;
+    private float cooldownTimer;
+    public float castTime;
+    public float duration;
+    public bool canMoveWhileCasting;
 
-    // Cast the ability, with optional delay for castTime
-    protected virtual IEnumerator CastAbility()
-    {
-        if (castTime > 0f)
-        {
-            Debug.Log("Casting " + abilityName + " for " + castTime + " seconds.");
-            yield return new WaitForSeconds(castTime);
-        }
+    [Header("Resources")]
+    public float energyCost;
+    
+    public bool isReady { get; private set; }
 
-        // Perform the actual ability logic
-        ActivateAbility();
+    // Core methods that each ability will implement
+    public abstract bool CanUseAbility(AbilityHolder user);
+    public abstract void InitiateAbility(AbilityHolder user);
+    public abstract void ExecuteAbility(AbilityHolder user);
+    public abstract void EndAbility(AbilityHolder user);
 
-        // Start the cooldown after use
-        StartCooldown();
-    }
-
-    // Ability logic is defined in derived classes
-    protected abstract void ActivateAbility();
-
-    // Cooldown management
-    private void StartCooldown()
-    {
-        isReady = false;
-        cooldownTimer = cooldownDuration;
-        //StartCoroutine(CooldownCoroutine());
-    }
-
-    private IEnumerator CooldownCoroutine()
-    {
-        while (cooldownTimer > 0f)
-        {
-            cooldownTimer -= Time.deltaTime;
-            yield return null;
-        }
-        isReady = true;
-        Debug.Log(abilityName + " is ready again.");
-    }
-
-    // UI-related methods to check ability readiness or display cooldown timers
-    public float GetCooldownRemaining()
-    {
-        return Mathf.Max(0f, cooldownTimer);
-    }
-
-    public bool IsAbilityReady()
-    {
-        return isReady;
-    }
+    // Optional override for ability update logic (continuous effects)
+    public virtual void UpdateAbility(AbilityHolder user) { }
 }
