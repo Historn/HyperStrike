@@ -52,11 +52,14 @@ public class PlayerController : MonoBehaviour
     LayerMask groundMask;
     [SerializeField] bool isGrounded;
     float groundDrag = 0.25f;
+    float wallDrag = 0.2f;
 
     // Wall run
     [SerializeField] bool isWallRunning;
     RaycastHit wallHit;
     float angleRoll = 25.0f; // Var to rotate camera while wallrunning
+
+    Vector3 grav;
 
     #endregion
 
@@ -104,6 +107,8 @@ public class PlayerController : MonoBehaviour
 
         // Init Attack Variables
         shootReady = true;
+
+        grav = Physics.gravity;
     }
 
     private void Update()
@@ -118,6 +123,9 @@ public class PlayerController : MonoBehaviour
     // Physics-based + Rigidbody Actions
     private void FixedUpdate()
     {
+        // Set it to avoid flying bugs
+        Physics.gravity = grav;
+
         //Ground Check
         float dist = characterHeight * 0.5f + 0.1f;
         Vector3 endRayPos = new Vector3(transform.position.x, transform.position.y - dist, transform.position.z);
@@ -139,9 +147,6 @@ public class PlayerController : MonoBehaviour
 
         // Jump
         if (isGrounded) Jump(Vector3.zero);
-
-        //Handle Drag with the ground after all movement inputs
-        HandleDrag();
     }
 
     void InitInputs()
@@ -272,14 +277,6 @@ public class PlayerController : MonoBehaviour
         }
 
         // Rotate camera a bit on the z-axis
-    }
-
-    void HandleDrag()
-    {
-        if (isGrounded)
-            rb.linearDamping = groundDrag;
-        else
-            rb.linearDamping = 0;
     }
     #endregion
 

@@ -18,7 +18,8 @@ public class PlayerView : MonoBehaviour
 
     private void Start()
     {
-        MatchManager.Instance.OnUpdateMatchScore += UpdateView;
+        if (MatchManager.Instance != null)
+            MatchManager.Instance.OnUpdateMatchScore += UpdateView;
     }
 
     public void UpdateView(Player player)

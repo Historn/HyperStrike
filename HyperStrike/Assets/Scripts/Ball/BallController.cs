@@ -68,12 +68,4 @@ public class BallController : MonoBehaviour
     {
         return;
     }
-
-    void HandleDrag()
-    {
-        if (isGrounded)
-            rb.linearDamping = groundDrag;
-        else
-            rb.linearDamping = 0;
-    }
 }
