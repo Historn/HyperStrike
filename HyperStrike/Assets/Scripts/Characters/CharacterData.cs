@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.Playables;
 using UnityEngine;
 
 namespace HyperStrike
@@ -12,7 +9,6 @@ namespace HyperStrike
         public int health;
         public float speed;
         public float sprintSpeed;
-        public float basicDamage;
 
         [Header("Character Shoot Attack")]
         public GameObject projectilePrefab;

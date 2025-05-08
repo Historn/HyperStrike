@@ -56,7 +56,7 @@ public class PlayerController : MonoBehaviour
     RaycastHit wallHit;
     float angleRoll = 25.0f; // Var to rotate camera while wallrunning
 
-    Vector3 grav;
+    Vector3 gravity;
 
     #endregion
 
@@ -105,7 +105,7 @@ public class PlayerController : MonoBehaviour
         // Init Attack Variables
         shootReady = true;
 
-        grav = Physics.gravity;
+        gravity = Physics.gravity;
     }
 
     private void Update()
@@ -121,7 +121,7 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         // Set it to avoid flying bugs
-        Physics.gravity = grav;
+        Physics.gravity = gravity;
 
         //Ground Check
         float dist = characterHeight * 0.5f + 0.1f;
@@ -143,7 +143,7 @@ public class PlayerController : MonoBehaviour
         CrouchSlide();
 
         // Jump
-        if (isGrounded) Jump(Vector3.zero);
+        if (isGrounded && !isWallRunning) Jump(Vector3.zero);
     }
 
     void InitInputs()
@@ -205,7 +205,7 @@ public class PlayerController : MonoBehaviour
 
         Vector2 moveValue = moveAction.ReadValue<Vector2>(); // Gets Input Values
         Vector3 dir = transform.forward * moveValue.y + transform.right * moveValue.x;
-        rb.AddForce(dir.normalized * speed, ForceMode.Force);
+        if (!isWallRunning) rb.AddForce(dir.normalized * speed, ForceMode.Force);
     }
 
     void CrouchSlide()
@@ -267,9 +267,10 @@ public class PlayerController : MonoBehaviour
             isWallRunning = Physics.Raycast(transform.position, directions[i], out wallHit, transform.localScale.x + 0.15f);
             if (!isGrounded && isWallRunning && moveAction.IsPressed())
             {
-                Physics.gravity = Physics.gravity / 3.0f; // Reduce gravity to stay more time in the wall but not infinite
+                Physics.gravity = Physics.gravity / 2.0f; // Reduce gravity to stay more time in the wall but not infinite
                 rb.AddForce(transform.forward * player.Character.sprintSpeed, ForceMode.Force);
                 Jump(wallHit.normal);
+                break;
             }
         }
 

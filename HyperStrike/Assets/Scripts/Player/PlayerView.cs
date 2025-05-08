@@ -5,16 +5,16 @@ using TMPro;
 // UI Layer || Visual components display
 public class PlayerView : MonoBehaviour
 {
-    [Header("UI Settings")]
+    [Header("UI Leaderboard")]
     [SerializeField] private GameObject leaderboardPanel;
+    public TextMeshProUGUI scoreText;
+    public TextMeshProUGUI characterNameText;
 
     [Header("UI Match Display")]
     [SerializeField] private TextMeshProUGUI timerText;
     [SerializeField] private TextMeshProUGUI localScoreText;
     [SerializeField] private TextMeshProUGUI visitantScoreText;
 
-    public TextMeshProUGUI scoreText;
-    public TextMeshProUGUI characterNameText;
 
     private void Start()
     {
@@ -29,7 +29,12 @@ public class PlayerView : MonoBehaviour
     }
     public void UpdateView()
     {
-        //scoreText.text = "Score: " + player.Score;
-        //characterNameText.text = "Character: " + player.CharacterName;
+        localScoreText.text = MatchManager.Instance.localGoals.ToString();
+        visitantScoreText.text = MatchManager.Instance.visitantGoals.ToString();
+    }
+
+    public void UpdateLeaderboard()
+    {
+
     }
 }
