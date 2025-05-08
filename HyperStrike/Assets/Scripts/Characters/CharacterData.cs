@@ -11,6 +11,7 @@ namespace HyperStrike
         public string characterName;
         public int health;
         public float speed;
+        public float sprintSpeed;
         public float basicDamage;
 
         [Header("Character Shoot Attack")]

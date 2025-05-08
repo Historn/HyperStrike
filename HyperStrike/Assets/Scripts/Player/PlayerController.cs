@@ -38,9 +38,6 @@ public class PlayerController : MonoBehaviour
     float sensitivity = 5.0f;
     float xRotation;
 
-    float movementSpeed = 20.0f;
-    float sprintSpeed = 30.0f;
-
     // Jump Vars
     bool readyToJump;
     float jumpCooldown = 0.0f;
@@ -201,8 +198,8 @@ public class PlayerController : MonoBehaviour
     void WalkAndRun()
     {
         // Sprint
-        float speed = movementSpeed;
-        if (sprintAction.IsPressed() && isGrounded) speed = sprintSpeed;
+        float speed = player.Character.speed;
+        if (sprintAction.IsPressed() && isGrounded) speed = player.Character.sprintSpeed;
         //Debug.Log(speed);
         //Debug.Log(rb.linearVelocity.magnitude);
 
@@ -271,7 +268,7 @@ public class PlayerController : MonoBehaviour
             if (!isGrounded && isWallRunning && moveAction.IsPressed())
             {
                 Physics.gravity = Physics.gravity / 3.0f; // Reduce gravity to stay more time in the wall but not infinite
-                rb.AddForce(transform.forward * sprintSpeed, ForceMode.Force);
+                rb.AddForce(transform.forward * player.Character.sprintSpeed, ForceMode.Force);
                 Jump(wallHit.normal);
             }
         }
@@ -303,6 +300,16 @@ public class PlayerController : MonoBehaviour
         return;
     }
     #endregion
+
+    private void OnCollisionEnter(Collision other)
+    {
+        if (other != null && other.gameObject.CompareTag("Bouncer"))
+        {
+            Vector3 dir = rb.position - other.transform.position;
+
+            rb.AddForce(dir.normalized * 100f, ForceMode.Impulse);
+        }
+    }
 
     #region "Player Data Visualization Methods"
     public void IncreaseScore(int amount)
