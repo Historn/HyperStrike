@@ -24,7 +24,7 @@ public class PlayerController : MonoBehaviour
     InputAction ability1Action;
     InputAction ability2Action;
     InputAction interactAction;
-    InputAction crouchAction;
+    InputAction slideAction;
     InputAction sprintAction;
     InputAction previousAction;
     InputAction nextAction;
@@ -90,7 +90,7 @@ public class PlayerController : MonoBehaviour
         // Init Physics variables
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
-        rb.maxLinearVelocity = 15.0f;
+        rb.maxLinearVelocity = player.Character.maxSpeed;
 
         // Init Inputs
         InitInputs();
@@ -139,8 +139,7 @@ public class PlayerController : MonoBehaviour
 
         WallRun();
 
-        // Crouch and Slide
-        CrouchSlide();
+        Slide();
 
         // Jump
         if (isGrounded && !isWallRunning) Jump(Vector3.zero);
@@ -162,7 +161,7 @@ public class PlayerController : MonoBehaviour
         //ability2Action.started += _ => ActivateAbility(player.Character.ability2);
 
         interactAction = InputSystem.actions.FindAction("Interact");
-        crouchAction = InputSystem.actions.FindAction("Crouch");
+        slideAction = InputSystem.actions.FindAction("Crouch");
         sprintAction = InputSystem.actions.FindAction("Sprint");
         previousAction = InputSystem.actions.FindAction("Previous");
         nextAction = InputSystem.actions.FindAction("Next");
@@ -208,25 +207,19 @@ public class PlayerController : MonoBehaviour
         if (!isWallRunning) rb.AddForce(dir.normalized * speed, ForceMode.Force);
     }
 
-    void CrouchSlide()
+    void Slide()
     {
-        // Set scale to (transform.position.y * 0.5f)
-        // If running + crouch --> Slide --> Higher velocity? or less drag
-        if (crouchAction.IsPressed())
+        if (slideAction.IsPressed())
         {
-            Vector3 crouchedScale = Vector3.one * 0.5f;
-            transform.localScale = crouchedScale;
-            //Activate Crouch Anim
+            rb.maxLinearVelocity = player.Character.maxSlidingSpeed;
+            rb.linearDamping = 0.1f;
+            transform.localScale = Vector3.one * 0.75f;
 
-
-            if (sprintAction.IsPressed())
-            {
-                // Activate Sliding Anim
-                // Higher speed
-            }
         }
         else
         {
+            rb.maxLinearVelocity = player.Character.maxSpeed;
+            rb.linearDamping = 0.2f;
             transform.localScale = Vector3.one;
         }
     }
