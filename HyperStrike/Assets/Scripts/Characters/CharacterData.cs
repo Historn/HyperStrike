@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.Playables;
 using UnityEngine;
 
 namespace HyperStrike
@@ -11,11 +8,12 @@ namespace HyperStrike
         public string characterName;
         public int health;
         public float speed;
-        public float basicDamage;
+        public float sprintSpeed;
+        public float maxSpeed;
+        public float maxSlidingSpeed;
 
         [Header("Character Shoot Attack")]
         public GameObject projectilePrefab;
-        public Transform projectileSpawnOffset;
         public float shootCooldown;
         public float shootOffset; // Forward offset for the projectile spawn
 

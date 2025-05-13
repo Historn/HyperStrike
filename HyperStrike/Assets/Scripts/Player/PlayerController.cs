@@ -24,16 +24,13 @@ public class PlayerController : MonoBehaviour
     InputAction ability1Action;
     InputAction ability2Action;
     InputAction interactAction;
-    InputAction crouchAction;
+    InputAction slideAction;
     InputAction sprintAction;
     InputAction previousAction;
     InputAction nextAction;
     #endregion
 
     #region "Movement Variables"
-    float movementSpeed = 20.0f;
-    float sprintSpeed = 30.0f;
-
     [Header("Cinemachine Settings")]
     public CinemachineCamera cinemachineCamera; // Reference to the Cinemachine virtual camera
     public CinemachineInputAxisController cinemachineAxisCamera; // Reference to the Cinemachine virtual camera
@@ -52,16 +49,20 @@ public class PlayerController : MonoBehaviour
     LayerMask groundMask;
     [SerializeField] bool isGrounded;
     float groundDrag = 0.25f;
+    float wallDrag = 0.2f;
 
     // Wall run
     [SerializeField] bool isWallRunning;
     RaycastHit wallHit;
     float angleRoll = 25.0f; // Var to rotate camera while wallrunning
 
+    Vector3 gravity;
+
     #endregion
 
     #region "Attack Variables"
-
+    [Header("Shooting Variables")]
+    public Transform projectileSpawnOffset;
     private bool shootReady;
 
     #endregion
@@ -89,7 +90,7 @@ public class PlayerController : MonoBehaviour
         // Init Physics variables
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
-        rb.maxLinearVelocity = 15.0f;
+        rb.maxLinearVelocity = player.Character.maxSpeed;
 
         // Init Inputs
         InitInputs();
@@ -103,6 +104,8 @@ public class PlayerController : MonoBehaviour
 
         // Init Attack Variables
         shootReady = true;
+
+        gravity = Physics.gravity;
     }
 
     private void Update()
@@ -117,6 +120,9 @@ public class PlayerController : MonoBehaviour
     // Physics-based + Rigidbody Actions
     private void FixedUpdate()
     {
+        // Set it to avoid flying bugs
+        Physics.gravity = gravity;
+
         //Ground Check
         float dist = characterHeight * 0.5f + 0.1f;
         Vector3 endRayPos = new Vector3(transform.position.x, transform.position.y - dist, transform.position.z);
@@ -133,14 +139,10 @@ public class PlayerController : MonoBehaviour
 
         WallRun();
 
-        // Crouch and Slide
-        CrouchSlide();
+        Slide();
 
         // Jump
-        if (isGrounded) Jump(Vector3.zero);
-
-        //Handle Drag with the ground after all movement inputs
-        HandleDrag();
+        if (isGrounded && !isWallRunning) Jump(Vector3.zero);
     }
 
     void InitInputs()
@@ -159,7 +161,7 @@ public class PlayerController : MonoBehaviour
         //ability2Action.started += _ => ActivateAbility(player.Character.ability2);
 
         interactAction = InputSystem.actions.FindAction("Interact");
-        crouchAction = InputSystem.actions.FindAction("Crouch");
+        slideAction = InputSystem.actions.FindAction("Crouch");
         sprintAction = InputSystem.actions.FindAction("Sprint");
         previousAction = InputSystem.actions.FindAction("Previous");
         nextAction = InputSystem.actions.FindAction("Next");
@@ -195,35 +197,29 @@ public class PlayerController : MonoBehaviour
     void WalkAndRun()
     {
         // Sprint
-        float speed = movementSpeed;
-        if (sprintAction.IsPressed() && isGrounded) speed = sprintSpeed;
+        float speed = player.Character.speed;
+        if (sprintAction.IsPressed() && isGrounded) speed = player.Character.sprintSpeed;
         //Debug.Log(speed);
         //Debug.Log(rb.linearVelocity.magnitude);
 
         Vector2 moveValue = moveAction.ReadValue<Vector2>(); // Gets Input Values
         Vector3 dir = transform.forward * moveValue.y + transform.right * moveValue.x;
-        rb.AddForce(dir.normalized * speed, ForceMode.Force);
+        if (!isWallRunning) rb.AddForce(dir.normalized * speed, ForceMode.Force);
     }
 
-    void CrouchSlide()
+    void Slide()
     {
-        // Set scale to (transform.position.y * 0.5f)
-        // If running + crouch --> Slide --> Higher velocity? or less drag
-        if (crouchAction.IsPressed())
+        if (slideAction.IsPressed())
         {
-            Vector3 crouchedScale = Vector3.one * 0.5f;
-            transform.localScale = crouchedScale;
-            //Activate Crouch Anim
+            rb.maxLinearVelocity = player.Character.maxSlidingSpeed;
+            rb.linearDamping = 0.1f;
+            transform.localScale = Vector3.one * 0.75f;
 
-
-            if (sprintAction.IsPressed())
-            {
-                // Activate Sliding Anim
-                // Higher speed
-            }
         }
         else
         {
+            rb.maxLinearVelocity = player.Character.maxSpeed;
+            rb.linearDamping = 0.2f;
             transform.localScale = Vector3.one;
         }
     }
@@ -264,32 +260,25 @@ public class PlayerController : MonoBehaviour
             isWallRunning = Physics.Raycast(transform.position, directions[i], out wallHit, transform.localScale.x + 0.15f);
             if (!isGrounded && isWallRunning && moveAction.IsPressed())
             {
-                Physics.gravity = Physics.gravity / 3.0f; // Reduce gravity to stay more time in the wall but not infinite
-                rb.AddForce(transform.forward * sprintSpeed, ForceMode.Force);
+                Physics.gravity = Physics.gravity / 2.0f; // Reduce gravity to stay more time in the wall but not infinite
+                rb.AddForce(transform.forward * player.Character.sprintSpeed, ForceMode.Force);
                 Jump(wallHit.normal);
+                break;
             }
         }
 
         // Rotate camera a bit on the z-axis
-    }
-
-    void HandleDrag()
-    {
-        if (isGrounded)
-            rb.linearDamping = groundDrag;
-        else
-            rb.linearDamping = 0;
     }
     #endregion
 
     #region "Attacks and Abilities"
     void Shoot()
     {
-        if (shootReady && player.Character != null && (player.Character.projectileSpawnOffset != null && player.Character.projectilePrefab != null))
+        if (shootReady && player.Character != null && (projectileSpawnOffset != null && player.Character.projectilePrefab != null))
         {
             shootReady = false;
 
-            GameObject projectileGO = Instantiate(player.Character.projectilePrefab, player.Character.projectileSpawnOffset.position + cameraTransform.forward * player.Character.shootOffset, cameraTransform.rotation);
+            GameObject projectileGO = Instantiate(player.Character.projectilePrefab, projectileSpawnOffset.position + cameraTransform.forward * player.Character.shootOffset, cameraTransform.rotation);
 
             Invoke(nameof(ResetShoot), player.Character.shootCooldown);    //Delay for attack to reset
         }
@@ -305,6 +294,16 @@ public class PlayerController : MonoBehaviour
         return;
     }
     #endregion
+
+    private void OnCollisionEnter(Collision other)
+    {
+        if (other != null && other.gameObject.CompareTag("Bouncer"))
+        {
+            Vector3 dir = rb.position - other.transform.position;
+
+            rb.AddForce(dir.normalized * 100f, ForceMode.Impulse);
+        }
+    }
 
     #region "Player Data Visualization Methods"
     public void IncreaseScore(int amount)
