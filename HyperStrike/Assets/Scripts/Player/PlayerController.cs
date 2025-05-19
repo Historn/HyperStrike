@@ -1,12 +1,13 @@
 using HyperStrike;
 using Unity.Cinemachine;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Timeline;
 
 // PLAYER STATE????
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : NetworkBehaviour
 {
     Rigidbody rb;
 
@@ -45,16 +46,13 @@ public class PlayerController : MonoBehaviour
 
     // Ground Vars
     [Header("Ground Check")]
+    private GroundCheck groundCheck;
     float characterHeight; // Change to character Data
-    LayerMask groundMask;
-    [SerializeField] bool isGrounded;
-    float groundDrag = 0.25f;
-    float wallDrag = 0.2f;
 
     // Wall run
     [SerializeField] bool isWallRunning;
     RaycastHit wallHit;
-    float angleRoll = 25.0f; // Var to rotate camera while wallrunning
+    //float angleRoll = 25.0f; // Var to rotate camera while wallrunning
 
     Vector3 gravity;
 
@@ -66,6 +64,11 @@ public class PlayerController : MonoBehaviour
     private bool shootReady;
 
     #endregion
+
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+    }
 
     private void Start()
     {
@@ -100,7 +103,8 @@ public class PlayerController : MonoBehaviour
 
         characterHeight = GetComponent<CapsuleCollider>().height;
         isWallRunning = false;
-        isGrounded = false;
+
+        groundCheck = new GroundCheck();
 
         // Init Attack Variables
         shootReady = true;
@@ -124,10 +128,7 @@ public class PlayerController : MonoBehaviour
         Physics.gravity = gravity;
 
         //Ground Check
-        float dist = characterHeight * 0.5f + 0.1f;
-        Vector3 endRayPos = new Vector3(transform.position.x, transform.position.y - dist, transform.position.z);
-        Debug.DrawLine(transform.position, endRayPos, UnityEngine.Color.red);
-        isGrounded = Physics.Raycast(transform.position, Vector3.down, dist);
+        groundCheck.CheckGrounded(transform, characterHeight);
 
         if (cameraTransform != null)
         {
@@ -142,7 +143,7 @@ public class PlayerController : MonoBehaviour
         Slide();
 
         // Jump
-        if (isGrounded && !isWallRunning) Jump(Vector3.zero);
+        if (groundCheck.IsGrounded && !isWallRunning) Jump(Vector3.zero);
     }
 
     void InitInputs()
@@ -198,9 +199,7 @@ public class PlayerController : MonoBehaviour
     {
         // Sprint
         float speed = player.Character.speed;
-        if (sprintAction.IsPressed() && isGrounded) speed = player.Character.sprintSpeed;
-        //Debug.Log(speed);
-        //Debug.Log(rb.linearVelocity.magnitude);
+        if (sprintAction.IsPressed() && groundCheck.IsGrounded) speed = player.Character.sprintSpeed;
 
         Vector2 moveValue = moveAction.ReadValue<Vector2>(); // Gets Input Values
         Vector3 dir = transform.forward * moveValue.y + transform.right * moveValue.x;
@@ -258,7 +257,7 @@ public class PlayerController : MonoBehaviour
         {
             Debug.DrawLine(transform.position, transform.position + directions[i], UnityEngine.Color.green);
             isWallRunning = Physics.Raycast(transform.position, directions[i], out wallHit, transform.localScale.x + 0.15f);
-            if (!isGrounded && isWallRunning && moveAction.IsPressed())
+            if (!groundCheck.IsGrounded && isWallRunning && moveAction.IsPressed())
             {
                 Physics.gravity = Physics.gravity / 2.0f; // Reduce gravity to stay more time in the wall but not infinite
                 rb.AddForce(transform.forward * player.Character.sprintSpeed, ForceMode.Force);
@@ -294,16 +293,6 @@ public class PlayerController : MonoBehaviour
         return;
     }
     #endregion
-
-    private void OnCollisionEnter(Collision other)
-    {
-        if (other != null && other.gameObject.CompareTag("Bouncer"))
-        {
-            Vector3 dir = rb.position - other.transform.position;
-
-            rb.AddForce(dir.normalized * 100f, ForceMode.Impulse);
-        }
-    }
 
     #region "Player Data Visualization Methods"
     public void IncreaseScore(int amount)
