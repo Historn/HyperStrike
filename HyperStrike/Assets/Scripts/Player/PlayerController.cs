@@ -34,10 +34,10 @@ public class PlayerController : NetworkBehaviour
     #region "Movement Variables"
     [Header("Cinemachine Settings")]
     public CinemachineCamera cinemachineCamera; // Reference to the Cinemachine virtual camera
-    public CinemachineInputAxisController cinemachineAxisCamera; // Reference to the Cinemachine virtual camera
-    private Transform cameraTransform; // The transform of the Cinemachine camera's LookAt target
+    [SerializeField] private Transform cameraTransform; // The transform of the Cinemachine camera's LookAt target
     float sensitivity = 5.0f;
     float xRotation;
+    float yRotation;
 
     // Jump Vars
     bool readyToJump;
@@ -46,7 +46,7 @@ public class PlayerController : NetworkBehaviour
 
     // Ground Vars
     [Header("Ground Check")]
-    private GroundCheck groundCheck;
+    [SerializeField] bool isGrounded;
     float characterHeight; // Change to character Data
 
     // Wall run
@@ -67,44 +67,46 @@ public class PlayerController : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        base.OnNetworkSpawn();
-    }
+        if (IsClient && IsOwner)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
 
-    private void Start()
-    {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+            // Init Inputs
+            InitInputs();
 
-        // Init Player MVC
-        player = new Player();
-        player.Character = characterData;
-        view = GetComponent<PlayerView>();
-
-        player.Score = 0;
-        view.UpdateView(player);
+            if (cinemachineCamera != null) cinemachineCamera.Priority = 1;
+        }
+        else
+        {
+            if (cinemachineCamera != null) cinemachineCamera.Priority = 0;
+        }
 
         // Ensure the Cinemachine camera is set up properly
         if (cinemachineCamera != null)
         {
             cameraTransform = cinemachineCamera.LookAt; // Use the LookAt target for rotation
         }
-        
+
+        // Init Player MVC
+        player = new Player();
+        player.Character = characterData;
+        view = GetComponent<PlayerView>();
+
+        // Net Owner Only?
+        player.Score = 0;
+        view.UpdateView(player);
 
         // Init Physics variables
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
         rb.maxLinearVelocity = player.Character.maxSpeed;
 
-        // Init Inputs
-        InitInputs();
-
-        // Init Movement variables
         readyToJump = true;
 
         characterHeight = GetComponent<CapsuleCollider>().height;
+        isGrounded = false;
         isWallRunning = false;
-
-        groundCheck = new GroundCheck();
 
         // Init Attack Variables
         shootReady = true;
@@ -125,25 +127,28 @@ public class PlayerController : NetworkBehaviour
     private void FixedUpdate()
     {
         // Set it to avoid flying bugs
-        Physics.gravity = gravity;
+        if (IsServer) Physics.gravity = gravity;
 
         //Ground Check
-        groundCheck.CheckGrounded(transform, characterHeight);
+        isGrounded = GroundCheck.CheckGrounded(transform, characterHeight);
 
-        if (cameraTransform != null)
+        if (IsClient && IsOwner)
         {
-            RotatePlayerWithCamera();
-        }
+            if (cameraTransform != null)
+            {
+                RotatePlayerWithCameraServerRPC(lookAction.ReadValue<Vector2>());
+            }
 
-        // Move
-        WalkAndRun();
+            // Move
+            WalkAndRunServerRPC(moveAction.ReadValue<Vector2>(), sprintAction.IsPressed());
 
-        WallRun();
+            WallRunServerRPC(moveAction.IsPressed(), jumpAction.IsPressed());
 
-        Slide();
+            SlideServerRPC(slideAction.IsPressed());
 
-        // Jump
-        if (groundCheck.IsGrounded && !isWallRunning) Jump(Vector3.zero);
+            // Jump
+            if (isGrounded && !isWallRunning) JumpServerRPC(jumpAction.IsPressed(), Vector3.zero);
+        } 
     }
 
     void InitInputs()
@@ -153,7 +158,7 @@ public class PlayerController : NetworkBehaviour
         jumpAction = InputSystem.actions.FindAction("Jump");
 
         attackAction = InputSystem.actions.FindAction("Attack");
-        attackAction.started += _ => Shoot();
+        attackAction.started += _ => ShootServerRPC();
 
         //ability1Action = InputSystem.actions.FindAction("Ability1");
         //ability1Action.started += _ => ActivateAbility(player.Character.ability1);
@@ -168,18 +173,11 @@ public class PlayerController : NetworkBehaviour
         nextAction = InputSystem.actions.FindAction("Next");
     }
 
-    void DebugMovement()
-    {
-        // SHOW RAYCASTS
-        // SHOW SPEED AND OTHER MOVEMENT STATS
-        return;
-    }
-
     #region "Movement Mechanics Methods"
-    void RotatePlayerWithCamera()
-    {
-        Vector2 lookValue = lookAction.ReadValue<Vector2>();
 
+    [ServerRpc]
+    void RotatePlayerWithCameraServerRPC(Vector2 lookValue)
+    {
         // Get mouse input
         float mouseX = lookValue.x * sensitivity * Time.fixedDeltaTime;
         float mouseY = lookValue.y * sensitivity * Time.fixedDeltaTime;
@@ -188,32 +186,35 @@ public class PlayerController : NetworkBehaviour
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);
 
+        yRotation += mouseX;
+
         // Update the Cinemachine camera's rotation
-        cameraTransform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+        cameraTransform.localRotation = Quaternion.Euler(xRotation, yRotation, 0);
 
         // Apply horizontal rotation to the player
-        transform.Rotate(Vector3.up * mouseX);
+        //transform.Rotate(Vector3.up * yRotation);
+        //transform.localRotation = Quaternion.Euler(0, yRotation, 0);
     }
 
-    void WalkAndRun()
+    [ServerRpc]
+    void WalkAndRunServerRPC(Vector2 moveValue, bool isSprinting)
     {
         // Sprint
         float speed = player.Character.speed;
-        if (sprintAction.IsPressed() && groundCheck.IsGrounded) speed = player.Character.sprintSpeed;
+        if (isSprinting && isGrounded) speed = player.Character.sprintSpeed;
 
-        Vector2 moveValue = moveAction.ReadValue<Vector2>(); // Gets Input Values
         Vector3 dir = transform.forward * moveValue.y + transform.right * moveValue.x;
         if (!isWallRunning) rb.AddForce(dir.normalized * speed, ForceMode.Force);
     }
 
-    void Slide()
+    [ServerRpc]
+    void SlideServerRPC(bool isSliding)
     {
-        if (slideAction.IsPressed())
+        if (isSliding)
         {
             rb.maxLinearVelocity = player.Character.maxSlidingSpeed;
             rb.linearDamping = 0.1f;
             transform.localScale = Vector3.one * 0.75f;
-
         }
         else
         {
@@ -223,9 +224,10 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
-    void Jump(Vector3 jumpDir)
+    [ServerRpc]
+    void JumpServerRPC(bool isJumping, Vector3 jumpDir)
     {
-        if (jumpAction.IsPressed() && readyToJump)
+        if (isJumping && readyToJump)
         {
             readyToJump = false;
 
@@ -242,7 +244,8 @@ public class PlayerController : NetworkBehaviour
         readyToJump = true;
     }
 
-    void WallRun()
+    [ServerRpc]
+    void WallRunServerRPC(bool isMoving, bool isJumping)
     {
         Vector3[] directions = new Vector3[]
             {
@@ -257,12 +260,11 @@ public class PlayerController : NetworkBehaviour
         {
             Debug.DrawLine(transform.position, transform.position + directions[i], UnityEngine.Color.green);
             isWallRunning = Physics.Raycast(transform.position, directions[i], out wallHit, transform.localScale.x + 0.15f);
-            if (!groundCheck.IsGrounded && isWallRunning && moveAction.IsPressed())
+            if (!isGrounded && isWallRunning && isMoving)
             {
                 Physics.gravity = Physics.gravity / 2.0f; // Reduce gravity to stay more time in the wall but not infinite
                 rb.AddForce(transform.forward * player.Character.sprintSpeed, ForceMode.Force);
-                Jump(wallHit.normal);
-                break;
+                JumpServerRPC(isJumping, wallHit.normal);
             }
         }
 
@@ -271,14 +273,16 @@ public class PlayerController : NetworkBehaviour
     #endregion
 
     #region "Attacks and Abilities"
-    void Shoot()
+
+    [ServerRpc]
+    void ShootServerRPC()
     {
         if (shootReady && player.Character != null && (projectileSpawnOffset != null && player.Character.projectilePrefab != null))
         {
             shootReady = false;
-
+            
             GameObject projectileGO = Instantiate(player.Character.projectilePrefab, projectileSpawnOffset.position + cameraTransform.forward * player.Character.shootOffset, cameraTransform.rotation);
-
+            //projectileGO.GetComponent<NetworkObject>().Spawn(true);
             Invoke(nameof(ResetShoot), player.Character.shootCooldown);    //Delay for attack to reset
         }
     }

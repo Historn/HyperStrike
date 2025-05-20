@@ -1,6 +1,7 @@
+using Unity.Netcode;
 using UnityEngine;
 
-public class Bouncer : MonoBehaviour
+public class Bouncer : NetworkBehaviour
 {
     [SerializeField] float force = 100f;
     public string[] allowedTags;

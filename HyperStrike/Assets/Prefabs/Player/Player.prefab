@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7386540409274619411}
   - component: {fileID: 9039405637638705796}
   - component: {fileID: 2950555883457769650}
+  - component: {fileID: 7304454813537599321}
   m_Layer: 5
   m_Name: PlayerCanvasUI
   m_TagString: Untagged
@@ -102,6 +103,15 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!1652712579 &7304454813537599321
+MultiplayerRolesData:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1580034312845572575}
+  m_GameObjectRolesMask: 1
+  m_ComponentsRolesMasks: []
 --- !u!1 &3057295474076285659
 GameObject:
   m_ObjectHideFlags: 0
@@ -122,6 +132,7 @@ GameObject:
   - component: {fileID: 4273061715997264505}
   - component: {fileID: 4284417717198246814}
   - component: {fileID: 3289915323030772734}
+  - component: {fileID: 2436927614653419663}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -287,7 +298,7 @@ MonoBehaviour:
   DeferredDespawnTick: 0
   Ownership: 1
   AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
+  SynchronizeTransform: 0
   ActiveSceneSynchronization: 0
   SceneMigrationSynchronization: 1
   SpawnWithObservers: 1
@@ -310,7 +321,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   characterData: {fileID: 11400000, guid: 9d4e3ba57a1756c44ac3868b3c2b2ba0, type: 2}
   cinemachineCamera: {fileID: 5505959830489533935}
-  cinemachineAxisCamera: {fileID: 0}
+  cameraTransform: {fileID: 0}
   isGrounded: 0
   isWallRunning: 0
   projectileSpawnOffset: {fileID: 3935416128287498826}
@@ -369,7 +380,7 @@ MonoBehaviour:
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01
   UseQuaternionSynchronization: 1
-  UseQuaternionCompression: 0
+  UseQuaternionCompression: 1
   UseHalfFloatPrecision: 0
   InLocalSpace: 0
   SwitchTransformSpaceWhenParented: 0
@@ -405,6 +416,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+--- !u!1652712579 &2436927614653419663
+MultiplayerRolesData:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3057295474076285659}
+  m_GameObjectRolesMask: 3
+  m_ComponentsRolesMasks:
+  - m_Object: {fileID: 6626440046734023120}
+    m_RolesMask: 3
+  - m_Object: {fileID: 4227015264546652421}
+    m_RolesMask: 3
 --- !u!1 &3571611073814483599
 GameObject:
   m_ObjectHideFlags: 0
@@ -417,6 +441,8 @@ GameObject:
   - component: {fileID: 3706229437727704257}
   - component: {fileID: 7831275041173579939}
   - component: {fileID: 4453441278724225867}
+  - component: {fileID: 3877606990449082468}
+  - component: {fileID: 9105378071074426441}
   m_Layer: 0
   m_Name: MainCamera
   m_TagString: MainCamera
@@ -567,6 +593,61 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
+--- !u!1652712579 &3877606990449082468
+MultiplayerRolesData:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3571611073814483599}
+  m_GameObjectRolesMask: 3
+  m_ComponentsRolesMasks: []
+--- !u!114 &9105378071074426441
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3571611073814483599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkTransformExpanded: 0
+  AutoOwnerAuthorityTickOffset: 1
+  PositionInterpolationType: 0
+  RotationInterpolationType: 0
+  ScaleInterpolationType: 0
+  PositionLerpSmoothing: 1
+  PositionMaxInterpolationTime: 0.1
+  RotationLerpSmoothing: 1
+  RotationMaxInterpolationTime: 0.1
+  ScaleLerpSmoothing: 1
+  ScaleMaxInterpolationTime: 0.1
+  AuthorityMode: 0
+  TickSyncChildren: 0
+  UseUnreliableDeltas: 0
+  SyncPositionX: 0
+  SyncPositionY: 0
+  SyncPositionZ: 0
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 1
+  UseQuaternionCompression: 1
+  UseHalfFloatPrecision: 0
+  InLocalSpace: 0
+  SwitchTransformSpaceWhenParented: 0
+  Interpolate: 1
+  SlerpPosition: 0
 --- !u!1 &5569182903972495050
 GameObject:
   m_ObjectHideFlags: 0
@@ -751,8 +832,9 @@ GameObject:
   - component: {fileID: 2381903384639404792}
   - component: {fileID: 5505959830489533935}
   - component: {fileID: 1404251419638313748}
-  - component: {fileID: 7405832320965164288}
-  - component: {fileID: 6010070970233376381}
+  - component: {fileID: 5183823433486902868}
+  - component: {fileID: 7080259533809052655}
+  - component: {fileID: 3069327740857795950}
   m_Layer: 0
   m_Name: FP Camera
   m_TagString: Untagged
@@ -789,7 +871,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Priority:
-    Enabled: 0
+    Enabled: 1
     m_Value: 0
   OutputChannel: 1
   StandbyUpdate: 2
@@ -832,7 +914,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Damping: 0
---- !u!114 &7405832320965164288
+--- !u!1652712579 &5183823433486902868
+MultiplayerRolesData:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7575585322854591780}
+  m_GameObjectRolesMask: 3
+  m_ComponentsRolesMasks:
+  - m_Object: {fileID: 5505959830489533935}
+    m_RolesMask: 3
+  - m_Object: {fileID: 1404251419638313748}
+    m_RolesMask: 3
+  - m_Object: {fileID: 0}
+    m_RolesMask: 3
+--- !u!114 &7080259533809052655
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -845,7 +942,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Damping: 0
---- !u!114 &6010070970233376381
+--- !u!114 &3069327740857795950
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -872,9 +969,9 @@ MonoBehaviour:
   AuthorityMode: 0
   TickSyncChildren: 0
   UseUnreliableDeltas: 0
-  SyncPositionX: 1
-  SyncPositionY: 1
-  SyncPositionZ: 1
+  SyncPositionX: 0
+  SyncPositionY: 0
+  SyncPositionZ: 0
   SyncRotAngleX: 1
   SyncRotAngleY: 1
   SyncRotAngleZ: 1
@@ -885,7 +982,7 @@ MonoBehaviour:
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01
   UseQuaternionSynchronization: 1
-  UseQuaternionCompression: 0
+  UseQuaternionCompression: 1
   UseHalfFloatPrecision: 0
   InLocalSpace: 0
   SwitchTransformSpaceWhenParented: 0
@@ -1058,7 +1155,7 @@ AudioListener:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8549731204100806246}
-  m_Enabled: 1
+  m_Enabled: 0
 --- !u!114 &4002611150900732110
 MonoBehaviour:
   m_ObjectHideFlags: 0
