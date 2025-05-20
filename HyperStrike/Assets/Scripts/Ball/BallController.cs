@@ -1,6 +1,7 @@
 using UnityEngine;
+using Unity.Netcode;
 
-public class BallController : MonoBehaviour
+public class BallController : NetworkBehaviour
 {
     private Rigidbody rb;
 

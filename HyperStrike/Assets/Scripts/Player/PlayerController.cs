@@ -1,12 +1,13 @@
 using HyperStrike;
 using Unity.Cinemachine;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Timeline;
 
 // PLAYER STATE????
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : NetworkBehaviour
 {
     Rigidbody rb;
 
@@ -33,10 +34,10 @@ public class PlayerController : MonoBehaviour
     #region "Movement Variables"
     [Header("Cinemachine Settings")]
     public CinemachineCamera cinemachineCamera; // Reference to the Cinemachine virtual camera
-    public CinemachineInputAxisController cinemachineAxisCamera; // Reference to the Cinemachine virtual camera
-    private Transform cameraTransform; // The transform of the Cinemachine camera's LookAt target
+    [SerializeField] private Transform cameraTransform; // The transform of the Cinemachine camera's LookAt target
     float sensitivity = 5.0f;
     float xRotation;
+    float yRotation;
 
     // Jump Vars
     bool readyToJump;
@@ -45,16 +46,13 @@ public class PlayerController : MonoBehaviour
 
     // Ground Vars
     [Header("Ground Check")]
-    float characterHeight; // Change to character Data
-    LayerMask groundMask;
     [SerializeField] bool isGrounded;
-    float groundDrag = 0.25f;
-    float wallDrag = 0.2f;
+    float characterHeight; // Change to character Data
 
     // Wall run
     [SerializeField] bool isWallRunning;
     RaycastHit wallHit;
-    float angleRoll = 25.0f; // Var to rotate camera while wallrunning
+    //float angleRoll = 25.0f; // Var to rotate camera while wallrunning
 
     Vector3 gravity;
 
@@ -67,40 +65,48 @@ public class PlayerController : MonoBehaviour
 
     #endregion
 
-    private void Start()
+    public override void OnNetworkSpawn()
     {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        if (IsClient && IsOwner)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
 
-        // Init Player MVC
-        player = new Player();
-        player.Character = characterData;
-        view = GetComponent<PlayerView>();
+            // Init Inputs
+            InitInputs();
 
-        player.Score = 0;
-        view.UpdateView(player);
+            if (cinemachineCamera != null) cinemachineCamera.Priority = 1;
+        }
+        else
+        {
+            if (cinemachineCamera != null) cinemachineCamera.Priority = 0;
+        }
 
         // Ensure the Cinemachine camera is set up properly
         if (cinemachineCamera != null)
         {
             cameraTransform = cinemachineCamera.LookAt; // Use the LookAt target for rotation
         }
-        
+
+        // Init Player MVC
+        player = new Player();
+        player.Character = characterData;
+        view = GetComponent<PlayerView>();
+
+        // Net Owner Only?
+        player.Score = 0;
+        view.UpdateView(player);
 
         // Init Physics variables
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
         rb.maxLinearVelocity = player.Character.maxSpeed;
 
-        // Init Inputs
-        InitInputs();
-
-        // Init Movement variables
         readyToJump = true;
 
         characterHeight = GetComponent<CapsuleCollider>().height;
-        isWallRunning = false;
         isGrounded = false;
+        isWallRunning = false;
 
         // Init Attack Variables
         shootReady = true;
@@ -121,28 +127,28 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         // Set it to avoid flying bugs
-        Physics.gravity = gravity;
+        if (IsServer) Physics.gravity = gravity;
 
         //Ground Check
-        float dist = characterHeight * 0.5f + 0.1f;
-        Vector3 endRayPos = new Vector3(transform.position.x, transform.position.y - dist, transform.position.z);
-        Debug.DrawLine(transform.position, endRayPos, UnityEngine.Color.red);
-        isGrounded = Physics.Raycast(transform.position, Vector3.down, dist);
+        isGrounded = GroundCheck.CheckGrounded(transform, characterHeight);
 
-        if (cameraTransform != null)
+        if (IsClient && IsOwner)
         {
-            RotatePlayerWithCamera();
-        }
+            if (cameraTransform != null)
+            {
+                RotatePlayerWithCameraServerRPC(lookAction.ReadValue<Vector2>());
+            }
 
-        // Move
-        WalkAndRun();
+            // Move
+            WalkAndRunServerRPC(moveAction.ReadValue<Vector2>(), sprintAction.IsPressed());
 
-        WallRun();
+            WallRunServerRPC(moveAction.IsPressed(), jumpAction.IsPressed());
 
-        Slide();
+            SlideServerRPC(slideAction.IsPressed());
 
-        // Jump
-        if (isGrounded && !isWallRunning) Jump(Vector3.zero);
+            // Jump
+            if (isGrounded && !isWallRunning) JumpServerRPC(jumpAction.IsPressed(), Vector3.zero);
+        } 
     }
 
     void InitInputs()
@@ -152,7 +158,7 @@ public class PlayerController : MonoBehaviour
         jumpAction = InputSystem.actions.FindAction("Jump");
 
         attackAction = InputSystem.actions.FindAction("Attack");
-        attackAction.started += _ => Shoot();
+        attackAction.started += _ => ShootServerRPC();
 
         //ability1Action = InputSystem.actions.FindAction("Ability1");
         //ability1Action.started += _ => ActivateAbility(player.Character.ability1);
@@ -167,18 +173,11 @@ public class PlayerController : MonoBehaviour
         nextAction = InputSystem.actions.FindAction("Next");
     }
 
-    void DebugMovement()
-    {
-        // SHOW RAYCASTS
-        // SHOW SPEED AND OTHER MOVEMENT STATS
-        return;
-    }
-
     #region "Movement Mechanics Methods"
-    void RotatePlayerWithCamera()
-    {
-        Vector2 lookValue = lookAction.ReadValue<Vector2>();
 
+    [ServerRpc]
+    void RotatePlayerWithCameraServerRPC(Vector2 lookValue)
+    {
         // Get mouse input
         float mouseX = lookValue.x * sensitivity * Time.fixedDeltaTime;
         float mouseY = lookValue.y * sensitivity * Time.fixedDeltaTime;
@@ -187,34 +186,34 @@ public class PlayerController : MonoBehaviour
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);
 
+        yRotation += mouseX;
+
         // Update the Cinemachine camera's rotation
-        cameraTransform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+        cameraTransform.localRotation = Quaternion.Euler(xRotation, 0, 0);
 
         // Apply horizontal rotation to the player
-        transform.Rotate(Vector3.up * mouseX);
+        rb.rotation = Quaternion.Euler(0, yRotation, 0);
     }
 
-    void WalkAndRun()
+    [ServerRpc]
+    void WalkAndRunServerRPC(Vector2 moveValue, bool isSprinting)
     {
         // Sprint
         float speed = player.Character.speed;
-        if (sprintAction.IsPressed() && isGrounded) speed = player.Character.sprintSpeed;
-        //Debug.Log(speed);
-        //Debug.Log(rb.linearVelocity.magnitude);
+        if (isSprinting && isGrounded) speed = player.Character.sprintSpeed;
 
-        Vector2 moveValue = moveAction.ReadValue<Vector2>(); // Gets Input Values
         Vector3 dir = transform.forward * moveValue.y + transform.right * moveValue.x;
         if (!isWallRunning) rb.AddForce(dir.normalized * speed, ForceMode.Force);
     }
 
-    void Slide()
+    [ServerRpc]
+    void SlideServerRPC(bool isSliding)
     {
-        if (slideAction.IsPressed())
+        if (isSliding)
         {
             rb.maxLinearVelocity = player.Character.maxSlidingSpeed;
             rb.linearDamping = 0.1f;
             transform.localScale = Vector3.one * 0.75f;
-
         }
         else
         {
@@ -224,9 +223,10 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void Jump(Vector3 jumpDir)
+    [ServerRpc]
+    void JumpServerRPC(bool isJumping, Vector3 jumpDir)
     {
-        if (jumpAction.IsPressed() && readyToJump)
+        if (isJumping && readyToJump)
         {
             readyToJump = false;
 
@@ -243,7 +243,8 @@ public class PlayerController : MonoBehaviour
         readyToJump = true;
     }
 
-    void WallRun()
+    [ServerRpc]
+    void WallRunServerRPC(bool isMoving, bool isJumping)
     {
         Vector3[] directions = new Vector3[]
             {
@@ -258,12 +259,11 @@ public class PlayerController : MonoBehaviour
         {
             Debug.DrawLine(transform.position, transform.position + directions[i], UnityEngine.Color.green);
             isWallRunning = Physics.Raycast(transform.position, directions[i], out wallHit, transform.localScale.x + 0.15f);
-            if (!isGrounded && isWallRunning && moveAction.IsPressed())
+            if (!isGrounded && isWallRunning && isMoving)
             {
                 Physics.gravity = Physics.gravity / 2.0f; // Reduce gravity to stay more time in the wall but not infinite
                 rb.AddForce(transform.forward * player.Character.sprintSpeed, ForceMode.Force);
-                Jump(wallHit.normal);
-                break;
+                JumpServerRPC(isJumping, wallHit.normal);
             }
         }
 
@@ -272,14 +272,16 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #region "Attacks and Abilities"
-    void Shoot()
+
+    [ServerRpc]
+    void ShootServerRPC()
     {
         if (shootReady && player.Character != null && (projectileSpawnOffset != null && player.Character.projectilePrefab != null))
         {
             shootReady = false;
-
+            
             GameObject projectileGO = Instantiate(player.Character.projectilePrefab, projectileSpawnOffset.position + cameraTransform.forward * player.Character.shootOffset, cameraTransform.rotation);
-
+            //projectileGO.GetComponent<NetworkObject>().Spawn(true);
             Invoke(nameof(ResetShoot), player.Character.shootCooldown);    //Delay for attack to reset
         }
     }
@@ -294,16 +296,6 @@ public class PlayerController : MonoBehaviour
         return;
     }
     #endregion
-
-    private void OnCollisionEnter(Collision other)
-    {
-        if (other != null && other.gameObject.CompareTag("Bouncer"))
-        {
-            Vector3 dir = rb.position - other.transform.position;
-
-            rb.AddForce(dir.normalized * 100f, ForceMode.Impulse);
-        }
-    }
 
     #region "Player Data Visualization Methods"
     public void IncreaseScore(int amount)
