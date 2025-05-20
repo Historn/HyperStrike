@@ -281,7 +281,7 @@ public class PlayerController : NetworkBehaviour
             shootReady = false;
             
             GameObject projectileGO = Instantiate(player.Character.projectilePrefab, projectileSpawnOffset.position + cameraTransform.forward * player.Character.shootOffset, cameraTransform.rotation);
-            //projectileGO.GetComponent<NetworkObject>().Spawn(true);
+            projectileGO.GetComponent<NetworkObject>().Spawn(true);
             Invoke(nameof(ResetShoot), player.Character.shootCooldown);    //Delay for attack to reset
         }
     }
