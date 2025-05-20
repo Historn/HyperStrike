@@ -189,11 +189,10 @@ public class PlayerController : NetworkBehaviour
         yRotation += mouseX;
 
         // Update the Cinemachine camera's rotation
-        cameraTransform.localRotation = Quaternion.Euler(xRotation, yRotation, 0);
+        cameraTransform.localRotation = Quaternion.Euler(xRotation, 0, 0);
 
         // Apply horizontal rotation to the player
-        //transform.Rotate(Vector3.up * yRotation);
-        //transform.localRotation = Quaternion.Euler(0, yRotation, 0);
+        rb.rotation = Quaternion.Euler(0, yRotation, 0);
     }
 
     [ServerRpc]
