@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/IntroLogo.unity
+    guid: 9a3caa674bb73ca4d9adee91cb1deacb
+  - enabled: 1
     path: Assets/Design/Levels/Blockouts/Pinball Testing/Pinball Blockout.unity
     guid: 01581683e2c2d6b478b47f3864acd659
   - enabled: 0
