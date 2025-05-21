@@ -2,6 +2,7 @@ using HyperStrike;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 public enum MatchState
@@ -15,15 +16,15 @@ public enum MatchState
     LOOSE,
 }
 
-public class MatchManager : MonoBehaviour
+public class MatchManager : NetworkBehaviour
 {
     public static MatchManager Instance { get; private set; }
 
     public Action OnUpdateMatchScore;
 
-    [SerializeField] private MatchState matchState;
+    public MatchState State { get; private set; }
 
-    private IEnumerator waitTimerCoroutine;
+    private IEnumerator initTimerCoroutine;
     private IEnumerator matchTimerCoroutine;
 
     [Header("Wait Conditions")]
@@ -56,21 +57,24 @@ public class MatchManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        // Init vars
+        // Init Enumerators
         matchTimerCoroutine = MatchTimer();
-        waitTimerCoroutine = PlayMatch();
-        SetMatchState(MatchState.RESET);
+        initTimerCoroutine = PlayMatch();
+
+        // Set initial Match state
+        //SetMatchState(MatchState.RESET);
     }
 
     // Update is called once per frame
     void Update()
     {
         //
+        if (NetworkManager.Singleton?.ConnectedClientsList.Count > 1) SetMatchState(MatchState.RESET);
     }
 
     void MatchStateBehavior()
     {
-        switch (matchState)
+        switch (State)
         {
             case MatchState.NONE:
                 SetMatchState(MatchState.RESET);
@@ -97,14 +101,14 @@ public class MatchManager : MonoBehaviour
                 {
                     currentWaitTime = waitTime;
 
-                    if (waitTimerCoroutine != null)
-                        StartCoroutine(waitTimerCoroutine);
+                    if (initTimerCoroutine != null)
+                        StartCoroutine(initTimerCoroutine);
                 }
                 break;
             case MatchState.PLAY:
                 {
-                    if (waitTimerCoroutine != null)
-                        StopCoroutine(waitTimerCoroutine);
+                    if (initTimerCoroutine != null)
+                        StopCoroutine(initTimerCoroutine);
                     
                     // Starts timer
                     if (matchTimerCoroutine != null)
@@ -135,13 +139,13 @@ public class MatchManager : MonoBehaviour
 
     public void SetMatchState(MatchState state)
     {
-        matchState = state;
+        State = state;
         MatchStateBehavior();
     }
 
     private IEnumerator PlayMatch()
     {
-        while (currentWaitTime > 0)
+        while (currentWaitTime >= 0)
         {
             yield return new WaitForSeconds(1f);
             currentWaitTime--;
@@ -223,4 +227,6 @@ public class MatchManager : MonoBehaviour
             Destroy(vfxInstance, 3f);
         }
     }
+
+    public float GetCurrentWaitTime() { return currentWaitTime; }
 }
