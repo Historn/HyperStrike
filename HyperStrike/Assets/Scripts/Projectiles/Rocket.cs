@@ -19,9 +19,6 @@ public class Rocket : Projectile
         // Spawns from the player that shot
         rb = GetComponent<Rigidbody>();
 
-        
-        
-
         StartCoroutine(DestroyRocket());
     }
 

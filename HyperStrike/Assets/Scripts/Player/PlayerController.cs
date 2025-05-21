@@ -34,7 +34,8 @@ public class PlayerController : NetworkBehaviour
     #region "Movement Variables"
     [Header("Cinemachine Settings")]
     public CinemachineCamera cinemachineCamera; // Reference to the Cinemachine virtual camera
-    [SerializeField] private Transform cameraTransform; // The transform of the Cinemachine camera's LookAt target
+    [SerializeField] private Transform mainCameraTransform;
+    [SerializeField] private Transform cameraWeaponTransform; // The transform of the Cinemachine camera's LookAt target
     float sensitivity = 5.0f;
     float xRotation;
     float yRotation;
@@ -75,17 +76,11 @@ public class PlayerController : NetworkBehaviour
             // Init Inputs
             InitInputs();
 
-            if (cinemachineCamera != null) cinemachineCamera.Priority = 1;
+            cinemachineCamera.Priority = 1;
         }
         else
         {
-            if (cinemachineCamera != null) cinemachineCamera.Priority = 0;
-        }
-
-        // Ensure the Cinemachine camera is set up properly
-        if (cinemachineCamera != null)
-        {
-            cameraTransform = cinemachineCamera.LookAt; // Use the LookAt target for rotation
+            cinemachineCamera.Priority = -1;
         }
 
         // Init Player MVC
@@ -114,6 +109,17 @@ public class PlayerController : NetworkBehaviour
         gravity = Physics.gravity;
     }
 
+    private void Start()
+    {
+        if (!IsOwner)
+        {
+            // Disable this camera if not owned by this client
+            GetComponentInChildren<Camera>().enabled = false;
+            GetComponentInChildren<AudioListener>().enabled = false;
+            GetComponentInChildren<CinemachineBrain>().enabled = false;
+        }
+    }
+
     private void Update()
     {
         //Show Leaderboard
@@ -134,7 +140,7 @@ public class PlayerController : NetworkBehaviour
 
         if (IsClient && IsOwner)
         {
-            if (cameraTransform != null)
+            if (cameraWeaponTransform != null)
             {
                 RotatePlayerWithCameraServerRPC(lookAction.ReadValue<Vector2>());
             }
@@ -189,7 +195,8 @@ public class PlayerController : NetworkBehaviour
         yRotation += mouseX;
 
         // Update the Cinemachine camera's rotation
-        cameraTransform.localRotation = Quaternion.Euler(xRotation, 0, 0);
+        cameraWeaponTransform.localRotation = Quaternion.Euler(xRotation, 0, 0);
+        mainCameraTransform.localRotation = Quaternion.Euler(xRotation, 0, 0);
 
         // Apply horizontal rotation to the player
         rb.rotation = Quaternion.Euler(0, yRotation, 0);
@@ -280,7 +287,7 @@ public class PlayerController : NetworkBehaviour
         {
             shootReady = false;
             
-            GameObject projectileGO = Instantiate(player.Character.projectilePrefab, projectileSpawnOffset.position + cameraTransform.forward * player.Character.shootOffset, cameraTransform.rotation);
+            GameObject projectileGO = Instantiate(player.Character.projectilePrefab, projectileSpawnOffset.position + cameraWeaponTransform.forward * player.Character.shootOffset, cameraWeaponTransform.rotation);
             projectileGO.GetComponent<NetworkObject>().Spawn(true);
             Invoke(nameof(ResetShoot), player.Character.shootCooldown);    //Delay for attack to reset
         }
