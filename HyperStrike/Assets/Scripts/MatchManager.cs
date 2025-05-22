@@ -5,9 +5,10 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-public enum MatchState
+public enum MatchState : byte
 {
     NONE = 0,
+    CHARACTER_SELECTION,
     RESET,
     WAIT,
     INIT,
@@ -22,20 +23,24 @@ public class MatchManager : NetworkBehaviour
 
     public Action OnUpdateMatchScore;
 
-    public MatchState State { get; private set; }
+    public NetworkVariable<MatchState> State { get; private set; } = new NetworkVariable<MatchState>(MatchState.NONE);
 
+    private IEnumerator characterSelectTimerCoroutine;
     private IEnumerator initTimerCoroutine;
     private IEnumerator matchTimerCoroutine;
 
+    [Header("Character Selection")]
+    public NetworkVariable<float> characterSelectionTime = new NetworkVariable<float>(90.0f);
+
     [Header("Wait Conditions")]
     float waitTime = 5f; // Wait for 5 seconds
-    float currentWaitTime; // Wait for 5 seconds
+    public NetworkVariable<float> currentWaitTime = new NetworkVariable<float>(5.0f);
 
     [Header("Match Conditions")]
     public float maxTime = 300f; // 300 = 5 minutes in seconds
-    private float currentMatchTime;
-    [HideInInspector] public int localGoals;
-    [HideInInspector] public int visitantGoals;
+    public NetworkVariable<float> currentMatchTime = new NetworkVariable<float>(300.0f);
+    public NetworkVariable<int> localGoals = new NetworkVariable<int>(0);
+    public NetworkVariable<int> visitantGoals = new NetworkVariable<int>(0);
 
     [Header("VFX References")]
     [SerializeField] private GameObject localGoalVFX;
@@ -52,32 +57,39 @@ public class MatchManager : NetworkBehaviour
         {
             Destroy(gameObject);
         }
+
+        // Init Enumerators
+        characterSelectTimerCoroutine = CharacterSelectionTimer();
+        matchTimerCoroutine = MatchTimer();
+        initTimerCoroutine = PlayMatch();
+
+        if (IsServer) State.Value = MatchState.NONE;
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        // Init Enumerators
-        matchTimerCoroutine = MatchTimer();
-        initTimerCoroutine = PlayMatch();
 
-        // Set initial Match state
-        //SetMatchState(MatchState.RESET);
     }
 
     // Update is called once per frame
     void Update()
     {
-        //
-        if (NetworkManager.Singleton?.ConnectedClientsList.Count > 1) SetMatchState(MatchState.RESET);
+        if (NetworkManager.Singleton?.ConnectedClientsList.Count > 0 && State.Value == MatchState.NONE) SetMatchState(MatchState.RESET);
     }
 
     void MatchStateBehavior()
     {
-        switch (State)
+        switch (State.Value)
         {
             case MatchState.NONE:
                 SetMatchState(MatchState.RESET);
+                break;
+            case MatchState.CHARACTER_SELECTION:
+                {
+                    // DISPLAY CHARACTER SELECTION WHEN ALL PLAYERS ALL CONNECTED
+                    // Look NetworkSceneManager client sync to check if all are synced
+                }
                 break;
             case MatchState.RESET:
                 {
@@ -93,13 +105,16 @@ public class MatchManager : NetworkBehaviour
                     // PUT PLAYERS AND BALL TO INIT POS
                     ResetPositions();
 
-                    // CHECK CONNECTION STATUS AND WAIT A COUPLE OF SECONDS
+                    // CHECK CONNECTION STATUS // Look NetworkSceneManager client sync to check if all are synced
+
+
+                    // AND WAIT SOME OF SECONDS
                     SetMatchState(MatchState.INIT);
                 }
                 break;
             case MatchState.INIT:
                 {
-                    currentWaitTime = waitTime;
+                    currentWaitTime.Value = waitTime;
 
                     if (initTimerCoroutine != null)
                         StartCoroutine(initTimerCoroutine);
@@ -139,16 +154,29 @@ public class MatchManager : NetworkBehaviour
 
     public void SetMatchState(MatchState state)
     {
-        State = state;
-        MatchStateBehavior();
+        if (IsServer) 
+        {
+            State.Value = state;
+            MatchStateBehavior();
+        } 
     }
 
-    private IEnumerator PlayMatch()
+    private IEnumerator CharacterSelectionTimer()
     {
-        while (currentWaitTime >= 0)
+        while (currentWaitTime.Value >= 0.0f)
         {
             yield return new WaitForSeconds(1f);
-            currentWaitTime--;
+            currentWaitTime.Value--;
+        }
+
+        SetMatchState(MatchState.PLAY);
+    }
+    private IEnumerator PlayMatch()
+    {
+        while (currentWaitTime.Value >= 0.0f)
+        {
+            yield return new WaitForSeconds(1f);
+            currentWaitTime.Value--;
         }
 
         SetMatchState(MatchState.PLAY);
@@ -163,9 +191,10 @@ public class MatchManager : NetworkBehaviour
         }
 
         // Reset Match vars
-        localGoals = 0;
-        visitantGoals = 0;
-        currentMatchTime = maxTime;
+        localGoals.Value = 0;
+        visitantGoals.Value = 0;
+        currentWaitTime.Value = waitTime;
+        currentMatchTime.Value = maxTime;
     }
 
     void ResetPositions()
@@ -182,7 +211,7 @@ public class MatchManager : NetworkBehaviour
         }
 
         // Set the match state to WON or LOOSE based on the score after finishing the time
-        MatchState st = localGoals > visitantGoals ? MatchState.WON : MatchState.LOOSE;
+        MatchState st = localGoals.Value > visitantGoals.Value ? MatchState.WON : MatchState.LOOSE;
         SetMatchState(st);
 
         Debug.Log("Match Ended!");
@@ -191,10 +220,10 @@ public class MatchManager : NetworkBehaviour
 
     private IEnumerator MatchTimer()
     {
-        while (currentMatchTime > 0)
+        while (currentMatchTime.Value > 0)
         {
             yield return new WaitForSeconds(1f);
-            currentMatchTime--;
+            currentMatchTime.Value--;
             //UpdateTimerUI();
         }
 
@@ -205,16 +234,6 @@ public class MatchManager : NetworkBehaviour
     {
         OnUpdateMatchScore.Invoke();
         Debug.Log("Match score updated!");
-    }
-
-    private string UpdateTimerAsText()
-    {
-        int minutes = Mathf.FloorToInt(currentMatchTime / 60f);
-        int seconds = Mathf.FloorToInt(currentMatchTime % 60f);
-
-        string timeText = $"{minutes:D2}:{seconds:D2}";
-
-        return timeText;
     }
 
     private void TriggerGoalVFX(GameObject vfxPrefab, Vector3 goalPosition)
@@ -228,5 +247,13 @@ public class MatchManager : NetworkBehaviour
         }
     }
 
-    public float GetCurrentWaitTime() { return currentWaitTime; }
+    public float GetCurrentWaitTime() 
+    {
+        return currentWaitTime.Value; 
+    }
+    
+    public float GetCurrentMatchTime() 
+    {
+        return currentMatchTime.Value; 
+    }
 }

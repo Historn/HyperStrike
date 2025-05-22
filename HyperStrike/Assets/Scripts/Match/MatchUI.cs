@@ -1,24 +1,43 @@
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 
-public class MatchUI : MonoBehaviour
+public class MatchUI : NetworkBehaviour
 {
     [SerializeField] private TextMeshProUGUI initTimerText;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [SerializeField] private GameObject characterSelection;
+
+    private void Awake()
     {
-        
+        if (IsOwner) NetworkManager.Singleton.OnClientConnectedCallback += _ => DisplayCharacterSelection();
+
+        MatchManager.Instance.currentWaitTime.OnValueChanged += (previous, current) => UpdateWaitTimerText();
+        MatchManager.Instance.currentMatchTime.OnValueChanged += (previous, current) => UpdateMatchTimerAsText();
     }
 
-    // Update is called once per frame
-    void Update()
+    void UpdateWaitTimerText()
     {
-        if (initTimerText != null && MatchManager.Instance.State == MatchState.INIT)
+        if (initTimerText != null)
         {
-            float time = MatchManager.Instance.GetCurrentWaitTime();
+            int time = Mathf.FloorToInt(MatchManager.Instance.GetCurrentWaitTime());
             initTimerText.text = time.ToString();
-            if (time <= 0f) initTimerText.enabled = false;
+            if (time <= 0) initTimerText.enabled = false;
         }
+    }
+
+    string UpdateMatchTimerAsText()
+    {
+        int minutes = Mathf.FloorToInt(MatchManager.Instance.GetCurrentMatchTime() / 60f);
+        int seconds = Mathf.FloorToInt(MatchManager.Instance.GetCurrentMatchTime() % 60f);
+
+        string timeText = $"{minutes:D2}:{seconds:D2}";
+
+        return timeText;
+    }
+
+    void DisplayCharacterSelection()
+    {
+        characterSelection.SetActive(true);
     }
 }
