@@ -148,7 +148,7 @@ public class PlayerController : NetworkBehaviour
             // Move
             WalkAndRunServerRPC(moveAction.ReadValue<Vector2>(), sprintAction.IsPressed());
 
-            WallRunServerRPC(moveAction.IsPressed(), jumpAction.IsPressed());
+            WallRunServerRPC(moveAction.IsInProgress(), jumpAction.IsPressed());
 
             SlideServerRPC(slideAction.IsPressed());
 
@@ -233,10 +233,15 @@ public class PlayerController : NetworkBehaviour
     [ServerRpc]
     void JumpServerRPC(bool isJumping, Vector3 jumpDir)
     {
+        Jump(isJumping, jumpDir);
+    }
+    
+    void Jump(bool isJumping, Vector3 jumpDir)
+    {
         if (isJumping && readyToJump)
         {
             readyToJump = false;
-
+            Debug.Log($"Is ready to jump: {readyToJump}");
             //Reset Y Velocity
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
             rb.AddForce((transform.up + jumpDir) * jumpForce, ForceMode.Impulse);
@@ -269,8 +274,8 @@ public class PlayerController : NetworkBehaviour
             if (!isGrounded && isWallRunning && isMoving)
             {
                 Physics.gravity = Physics.gravity / 2.0f; // Reduce gravity to stay more time in the wall but not infinite
-                rb.AddForce(transform.forward * player.Character.sprintSpeed, ForceMode.Force);
-                JumpServerRPC(isJumping, wallHit.normal);
+                rb.AddForce(transform.forward * player.Character.wallRunSpeed, ForceMode.Force);
+                Jump(isJumping, wallHit.normal);
             }
         }
 
