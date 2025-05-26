@@ -41,20 +41,22 @@ public class MainMenuUI : MonoBehaviour
 
     void FindMatch()
     {
-        NetworkManager.Singleton.StartClient();
-        //var status = NetworkManager.Singleton.SceneManager.LoadScene("Design/Levels/Blockouts/Pinball Testing/Pinball Blockout", LoadSceneMode.Single);
-        //if (status != SceneEventProgressStatus.Started)
-        //{
-        //    Debug.LogWarning($"Failed to load Lobby" +
-        //          $"with a {nameof(SceneEventProgressStatus)}: {status}");
-        //}
+        var success = NetworkManager.Singleton.StartClient();
+        if (success)
+        {
+            NetworkManager.Singleton.SceneManager.OnSynchronize += SceneManager_OnSynchronize; // Must be here, before loading the NetworkObjects from next scene
+        }
         DeactivateButtons();
+    }
+    private void SceneManager_OnSynchronize(ulong clientId)
+    {
+        Debug.Log($"Client-Id ({clientId}) is synchronizing!");
     }
 
     void StartServer()
     {
         NetworkManager.Singleton.StartServer();
-        var status = NetworkManager.Singleton.SceneManager.LoadScene("Design/Levels/Blockouts/Pinball Testing/Pinball Blockout", LoadSceneMode.Single);
+        var status = NetworkManager.Singleton.SceneManager.LoadScene("LobbyTest", LoadSceneMode.Single);
         if (status != SceneEventProgressStatus.Started)
         {
             Debug.LogWarning($"Failed to load Lobby" +

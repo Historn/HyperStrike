@@ -120,15 +120,6 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
-    private void Update()
-    {
-        //Show Leaderboard
-        //if (UnityEngine.Input.GetKey(showLeaderboard))
-        //    leaderboardPanel.SetActive(true);
-        //else
-        //    leaderboardPanel.SetActive(false);
-    }
-
     // Physics-based + Rigidbody Actions
     private void FixedUpdate()
     {
@@ -241,7 +232,7 @@ public class PlayerController : NetworkBehaviour
         if (isJumping && readyToJump)
         {
             readyToJump = false;
-            Debug.Log($"Is ready to jump: {readyToJump}");
+
             //Reset Y Velocity
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
             rb.AddForce((transform.up + jumpDir) * jumpForce, ForceMode.Impulse);

@@ -10,8 +10,7 @@ public class MatchUI : NetworkBehaviour
 
     private void Awake()
     {
-        if (IsOwner) NetworkManager.Singleton.OnClientConnectedCallback += _ => DisplayCharacterSelection();
-
+        MatchManager.Instance.OnDisplayCharacterSelection += DisplayCharacterSelectionRpc;
         MatchManager.Instance.currentWaitTime.OnValueChanged += (previous, current) => UpdateWaitTimerText();
         MatchManager.Instance.currentMatchTime.OnValueChanged += (previous, current) => UpdateMatchTimerAsText();
     }
@@ -23,6 +22,7 @@ public class MatchUI : NetworkBehaviour
             int time = Mathf.FloorToInt(MatchManager.Instance.GetCurrentWaitTime());
             initTimerText.text = time.ToString();
             if (time <= 0) initTimerText.enabled = false;
+            else initTimerText.enabled = true;
         }
     }
 
@@ -36,8 +36,11 @@ public class MatchUI : NetworkBehaviour
         return timeText;
     }
 
-    void DisplayCharacterSelection()
+    [Rpc(SendTo.NotServer)]
+    void DisplayCharacterSelectionRpc()
     {
+        Cursor.lockState = CursorLockMode.Confined;
+        Cursor.visible = true;
         characterSelection.SetActive(true);
     }
 }
