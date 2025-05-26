@@ -6,6 +6,7 @@ using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEditor.PackageManager;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.TextCore.Text;
 
 public enum MatchState : byte
@@ -83,6 +84,9 @@ public class MatchManager : NetworkBehaviour
             Destroy(gameObject);
         }
 
+        // SYNCHRONIZATION EVENT PROCESS
+        NetworkManager.Singleton.SceneManager.OnLoadComplete += OnSceneLoaded;
+
         // Init Enumerators
         characterSelectTimerCoroutine = CharacterSelectionTimer();
         matchTimerCoroutine = MatchTimer();
@@ -95,6 +99,13 @@ public class MatchManager : NetworkBehaviour
         {
             State.Value = MatchState.NONE;
         }
+
+        GameManager.Instance.allowMovement = false;
+    }
+
+    private void OnSceneLoaded(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
+    {
+        if (NetworkManager.Singleton?.ConnectedClientsList.Count > 1) SetMatchState(MatchState.CHARACTER_SELECTION);
     }
 
     public void SceneManager_OnSynchronizeComplete(ulong clientId)
@@ -138,7 +149,13 @@ public class MatchManager : NetworkBehaviour
                     if (characterSelectTimerCoroutine != null)
                         StopCoroutine(characterSelectTimerCoroutine);
 
-                    /* SPAWN EACH TEAM PLAYER PREFABS TO SPAWN POSITIONS*/
+                    /*DESPAWN EACH TEAM PLAYER PREFABS TO SPAWN POSITIONS*/
+                    foreach (var clientId in NetworkManager.Singleton.ConnectedClients.Keys)
+                    {
+                        NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.Despawn();
+                    }
+
+                    /*SPAWN EACH TEAM PLAYER PREFABS TO SPAWN POSITIONS*/
                     for (int i = 0; i < CharacterSelected.Count; i++)
                     {
                         var character = CharacterSelected[i];
@@ -175,6 +192,8 @@ public class MatchManager : NetworkBehaviour
                 break;
             case MatchState.PLAY:
                 {
+                    GameManager.Instance.allowMovement = true;
+
                     if (initTimerCoroutine != null)
                         StopCoroutine(initTimerCoroutine);
 

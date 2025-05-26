@@ -17,7 +17,7 @@ public class LobbyManager : NetworkBehaviour
     public NetworkVariable<LobbyState> State { get; private set; } = new NetworkVariable<LobbyState>(LobbyState.NONE);
 
 
-    public NetworkVariable<float> currentWaitTime = new NetworkVariable<float>(30.0f);
+    public NetworkVariable<float> currentWaitTime = new NetworkVariable<float>(5.0f);
 
     private IEnumerator completedTimerCoroutine;
 
@@ -45,7 +45,7 @@ public class LobbyManager : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (Input.GetKeyDown(KeyCode.P) && NetworkManager.Singleton?.ConnectedClientsList.Count > 1) SetLobbyState(LobbyState.WAIT);
     }
 
     void LobbyStateBehaviour()
@@ -57,18 +57,13 @@ public class LobbyManager : NetworkBehaviour
             case LobbyState.WAIT:   
                 {
                     // Once all 6 players are in the lobby, init Coroutine with timer, then change scene in server.
-                    if (NetworkManager.Singleton?.ConnectedClientsList.Count > 0) StartCoroutine(completedTimerCoroutine);
-                    else 
-                    {
-                        StopCoroutine(completedTimerCoroutine);
-                        currentWaitTime.Value = 30.0f;
-                    }
+                    StartCoroutine(completedTimerCoroutine);
                     
                 }
                 break;
             case LobbyState.COMPLETED: 
                 {
-                    var status = NetworkManager.Singleton.SceneManager.LoadScene("Design/Levels/Blockouts/Pinball Testing/Pinball Blockout", LoadSceneMode.Single);
+                    var status = NetworkManager.Singleton.SceneManager.LoadScene("PinballTest", LoadSceneMode.Single);
                     if (status != SceneEventProgressStatus.Started)
                     {
                         Debug.LogWarning($"Failed to load Match Scene" +

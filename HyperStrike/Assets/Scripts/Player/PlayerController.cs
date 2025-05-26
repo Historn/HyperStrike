@@ -54,9 +54,6 @@ public class PlayerController : NetworkBehaviour
     [SerializeField] bool isWallRunning;
     RaycastHit wallHit;
     //float angleRoll = 25.0f; // Var to rotate camera while wallrunning
-
-    Vector3 gravity;
-
     #endregion
 
     #region "Attack Variables"
@@ -105,8 +102,6 @@ public class PlayerController : NetworkBehaviour
 
         // Init Attack Variables
         shootReady = true;
-
-        gravity = Physics.gravity;
     }
 
     private void Start()
@@ -120,16 +115,21 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
+    private void Update()
+    {
+        if (IsClient && IsOwner && GameManager.Instance.allowMovement)
+        {
+            ShootServerRPC(attackAction.IsPressed());
+        }
+    }
+
     // Physics-based + Rigidbody Actions
     private void FixedUpdate()
     {
-        // Set it to avoid flying bugs
-        if (IsServer) Physics.gravity = gravity;
-
         //Ground Check
         isGrounded = GroundCheck.CheckGrounded(transform, characterHeight);
 
-        if (IsClient && IsOwner)
+        if (IsClient && IsOwner && GameManager.Instance.allowMovement)
         {
             if (cameraWeaponTransform != null)
             {
@@ -150,12 +150,14 @@ public class PlayerController : NetworkBehaviour
 
     void InitInputs()
     {
+
         moveAction = InputSystem.actions.FindAction("Move");
         lookAction = InputSystem.actions.FindAction("Look");
         jumpAction = InputSystem.actions.FindAction("Jump");
+        slideAction = InputSystem.actions.FindAction("Slide");
+        sprintAction = InputSystem.actions.FindAction("Sprint");
 
         attackAction = InputSystem.actions.FindAction("Attack");
-        attackAction.started += _ => ShootServerRPC();
 
         //ability1Action = InputSystem.actions.FindAction("Ability1");
         //ability1Action.started += _ => ActivateAbility(player.Character.ability1);
@@ -164,8 +166,6 @@ public class PlayerController : NetworkBehaviour
         //ability2Action.started += _ => ActivateAbility(player.Character.ability2);
 
         interactAction = InputSystem.actions.FindAction("Interact");
-        slideAction = InputSystem.actions.FindAction("Crouch");
-        sprintAction = InputSystem.actions.FindAction("Sprint");
         previousAction = InputSystem.actions.FindAction("Previous");
         nextAction = InputSystem.actions.FindAction("Next");
     }
@@ -264,8 +264,7 @@ public class PlayerController : NetworkBehaviour
             isWallRunning = Physics.Raycast(transform.position, directions[i], out wallHit, transform.localScale.x + 0.15f);
             if (!isGrounded && isWallRunning && isMoving)
             {
-                Physics.gravity = Physics.gravity / 2.0f; // Reduce gravity to stay more time in the wall but not infinite
-                rb.AddForce(transform.forward * player.Character.wallRunSpeed, ForceMode.Force);
+                rb.AddForce(transform.forward * player.Character.wallRunSpeed + transform.up * 0.5f, ForceMode.Force);// Reduce gravity to stay more time in the wall but not infinite
                 Jump(isJumping, wallHit.normal);
             }
         }
@@ -275,11 +274,10 @@ public class PlayerController : NetworkBehaviour
     #endregion
 
     #region "Attacks and Abilities"
-
     [ServerRpc]
-    void ShootServerRPC()
+    void ShootServerRPC(bool isAttacking)
     {
-        if (shootReady && player.Character != null && (projectileSpawnOffset != null && player.Character.projectilePrefab != null))
+        if (isAttacking && shootReady && player.Character != null && (projectileSpawnOffset != null && player.Character.projectilePrefab != null))
         {
             shootReady = false;
             

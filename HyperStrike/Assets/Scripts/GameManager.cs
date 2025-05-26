@@ -16,6 +16,8 @@ namespace HyperStrike
     {
         public static GameManager Instance { get; private set; }
 
+        public bool allowMovement = true;
+
         private void Awake()
         {
             if (Instance == null)

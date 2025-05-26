@@ -1,9 +1,12 @@
 using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
-using UnityEditor.PackageManager;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
+#if NEW_INPUT_SYSTEM_INSTALLED
+using UnityEngine.InputSystem.UI;
+#endif
 
 public class CharacterSelectUI : NetworkBehaviour
 {
@@ -18,6 +21,19 @@ public class CharacterSelectUI : NetworkBehaviour
         if (IsClient)
         {
             MatchManager.Instance.CharacterSelected.OnListChanged += (_) => OnClientSelectCharacter();
+        }
+    }
+
+    private void Awake()
+    {
+        if (!FindAnyObjectByType<EventSystem>())
+        {
+            var inputType = typeof(StandaloneInputModule);
+#if ENABLE_INPUT_SYSTEM && NEW_INPUT_SYSTEM_INSTALLED
+                inputType = typeof(InputSystemUIInputModule);                
+#endif
+            var eventSystem = new GameObject("EventSystem", typeof(EventSystem), inputType);
+            eventSystem.transform.SetParent(transform);
         }
     }
 
