@@ -1,3 +1,4 @@
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -16,7 +17,7 @@ namespace HyperStrike
     {
         public static GameManager Instance { get; private set; }
 
-        public bool allowMovement = true;
+        public NetworkVariable<bool> allowMovement = new(true);
 
         private void Awake()
         {

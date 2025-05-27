@@ -98,9 +98,8 @@ public class MatchManager : NetworkBehaviour
         if (IsServer)
         {
             State.Value = MatchState.NONE;
+            GameManager.Instance.allowMovement.Value = false;
         }
-
-        GameManager.Instance.allowMovement = false;
     }
 
     private void OnSceneLoaded(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
@@ -192,7 +191,7 @@ public class MatchManager : NetworkBehaviour
                 break;
             case MatchState.PLAY:
                 {
-                    GameManager.Instance.allowMovement = true;
+                    GameManager.Instance.allowMovement.Value = true;
 
                     if (initTimerCoroutine != null)
                         StopCoroutine(initTimerCoroutine);

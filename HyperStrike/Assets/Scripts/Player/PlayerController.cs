@@ -117,7 +117,7 @@ public class PlayerController : NetworkBehaviour
 
     private void Update()
     {
-        if (IsClient && IsOwner && GameManager.Instance.allowMovement)
+        if (IsClient && IsOwner && GameManager.Instance.allowMovement.Value)
         {
             ShootServerRPC(attackAction.IsPressed());
         }
@@ -129,7 +129,7 @@ public class PlayerController : NetworkBehaviour
         //Ground Check
         isGrounded = GroundCheck.CheckGrounded(transform, characterHeight);
 
-        if (IsClient && IsOwner && GameManager.Instance.allowMovement)
+        if (IsClient && IsOwner && GameManager.Instance.allowMovement.Value)
         {
             if (cameraWeaponTransform != null)
             {

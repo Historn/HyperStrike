@@ -63,7 +63,7 @@
                     "name": "Previous",
                     "type": "Button",
                     "id": "2776c80d-3c14-4091-8c56-d04ced07a2b0",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -439,7 +439,7 @@
                 {
                     "name": "",
                     "id": "1c04ea5f-b012-41d1-a6f7-02e963b52893",
-                    "path": "<Keyboard>/e",
+                    "path": "<Keyboard>/f",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
@@ -493,33 +493,11 @@
                 },
                 {
                     "name": "",
-                    "id": "ab8ee5d2-bec8-43e4-a5b9-4f7ea8a64135",
-                    "path": "",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Ability1",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "a09a8155-00ec-4777-981f-bac5964c77ca",
                     "path": "<Keyboard>/q",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "Ultimate",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "6dcf630c-6004-4ef0-ace0-eab1ef2a52af",
-                    "path": "",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
                     "action": "Ultimate",
                     "isComposite": false,
                     "isPartOfComposite": false
