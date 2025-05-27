@@ -2,6 +2,7 @@ using System;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 #if NEW_INPUT_SYSTEM_INSTALLED
 using UnityEngine.InputSystem.UI;
@@ -11,12 +12,12 @@ using UnityEngine.InputSystem.UI;
 /// A basic example of a UI to start a host or client.
 /// If you want to modify this Script please copy it into your own project and add it to your copied UI Prefab.
 /// </summary>
-public class TestNetButtons : MonoBehaviour
+public class MainMenuUI : MonoBehaviour
 {
     [SerializeField]
     Button m_StartServerButton;
     [SerializeField]
-    Button m_StartClientButton;
+    Button m_FindMatchButton;
 
     void Awake()
     {
@@ -35,29 +36,39 @@ public class TestNetButtons : MonoBehaviour
     void Start()
     {
         if (m_StartServerButton) m_StartServerButton.onClick.AddListener(StartServer);
-        if (m_StartClientButton) m_StartClientButton.onClick.AddListener(StartClient);
+        if (m_FindMatchButton) m_FindMatchButton.onClick.AddListener(FindMatch);
     }
 
-    void StartClient()
+    void FindMatch()
     {
-        NetworkManager.Singleton.StartClient();
+        var success = NetworkManager.Singleton.StartClient();
+        if (success)
+        {
+            NetworkManager.Singleton.SceneManager.OnSynchronize += SceneManager_OnSynchronize; // Must be here, before loading the NetworkObjects from next scene
+        }
         DeactivateButtons();
+    }
+    private void SceneManager_OnSynchronize(ulong clientId)
+    {
+        Debug.Log($"Client-Id ({clientId}) is synchronizing!");
     }
 
     void StartServer()
     {
         NetworkManager.Singleton.StartServer();
-
-        // SYNCHRONIZATION EVENT PROCESS
-        NetworkManager.Singleton.SceneManager.OnSynchronizeComplete += MatchManager.Instance.SceneManager_OnSynchronizeComplete;
-
+        var status = NetworkManager.Singleton.SceneManager.LoadScene("LobbyTest", LoadSceneMode.Single);
+        if (status != SceneEventProgressStatus.Started)
+        {
+            Debug.LogWarning($"Failed to load Lobby" +
+                  $"with a {nameof(SceneEventProgressStatus)}: {status}");
+        }
         DeactivateButtons();
     }
 
     void DeactivateButtons()
     {
         if (m_StartServerButton) m_StartServerButton.interactable = false;
-        if (m_StartClientButton) m_StartClientButton.interactable = false;
+        if (m_FindMatchButton) m_FindMatchButton.interactable = false;
         gameObject.SetActive(false);
     }
 }

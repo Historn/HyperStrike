@@ -4,29 +4,40 @@ using UnityEngine;
 
 public class Rocket : Projectile
 {
-    float force = 30f;
     float explosionForce = 25f;
     float radius = 20f;
     [SerializeField] GameObject shootFX;
     [SerializeField] GameObject explosionFX;
-    [SerializeField] Rigidbody body;
+    [SerializeField] Rigidbody rb;
 
-    // Start is called before the first frame update
-    void Start()
+    public override void OnNetworkSpawn()
     {
         SpawnParticles(shootFX, 0.3f);
         damage = 20.0f;
-        // Spawns from the player that shot
-        body = GetComponent<Rigidbody>();
+        speed = 30f;
 
-        if (body != null)
-        {
-            Move();
-        }
-        else
-            Destroy(gameObject);
+        // Spawns from the player that shot
+        rb = GetComponent<Rigidbody>();
 
         StartCoroutine(DestroyRocket());
+    }
+
+    protected override void OnNetworkPostSpawn()
+    {
+        if (IsServer)
+        {
+            if (rb != null)
+            {
+                Move();
+            }
+            else if (rb == null)
+            {
+                Debug.Log("Rigidbody Not Found!");
+                Destroy(gameObject);
+
+            } // In case the rigidbody is null
+
+        }
     }
 
     private void OnCollisionEnter(Collision other)
@@ -36,14 +47,14 @@ public class Rocket : Projectile
         if (other != null)
         {
             SpawnParticles(explosionFX, 3f, true, other);
-            Explode(other);
+            if (IsServer) Explode(other);
             Destroy(gameObject);
         }
     }
 
     public override void Move()
     {
-        body.AddForce(transform.forward * force, ForceMode.Impulse);
+        rb.AddForce(transform.forward * speed, ForceMode.Impulse);
     }
 
     void Explode(Collision other)
@@ -59,13 +70,9 @@ public class Rocket : Projectile
 
                 rb.AddForce(dir.normalized * explosionForce, ForceMode.Impulse);
             }
-            //if (collider.CompareTag("Ball"))
-            //{
-            //    //collider.GetComponent<BallController>().Packet.LastHitPlayerId = Packet.ShooterId;
-            //}
         }
     }
-
+    
     public override void ApplyDamage(GameObject collidedGO) { }
 
     void SpawnParticles(GameObject particlesGO, float destructionTime = -1f, bool useImpactNormal = false, Collision other = null)

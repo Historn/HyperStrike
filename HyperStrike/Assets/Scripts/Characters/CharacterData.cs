@@ -9,6 +9,7 @@ namespace HyperStrike
         public int health;
         public float speed;
         public float sprintSpeed;
+        public float wallRunSpeed;
         public float maxSpeed;
         public float maxSlidingSpeed;
 
