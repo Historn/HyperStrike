@@ -1,9 +1,9 @@
 using HyperStrike;
 using Unity.Cinemachine;
 using Unity.Netcode;
+using Unity.Netcode.Components;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Timeline;
 
 // PLAYER STATE????
 
@@ -17,19 +17,13 @@ public class PlayerController : NetworkBehaviour
     public Character characterData;
     #endregion
 
-    #region "Movement Inputs"
-    InputAction moveAction;
-    InputAction lookAction;
-    InputAction jumpAction;
-    InputAction attackAction;
-    InputAction ability1Action;
-    InputAction ability2Action;
-    InputAction interactAction;
-    InputAction slideAction;
-    InputAction sprintAction;
-    InputAction previousAction;
-    InputAction nextAction;
-    #endregion
+    NetworkAnimator animator;
+    int velocityHash;
+    int isWalkingHash;
+    int isJumpingHash;
+    int isSlidingHash;
+
+    PlayerInput input;
 
     #region "Movement Variables"
     [Header("Cinemachine Settings")]
@@ -63,6 +57,16 @@ public class PlayerController : NetworkBehaviour
 
     #endregion
 
+    private void OnEnable()
+    {
+        input?.Player.Enable();
+    }
+
+    private void OnDisable()
+    {
+        input?.Player.Disable();
+    }
+
     public override void OnNetworkSpawn()
     {
         if (IsClient && IsOwner)
@@ -70,8 +74,10 @@ public class PlayerController : NetworkBehaviour
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
 
-            // Init Inputs
-            InitInputs();
+            input = new PlayerInput();
+            input?.Player.Enable();
+
+            HideMeshRenderer();
 
             cinemachineCamera.Priority = 1;
         }
@@ -106,6 +112,8 @@ public class PlayerController : NetworkBehaviour
 
     private void Start()
     {
+        animator = GetComponent<NetworkAnimator>();
+        InitAnimatorHashes();
         if (!IsOwner)
         {
             // Disable this camera if not owned by this client
@@ -119,7 +127,7 @@ public class PlayerController : NetworkBehaviour
     {
         if (IsClient && IsOwner && GameManager.Instance.allowMovement.Value)
         {
-            ShootServerRPC(attackAction.IsPressed());
+            ShootServerRPC(input.Player.Attack.IsPressed());
         }
     }
 
@@ -133,42 +141,39 @@ public class PlayerController : NetworkBehaviour
         {
             if (cameraWeaponTransform != null)
             {
-                RotatePlayerWithCameraServerRPC(lookAction.ReadValue<Vector2>());
+                RotatePlayerWithCameraServerRPC(input.Player.Look.ReadValue<Vector2>());
             }
 
             // Move
-            WalkAndRunServerRPC(moveAction.ReadValue<Vector2>(), sprintAction.IsPressed());
+            WalkAndRunServerRPC(input.Player.Move.ReadValue<Vector2>(), input.Player.Move.IsPressed(), input.Player.Sprint.IsPressed());
 
-            WallRunServerRPC(moveAction.IsInProgress(), jumpAction.IsPressed());
+            WallRunServerRPC(input.Player.Move.IsInProgress(), input.Player.Jump.IsPressed());
 
-            SlideServerRPC(slideAction.IsPressed());
+            SlideServerRPC(input.Player.Slide.IsPressed());
 
             // Jump
-            if (isGrounded && !isWallRunning) JumpServerRPC(jumpAction.IsPressed(), Vector3.zero);
-        } 
+            if (isGrounded && !isWallRunning) JumpServerRPC(input.Player.Jump.IsPressed(), Vector3.zero);
+        }
+
+        if (IsServer) animator?.Animator.SetFloat(velocityHash, rb.linearVelocity.magnitude);
     }
 
-    void InitInputs()
+    void HideMeshRenderer()
     {
-
-        moveAction = InputSystem.actions.FindAction("Move");
-        lookAction = InputSystem.actions.FindAction("Look");
-        jumpAction = InputSystem.actions.FindAction("Jump");
-        slideAction = InputSystem.actions.FindAction("Slide");
-        sprintAction = InputSystem.actions.FindAction("Sprint");
-
-        attackAction = InputSystem.actions.FindAction("Attack");
-
-        //ability1Action = InputSystem.actions.FindAction("Ability1");
-        //ability1Action.started += _ => ActivateAbility(player.Character.ability1);
-
-        //ability2Action = InputSystem.actions.FindAction("Attack");
-        //ability2Action.started += _ => ActivateAbility(player.Character.ability2);
-
-        interactAction = InputSystem.actions.FindAction("Interact");
-        previousAction = InputSystem.actions.FindAction("Previous");
-        nextAction = InputSystem.actions.FindAction("Next");
+        var meshes = GetComponentsInChildren<SkinnedMeshRenderer>();
+        foreach (var mesh in meshes) 
+        {
+            if (mesh != null) mesh.enabled = false;
+        }
     }
+
+    void InitAnimatorHashes()
+    {
+        velocityHash    = Animator.StringToHash("Velocity");
+        isWalkingHash   = Animator.StringToHash("isWalking");
+        isJumpingHash   = Animator.StringToHash("isJumping");
+        isSlidingHash   = Animator.StringToHash("isSliding");
+    } 
 
     #region "Movement Mechanics Methods"
 
@@ -194,8 +199,9 @@ public class PlayerController : NetworkBehaviour
     }
 
     [ServerRpc]
-    void WalkAndRunServerRPC(Vector2 moveValue, bool isSprinting)
+    void WalkAndRunServerRPC(Vector2 moveValue, bool isWalking, bool isSprinting)
     {
+        animator?.Animator.SetBool(isWalkingHash, isWalking);
         // Sprint
         float speed = player.Character.speed;
         if (isSprinting && isGrounded) speed = player.Character.sprintSpeed;
@@ -211,14 +217,13 @@ public class PlayerController : NetworkBehaviour
         {
             rb.maxLinearVelocity = player.Character.maxSlidingSpeed;
             rb.linearDamping = 0.1f;
-            transform.localScale = Vector3.one * 0.75f;
         }
         else
         {
             rb.maxLinearVelocity = player.Character.maxSpeed;
             rb.linearDamping = 0.2f;
-            transform.localScale = Vector3.one;
         }
+        animator?.Animator.SetBool(isSlidingHash, isSliding);
     }
 
     [ServerRpc]
@@ -232,13 +237,13 @@ public class PlayerController : NetworkBehaviour
         if (isJumping && readyToJump)
         {
             readyToJump = false;
-
             //Reset Y Velocity
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
             rb.AddForce((transform.up + jumpDir) * jumpForce, ForceMode.Impulse);
 
             Invoke(nameof(ResetJump), jumpCooldown);    //Delay for jump to reset
         }
+        animator?.Animator.SetBool(isJumpingHash, isJumping);
     }
 
     void ResetJump()
