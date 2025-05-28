@@ -1,11 +1,36 @@
 using HyperStrike;
+using System;
 using Unity.Cinemachine;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Windows;
 
 // PLAYER STATE????
+
+[Serializable]
+public struct InputData : INetworkSerializable
+{
+    public Vector2 move;
+    public Vector2 look;
+    public bool sprint;
+    public bool jump;
+    public bool slide;
+    public bool shoot;
+    public bool moveInProgress;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref move);
+        serializer.SerializeValue(ref look);
+        serializer.SerializeValue(ref sprint);
+        serializer.SerializeValue(ref jump);
+        serializer.SerializeValue(ref slide);
+        serializer.SerializeValue(ref shoot);
+        serializer.SerializeValue(ref moveInProgress);
+    }
+}
 
 public class PlayerController : NetworkBehaviour
 {
@@ -22,6 +47,7 @@ public class PlayerController : NetworkBehaviour
     int isWalkingHash;
     int isJumpingHash;
     int isSlidingHash;
+    int isShootingHash;
 
     PlayerInput input;
 
@@ -48,6 +74,13 @@ public class PlayerController : NetworkBehaviour
     [SerializeField] bool isWallRunning;
     RaycastHit wallHit;
     //float angleRoll = 25.0f; // Var to rotate camera while wallrunning
+
+    // Checkers
+    private bool wasSprinting;
+    private bool wasJumpPressed;
+    private bool wasSliding;
+    private bool wasWallRunning;
+    private bool wasShooting;
     #endregion
 
     #region "Attack Variables"
@@ -123,45 +156,35 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
-    private void Update()
-    {
-        if (IsClient && IsOwner && GameManager.Instance.allowMovement.Value)
-        {
-            ShootServerRPC(input.Player.Attack.IsPressed());
-        }
-    }
-
     // Physics-based + Rigidbody Actions
     private void FixedUpdate()
     {
-        //Ground Check
-        isGrounded = GroundCheck.CheckGrounded(transform, characterHeight);
+        isGrounded = HyperStrikeUtils.CheckGrounded(transform, characterHeight);
+        isWallRunning = HyperStrikeUtils.CheckWalls(transform, ref wallHit);
 
         if (IsClient && IsOwner && GameManager.Instance.allowMovement.Value)
         {
-            if (cameraWeaponTransform != null)
+            InputData data = new InputData
             {
-                RotatePlayerWithCameraServerRPC(input.Player.Look.ReadValue<Vector2>());
-            }
-
-            // Move
-            WalkAndRunServerRPC(input.Player.Move.ReadValue<Vector2>(), input.Player.Move.IsPressed(), input.Player.Sprint.IsPressed());
-
-            WallRunServerRPC(input.Player.Move.IsInProgress(), input.Player.Jump.IsPressed());
-
-            SlideServerRPC(input.Player.Slide.IsPressed());
-
-            // Jump
-            if (isGrounded && !isWallRunning) JumpServerRPC(input.Player.Jump.IsPressed(), Vector3.zero);
+                move = input.Player.Move.ReadValue<Vector2>(),
+                look = input.Player.Look.ReadValue<Vector2>(),
+                sprint = input.Player.Sprint.IsPressed(),
+                jump = input.Player.Jump.IsPressed(),
+                slide = input.Player.Slide.IsPressed(),
+                shoot = input.Player.Attack.IsPressed(),
+                moveInProgress = input.Player.Move.IsInProgress()
+            };
+            SendInputServerRPC(data);
         }
 
-        if (IsServer) animator?.Animator.SetFloat(velocityHash, rb.linearVelocity.magnitude);
+        if (IsServer)
+            animator?.Animator.SetFloat(velocityHash, rb.linearVelocity.magnitude);
     }
 
     void HideMeshRenderer()
     {
         var meshes = GetComponentsInChildren<SkinnedMeshRenderer>();
-        foreach (var mesh in meshes) 
+        foreach (var mesh in meshes)
         {
             if (mesh != null) mesh.enabled = false;
         }
@@ -169,16 +192,54 @@ public class PlayerController : NetworkBehaviour
 
     void InitAnimatorHashes()
     {
-        velocityHash    = Animator.StringToHash("Velocity");
-        isWalkingHash   = Animator.StringToHash("isWalking");
-        isJumpingHash   = Animator.StringToHash("isJumping");
-        isSlidingHash   = Animator.StringToHash("isSliding");
-    } 
+        velocityHash = Animator.StringToHash("Velocity");
+        isWalkingHash = Animator.StringToHash("isWalking");
+        isJumpingHash = Animator.StringToHash("isJumping");
+        isSlidingHash = Animator.StringToHash("isSliding");
+        isShootingHash = Animator.StringToHash("isShooting");
+    }
+
+    [ServerRpc(Delivery = RpcDelivery.Unreliable)]
+    void SendInputServerRPC(InputData input)
+    {
+        // Only send when changed
+        if (input.look != Vector2.zero)
+            RotatePlayerWithCamera(input.look);
+
+        if (input.move != Vector2.zero)
+        {
+            WalkAndRun(input.move, input.moveInProgress, input.sprint);
+            wasSprinting = input.sprint;
+        }
+
+        if (input.moveInProgress != wasWallRunning || input.jump != wasJumpPressed)
+        {
+            WallRun(input.moveInProgress, input.jump);
+            // Rotate camera a bit on the z-axis
+            wasWallRunning = input.moveInProgress;
+            wasJumpPressed = input.jump;
+        }
+
+        if (input.slide != wasSliding)
+        {
+            Slide(input.slide);
+            wasSliding = input.slide;
+        }
+
+        if (input.jump && isGrounded && !isWallRunning)
+        {
+            Jump(input.jump, Vector3.zero);
+        }
+
+        if (input.shoot != wasShooting)
+        {
+            Shoot(input.shoot);
+            wasShooting = input.shoot;
+        }
+    }
 
     #region "Movement Mechanics Methods"
-
-    [ServerRpc]
-    void RotatePlayerWithCameraServerRPC(Vector2 lookValue)
+    void RotatePlayerWithCamera(Vector2 lookValue)
     {
         // Get mouse input
         float mouseX = lookValue.x * sensitivity * Time.fixedDeltaTime;
@@ -198,8 +259,7 @@ public class PlayerController : NetworkBehaviour
         rb.rotation = Quaternion.Euler(0, yRotation, 0);
     }
 
-    [ServerRpc]
-    void WalkAndRunServerRPC(Vector2 moveValue, bool isWalking, bool isSprinting)
+    void WalkAndRun(Vector2 moveValue, bool isWalking, bool isSprinting)
     {
         animator?.Animator.SetBool(isWalkingHash, isWalking);
         // Sprint
@@ -210,8 +270,7 @@ public class PlayerController : NetworkBehaviour
         if (!isWallRunning) rb.AddForce(dir.normalized * speed, ForceMode.Force);
     }
 
-    [ServerRpc]
-    void SlideServerRPC(bool isSliding)
+    void Slide(bool isSliding)
     {
         if (isSliding)
         {
@@ -226,12 +285,6 @@ public class PlayerController : NetworkBehaviour
         animator?.Animator.SetBool(isSlidingHash, isSliding);
     }
 
-    [ServerRpc]
-    void JumpServerRPC(bool isJumping, Vector3 jumpDir)
-    {
-        Jump(isJumping, jumpDir);
-    }
-    
     void Jump(bool isJumping, Vector3 jumpDir)
     {
         if (isJumping && readyToJump)
@@ -240,10 +293,9 @@ public class PlayerController : NetworkBehaviour
             //Reset Y Velocity
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
             rb.AddForce((transform.up + jumpDir) * jumpForce, ForceMode.Impulse);
-
+            animator?.Animator.SetBool(isJumpingHash, isJumping);
             Invoke(nameof(ResetJump), jumpCooldown);    //Delay for jump to reset
         }
-        animator?.Animator.SetBool(isJumpingHash, isJumping);
     }
 
     void ResetJump()
@@ -251,44 +303,27 @@ public class PlayerController : NetworkBehaviour
         readyToJump = true;
     }
 
-    [ServerRpc]
-    void WallRunServerRPC(bool isMoving, bool isJumping)
+    void WallRun(bool isMoving, bool isJumping)
     {
-        Vector3[] directions = new Vector3[]
-            {
-            transform.right,
-            transform.right + transform.forward,
-            transform.forward,
-            -transform.right + transform.forward,
-            -transform.right
-            };
-
-        for (int i = 0; i < directions.Length; i++)
+        if (!isGrounded && isWallRunning && isMoving)
         {
-            Debug.DrawLine(transform.position, transform.position + directions[i], UnityEngine.Color.green);
-            isWallRunning = Physics.Raycast(transform.position, directions[i], out wallHit, transform.localScale.x + 0.15f);
-            if (!isGrounded && isWallRunning && isMoving)
-            {
-                rb.AddForce(transform.forward * player.Character.wallRunSpeed + transform.up * 0.5f, ForceMode.Force);// Reduce gravity to stay more time in the wall but not infinite
-                Jump(isJumping, wallHit.normal);
-            }
+            rb.AddForce(transform.forward * player.Character.wallRunSpeed + transform.up * 0.8f, ForceMode.Force); // Reduce gravity to stay more time in the wall but not infinite
+            Jump(isJumping, wallHit.normal);
         }
-
-        // Rotate camera a bit on the z-axis
     }
     #endregion
 
     #region "Attacks and Abilities"
-    [ServerRpc]
-    void ShootServerRPC(bool isAttacking)
+    void Shoot(bool isAttacking)
     {
         if (isAttacking && shootReady && player.Character != null && (projectileSpawnOffset != null && player.Character.projectilePrefab != null))
         {
             shootReady = false;
-            
+
             GameObject projectileGO = Instantiate(player.Character.projectilePrefab, projectileSpawnOffset.position + cameraWeaponTransform.forward * player.Character.shootOffset, cameraWeaponTransform.rotation);
             projectileGO.GetComponent<NetworkObject>().Spawn(true);
             Invoke(nameof(ResetShoot), player.Character.shootCooldown);    //Delay for attack to reset
+            animator?.Animator.SetBool(isShootingHash, isAttacking);
         }
     }
 
