@@ -39,12 +39,17 @@ public class CharacterSelectUI : NetworkBehaviour
 
     private void Start()
     {
-        for (int i = 0; i < characterSelectButtons.Count; i++)
+        // Automatically assign based on enum order and ensure not hardcoding assumptions
+        Characters[] enumValues = (Characters[])System.Enum.GetValues(typeof(Characters));
+
+        for (int i = 0; i < characterSelectButtons.Count && i < enumValues.Length; i++)
         {
             if (characterSelectButtons[i])
             {
-                characterSelectButtons[i].onClick.AddListener(() => MatchManager.Instance.SelectCharacter(Characters.SPEED));
-                characterSelectButtons[i].onClick.AddListener(() => { Debug.Log($"Client pressed button"); });
+                Characters character = enumValues[i];
+
+                characterSelectButtons[i].onClick.AddListener(() => MatchManager.Instance.SelectCharacter(character));
+                characterSelectButtons[i].onClick.AddListener(() => { Debug.Log($"Client pressed button for character {character}"); });
             }
         }
     }

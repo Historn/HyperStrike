@@ -73,7 +73,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   charactersPrefabs:
   - {fileID: 5560394306431470110, guid: 67517a22e1ce0dc459c7ddd49f33728f, type: 3}
-  - {fileID: 3057295474076285659, guid: 6f39d9881c04f38468cf324b8a93e620, type: 3}
+  - {fileID: 4220784000810643060, guid: 865caeaf8c17fec4fadf61810ea01809, type: 3}
   - {fileID: 3057295474076285659, guid: 6f39d9881c04f38468cf324b8a93e620, type: 3}
   spawnPositions:
   - {fileID: 0}
