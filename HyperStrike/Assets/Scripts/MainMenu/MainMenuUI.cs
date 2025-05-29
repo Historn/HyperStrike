@@ -1,5 +1,6 @@
 using System;
 using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
@@ -42,6 +43,7 @@ public class MainMenuUI : MonoBehaviour
     void FindMatch()
     {
         var success = NetworkManager.Singleton.StartClient();
+        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("192.168.48.55", 7777);
         if (success)
         {
             NetworkManager.Singleton.SceneManager.OnSynchronize += SceneManager_OnSynchronize; // Must be here, before loading the NetworkObjects from next scene
@@ -56,6 +58,7 @@ public class MainMenuUI : MonoBehaviour
     void StartServer()
     {
         NetworkManager.Singleton.StartServer();
+        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("0.0.0.0", 7777);
         var status = NetworkManager.Singleton.SceneManager.LoadScene("LobbyTest", LoadSceneMode.Single);
         if (status != SceneEventProgressStatus.Started)
         {

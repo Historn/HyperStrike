@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2799265188
+  GlobalObjectIdHash: 1885121760
   InScenePlacedSourceGlobalObjectIdHash: 1885121760
   DeferredDespawnTick: 0
   Ownership: 1
@@ -74,7 +74,7 @@ MonoBehaviour:
   charactersPrefabs:
   - {fileID: 5560394306431470110, guid: 67517a22e1ce0dc459c7ddd49f33728f, type: 3}
   - {fileID: 4220784000810643060, guid: 865caeaf8c17fec4fadf61810ea01809, type: 3}
-  - {fileID: 3057295474076285659, guid: 6f39d9881c04f38468cf324b8a93e620, type: 3}
+  - {fileID: 4092117151816693018, guid: d5b614d8cc56a9d429cdb647c35fa1ba, type: 3}
   spawnPositions:
   - {fileID: 0}
   - {fileID: 0}
