@@ -3390,6 +3390,14 @@ PrefabInstance:
       propertyPath: GlobalObjectIdHash
       value: 642915526
       objectReference: {fileID: 0}
+    - target: {fileID: 3942679449315371580, guid: 865caeaf8c17fec4fadf61810ea01809, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.375
+      objectReference: {fileID: 0}
+    - target: {fileID: 3942679449315371580, guid: 865caeaf8c17fec4fadf61810ea01809, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.135
+      objectReference: {fileID: 0}
     - target: {fileID: 4220784000810643060, guid: 865caeaf8c17fec4fadf61810ea01809, type: 3}
       propertyPath: m_Name
       value: Char_Crashwall
@@ -4089,6 +4097,14 @@ PrefabInstance:
       propertyPath: GlobalObjectIdHash
       value: 3102924275
       objectReference: {fileID: 0}
+    - target: {fileID: 9015245848071529902, guid: 67517a22e1ce0dc459c7ddd49f33728f, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 1297530552
+      objectReference: {fileID: 0}
+    - target: {fileID: 9015245848071529902, guid: 67517a22e1ce0dc459c7ddd49f33728f, type: 3}
+      propertyPath: InScenePlacedSourceGlobalObjectIdHash
+      value: 15578665
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4238,11 +4254,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 237924521647347322, guid: d5b614d8cc56a9d429cdb647c35fa1ba, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.734
+      value: 1.375
       objectReference: {fileID: 0}
     - target: {fileID: 237924521647347322, guid: d5b614d8cc56a9d429cdb647c35fa1ba, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.205
+      value: 0.135
       objectReference: {fileID: 0}
     - target: {fileID: 4092117151816693018, guid: d5b614d8cc56a9d429cdb647c35fa1ba, type: 3}
       propertyPath: m_Name
