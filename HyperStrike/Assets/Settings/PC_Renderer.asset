@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-9191970658372307791
+--- !u!114 &-8337137290852548420
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b00045f12942b46c698459096c89274e, type: 3}
-  m_Name: Outline Fullscreen Shader
+  m_Name: Outline Fullscreen Pass
   m_EditorClassIdentifier: 
   m_Active: 1
   injectionPoint: 600
@@ -85,8 +85,8 @@ MonoBehaviour:
     probeVolumeBlendStatesCS: {fileID: 7200000, guid: b9a23f869c4fd45f19c5ada54dd82176, type: 3}
   m_RendererFeatures:
   - {fileID: 2061954004244831439}
-  - {fileID: -9191970658372307791}
-  m_RendererFeatureMap: cf1c35fe3d889d1cb1b4e729638f6f80
+  - {fileID: -8337137290852548420}
+  m_RendererFeatureMap: cf1c35fe3d889d1cbc401257ce894c8c
   m_UseNativeRenderPass: 1
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}

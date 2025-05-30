@@ -7,11 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-<<<<<<<< HEAD:HyperStrike/Assets/Shaders/ShaderGraphs/M_OutlineShader.mat
-  m_Name: M_OutlineShader
-========
   m_Name: M_Outline
->>>>>>>> wip-assets-integration:HyperStrike/Assets/Shaders/ShaderGraphs/Outline/M_Outline.mat
   m_Shader: {fileID: -6465566751694194690, guid: d1036bebedc1d014999297643c78943c, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -41,21 +37,11 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-<<<<<<<< HEAD:HyperStrike/Assets/Shaders/ShaderGraphs/M_OutlineShader.mat
-    - _Color_Threshold: 2
-    - _Normal_Threshold: 1.5
-========
-    - _Color_Threshold: 10
-    - _Normal_Threshold: 0.97
->>>>>>>> wip-assets-integration:HyperStrike/Assets/Shaders/ShaderGraphs/Outline/M_Outline.mat
+    - _Color_Threshold: 3.21
+    - _Normal_Threshold: 1.32
     - _OVERLAY: 0
-    - _Scale: 0.657
-    - _Visibility: 0.8
+    - _Visibility: 1
     m_Colors:
-<<<<<<<< HEAD:HyperStrike/Assets/Shaders/ShaderGraphs/M_OutlineShader.mat
-    - _Outline_Color: {r: 0.49056602, g: 0.49056602, b: 0.49056602, a: 1}
-========
-    - _Outline_Color: {r: 1, g: 1, b: 1, a: 1}
->>>>>>>> wip-assets-integration:HyperStrike/Assets/Shaders/ShaderGraphs/Outline/M_Outline.mat
+    - _Outline_Color: {r: 1, g: 1, b: 1, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

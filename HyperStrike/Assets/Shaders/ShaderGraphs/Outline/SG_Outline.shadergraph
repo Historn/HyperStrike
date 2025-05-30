@@ -3729,7 +3729,7 @@
     "m_Title": "Detect Edges based on World-Space Normals",
     "m_Position": {
         "x": -2304.0,
-        "y": -208.99996948242188
+        "y": -209.0
     }
 }
 
@@ -5973,7 +5973,7 @@
     "m_KeywordScope": 0,
     "m_KeywordStages": 63,
     "m_Entries": [],
-    "m_Value": 1,
+    "m_Value": 0,
     "m_IsEditable": true
 }
 
