@@ -1,3 +1,4 @@
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -15,6 +16,8 @@ namespace HyperStrike
     public class GameManager : MonoBehaviour
     {
         public static GameManager Instance { get; private set; }
+
+        public bool allowMovement = true;
 
         private void Awake()
         {

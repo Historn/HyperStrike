@@ -34,8 +34,8 @@ public class TestNetButtons : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        m_StartServerButton.onClick.AddListener(StartServer);
-        m_StartClientButton.onClick.AddListener(StartClient);
+        if (m_StartServerButton) m_StartServerButton.onClick.AddListener(StartServer);
+        if (m_StartClientButton) m_StartClientButton.onClick.AddListener(StartClient);
     }
 
     void StartClient()
@@ -47,12 +47,17 @@ public class TestNetButtons : MonoBehaviour
     void StartServer()
     {
         NetworkManager.Singleton.StartServer();
+
+        // SYNCHRONIZATION EVENT PROCESS
+        NetworkManager.Singleton.SceneManager.OnSynchronizeComplete += MatchManager.Instance.SceneManager_OnSynchronizeComplete;
+
         DeactivateButtons();
     }
 
     void DeactivateButtons()
     {
-        m_StartServerButton.interactable = false;
-        m_StartClientButton.interactable = false;
+        if (m_StartServerButton) m_StartServerButton.interactable = false;
+        if (m_StartClientButton) m_StartClientButton.interactable = false;
+        gameObject.SetActive(false);
     }
 }
