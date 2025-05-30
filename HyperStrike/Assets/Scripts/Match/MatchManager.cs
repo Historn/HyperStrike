@@ -95,7 +95,7 @@ public class MatchManager : NetworkBehaviour
         if (IsServer)
         {
             State.Value = MatchState.NONE;
-            GameManager.Instance.allowMovement.Value = false;
+            GameManager.Instance.allowMovement = false;
         }
     }
 
@@ -188,7 +188,7 @@ public class MatchManager : NetworkBehaviour
                 break;
             case MatchState.PLAY:
                 {
-                    GameManager.Instance.allowMovement.Value = true;
+                    GameManager.Instance.allowMovement = true;
 
                     if (initTimerCoroutine != null)
                         StopCoroutine(initTimerCoroutine);

@@ -13,11 +13,11 @@ namespace HyperStrike
         IN_GAME,
     }
 
-    public class GameManager : NetworkBehaviour
+    public class GameManager : MonoBehaviour
     {
         public static GameManager Instance { get; private set; }
 
-        public NetworkVariable<bool> allowMovement = new NetworkVariable<bool>(true);
+        public bool allowMovement = true;
 
         private void Awake()
         {

@@ -162,7 +162,7 @@ public class PlayerController : NetworkBehaviour
         isGrounded = HyperStrikeUtils.CheckGrounded(transform, characterHeight);
         isWallRunning = HyperStrikeUtils.CheckWalls(transform, ref wallHit);
 
-        if (IsClient && IsOwner && GameManager.Instance.allowMovement.Value)
+        if (IsClient && IsOwner && GameManager.Instance.allowMovement)
         {
             InputData data = new InputData
             {
