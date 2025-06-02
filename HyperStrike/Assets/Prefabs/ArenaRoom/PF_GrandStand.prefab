@@ -505,6 +505,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -323373096666140209, guid: 04c94216b4c7192449b6c4a97230444d, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: edd44311daf21b349a15fcb2b8a10ae5, type: 2}
+    - target: {fileID: 549655460268315275, guid: 04c94216b4c7192449b6c4a97230444d, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: ba4fe73966ac7604fa0db3ba45769964, type: 2}
     - target: {fileID: 919132149155446097, guid: 04c94216b4c7192449b6c4a97230444d, type: 3}
       propertyPath: m_Name
       value: MK_GrandStand_Corner_2 (2)
@@ -567,6 +575,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -323373096666140209, guid: 83ac5fcc02c5b6a498241ca6f9dff6df, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: d7e62642a1484ec4ab464960bc6771ea, type: 2}
     - target: {fileID: 919132149155446097, guid: 83ac5fcc02c5b6a498241ca6f9dff6df, type: 3}
       propertyPath: m_Name
       value: MK_GrandStand_Lateral_2
@@ -629,6 +641,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -323373096666140209, guid: 0e1d10ae6c267b74daeea398534e4bee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 7983020c76fee8a4aaebaf89fee9075a, type: 2}
+    - target: {fileID: 549655460268315275, guid: 0e1d10ae6c267b74daeea398534e4bee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: b20f6d124c726844d8ca848ade81f091, type: 2}
     - target: {fileID: 919132149155446097, guid: 0e1d10ae6c267b74daeea398534e4bee, type: 3}
       propertyPath: m_Name
       value: MK_GrandStand_Corner_1
@@ -691,6 +711,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -323373096666140209, guid: c79f8d2b74bce7745acd0d905d65b2c6, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 70e664b93d31f704c9143e45dd79db01, type: 2}
     - target: {fileID: 919132149155446097, guid: c79f8d2b74bce7745acd0d905d65b2c6, type: 3}
       propertyPath: m_Name
       value: MK_GrandStand_Goal_2 (1)
@@ -823,6 +847,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -323373096666140209, guid: 0e1d10ae6c267b74daeea398534e4bee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 7983020c76fee8a4aaebaf89fee9075a, type: 2}
+    - target: {fileID: 549655460268315275, guid: 0e1d10ae6c267b74daeea398534e4bee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: b20f6d124c726844d8ca848ade81f091, type: 2}
     - target: {fileID: 919132149155446097, guid: 0e1d10ae6c267b74daeea398534e4bee, type: 3}
       propertyPath: m_Name
       value: MK_GrandStand_Corner_1 (3)
@@ -885,6 +917,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -323373096666140209, guid: c24c982b38e8fb24eabbe8a385cc86f4, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: b1bd5991331f7a44aa161dd07ee0637b, type: 2}
     - target: {fileID: 919132149155446097, guid: c24c982b38e8fb24eabbe8a385cc86f4, type: 3}
       propertyPath: m_Name
       value: MK_GrandStand_Lateral_1
@@ -947,6 +983,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -323373096666140209, guid: c79f8d2b74bce7745acd0d905d65b2c6, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 70e664b93d31f704c9143e45dd79db01, type: 2}
     - target: {fileID: 919132149155446097, guid: c79f8d2b74bce7745acd0d905d65b2c6, type: 3}
       propertyPath: m_Name
       value: MK_GrandStand_Goal_2
@@ -1009,6 +1049,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -323373096666140209, guid: bca04a72aa247774789347269581b50a, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 7d7bc7b6fb3de0a439aaec627a118768, type: 2}
     - target: {fileID: 919132149155446097, guid: bca04a72aa247774789347269581b50a, type: 3}
       propertyPath: m_Name
       value: MK_GrandStand_Goal_1
@@ -1071,6 +1115,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -323373096666140209, guid: 04c94216b4c7192449b6c4a97230444d, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: edd44311daf21b349a15fcb2b8a10ae5, type: 2}
+    - target: {fileID: 549655460268315275, guid: 04c94216b4c7192449b6c4a97230444d, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: ba4fe73966ac7604fa0db3ba45769964, type: 2}
     - target: {fileID: 919132149155446097, guid: 04c94216b4c7192449b6c4a97230444d, type: 3}
       propertyPath: m_Name
       value: MK_GrandStand_Corner_2 (1)
@@ -1195,6 +1247,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -323373096666140209, guid: bca04a72aa247774789347269581b50a, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 7d7bc7b6fb3de0a439aaec627a118768, type: 2}
     - target: {fileID: 919132149155446097, guid: bca04a72aa247774789347269581b50a, type: 3}
       propertyPath: m_Name
       value: MK_GrandStand_Goal_1 (1)
@@ -1257,6 +1313,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -323373096666140209, guid: 04c94216b4c7192449b6c4a97230444d, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: edd44311daf21b349a15fcb2b8a10ae5, type: 2}
+    - target: {fileID: 549655460268315275, guid: 04c94216b4c7192449b6c4a97230444d, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: ba4fe73966ac7604fa0db3ba45769964, type: 2}
     - target: {fileID: 919132149155446097, guid: 04c94216b4c7192449b6c4a97230444d, type: 3}
       propertyPath: m_Name
       value: MK_GrandStand_Corner_2 (3)
@@ -1327,6 +1391,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -323373096666140209, guid: 0e1d10ae6c267b74daeea398534e4bee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 7983020c76fee8a4aaebaf89fee9075a, type: 2}
+    - target: {fileID: 549655460268315275, guid: 0e1d10ae6c267b74daeea398534e4bee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: b20f6d124c726844d8ca848ade81f091, type: 2}
     - target: {fileID: 919132149155446097, guid: 0e1d10ae6c267b74daeea398534e4bee, type: 3}
       propertyPath: m_Name
       value: MK_GrandStand_Corner_1 (1)
@@ -1389,6 +1461,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -323373096666140209, guid: c24c982b38e8fb24eabbe8a385cc86f4, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: b1bd5991331f7a44aa161dd07ee0637b, type: 2}
     - target: {fileID: 919132149155446097, guid: c24c982b38e8fb24eabbe8a385cc86f4, type: 3}
       propertyPath: m_Name
       value: MK_GrandStand_Lateral_1 (1)
@@ -1521,6 +1597,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -323373096666140209, guid: 83ac5fcc02c5b6a498241ca6f9dff6df, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: d7e62642a1484ec4ab464960bc6771ea, type: 2}
     - target: {fileID: 919132149155446097, guid: 83ac5fcc02c5b6a498241ca6f9dff6df, type: 3}
       propertyPath: m_Name
       value: MK_GrandStand_Lateral_2 (1)
@@ -1645,6 +1725,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -323373096666140209, guid: 04c94216b4c7192449b6c4a97230444d, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: edd44311daf21b349a15fcb2b8a10ae5, type: 2}
+    - target: {fileID: 549655460268315275, guid: 04c94216b4c7192449b6c4a97230444d, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: ba4fe73966ac7604fa0db3ba45769964, type: 2}
     - target: {fileID: 919132149155446097, guid: 04c94216b4c7192449b6c4a97230444d, type: 3}
       propertyPath: m_Name
       value: MK_GrandStand_Corner_2
@@ -1831,6 +1919,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -323373096666140209, guid: 0e1d10ae6c267b74daeea398534e4bee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 7983020c76fee8a4aaebaf89fee9075a, type: 2}
+    - target: {fileID: 549655460268315275, guid: 0e1d10ae6c267b74daeea398534e4bee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: b20f6d124c726844d8ca848ade81f091, type: 2}
     - target: {fileID: 919132149155446097, guid: 0e1d10ae6c267b74daeea398534e4bee, type: 3}
       propertyPath: m_Name
       value: MK_GrandStand_Corner_1 (2)
