@@ -34,6 +34,7 @@ public class MatchManager : NetworkBehaviour
     public event Action OnUpdateMatchScore;
 
     public NetworkVariable<MatchState> State { get; private set; } = new NetworkVariable<MatchState>(MatchState.NONE);
+    public NetworkVariable<bool> allowMovement = new NetworkVariable<bool>(false);
     public NetworkList<ulong> LocalPlayersID;
     public NetworkList<ulong> VisitantPlayersID;
 
@@ -64,10 +65,8 @@ public class MatchManager : NetworkBehaviour
     public NetworkVariable<int> localGoals = new NetworkVariable<int>(0);
     public NetworkVariable<int> visitantGoals = new NetworkVariable<int>(0);
     #endregion
-       
-    [Header("VFX References")]
-    [SerializeField] private GameObject localGoalVFX;
-    [SerializeField] private GameObject visitantGoalVFX;
+
+    [SerializeField] private GameObject ballPrefab;
 
     void Awake()
     {
@@ -95,18 +94,16 @@ public class MatchManager : NetworkBehaviour
         if (IsServer)
         {
             State.Value = MatchState.NONE;
-            GameManager.Instance.allowMovement = false;
+            allowMovement.Value = false;
         }
     }
 
     private void OnSceneLoaded(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
     {
-        if (NetworkManager.Singleton?.ConnectedClientsList.Count > 1) SetMatchState(MatchState.CHARACTER_SELECTION);
-    }
-
-    public void SceneManager_OnSynchronizeComplete(ulong clientId)
-    {
-        if (NetworkManager.Singleton?.ConnectedClientsList.Count > 1) SetMatchState(MatchState.CHARACTER_SELECTION);
+        if (NetworkManager.Singleton?.ConnectedClientsList.Count > 1)
+        {
+            SetMatchState(MatchState.CHARACTER_SELECTION);
+        }
     }
 
     void MatchStateBehavior()
@@ -114,8 +111,6 @@ public class MatchManager : NetworkBehaviour
         switch (State.Value)
         {
             case MatchState.NONE:
-
-                break;
             case MatchState.CHARACTER_SELECTION:
                 {
                     // ASSIGN PLAYERS TO A TEAM HARDCODED NOW
@@ -130,7 +125,7 @@ public class MatchManager : NetworkBehaviour
                             VisitantPlayersID.Add(NetworkManager.Singleton.ConnectedClientsList[i].ClientId);
                         }
 
-                        CharacterSelected.Add((byte)Characters.NONE);
+                        if (CharacterSelected.Count < 6) CharacterSelected.Add((byte)Characters.NONE);
                     }
 
                     // DISPLAY CHARACTER SELECTION WHEN ALL PLAYERS ARE CONNECTED AND SYNCED
@@ -188,7 +183,7 @@ public class MatchManager : NetworkBehaviour
                 break;
             case MatchState.PLAY:
                 {
-                    GameManager.Instance.allowMovement = true;
+                    allowMovement.Value = true;
 
                     if (initTimerCoroutine != null)
                         StopCoroutine(initTimerCoroutine);
@@ -285,7 +280,9 @@ public class MatchManager : NetworkBehaviour
 
     void ResetPositions()
     {
-
+        allowMovement.Value = false;
+        GameObject ball = Instantiate(ballPrefab, new Vector3(0, 5, 0), Quaternion.identity);
+        ball.GetComponent<NetworkObject>().Spawn(true);
     }
 
     private void EndMatch()
@@ -301,7 +298,7 @@ public class MatchManager : NetworkBehaviour
         SetMatchState(st);
 
         Debug.Log("Match Ended!");
-        Debug.Log($"Final Score: Local {localGoals} - {visitantGoals} Visitant");
+        Debug.Log($"Final Score: Local {localGoals.Value} - {visitantGoals.Value} Visitant");
     }
 
     private IEnumerator MatchTimer()

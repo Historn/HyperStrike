@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
@@ -18,9 +19,9 @@ public class CharacterSelectUI : NetworkBehaviour
     {
         MatchManager.Instance.characterSelectionTime.OnValueChanged += (previous, current) => UpdateCharSelectTimerAsText();
         MatchManager.Instance.characterSelectionTime.OnValueChanged += (previous, current) => { if (MatchManager.Instance.GetCurrentCharSelectTime() < 0.0f) gameObject.SetActive(false); };
-        if (IsClient)
+        if (IsOwner)
         {
-            MatchManager.Instance.CharacterSelected.OnListChanged += (_) => OnClientSelectCharacter();
+            MatchManager.Instance.CharacterSelected.OnListChanged += OnClientSelectCharacter;
         }
     }
 
@@ -49,7 +50,6 @@ public class CharacterSelectUI : NetworkBehaviour
                 Characters character = enumValues[i];
 
                 characterSelectButtons[i].onClick.AddListener(() => MatchManager.Instance.SelectCharacter(character));
-                characterSelectButtons[i].onClick.AddListener(() => { Debug.Log($"Client pressed button for character {character}"); });
             }
         }
     }
@@ -66,23 +66,21 @@ public class CharacterSelectUI : NetworkBehaviour
         characterSelectTimerText.text = timeText;
     }
 
-    public void OnClientSelectCharacter() // NO VA DE MOMENTO
+    private void OnClientSelectCharacter(NetworkListEvent<byte> changeEvent)
     {
-        if (IsClient)
+        for (int i = 0; i < MatchManager.Instance.CharacterSelected.Count; i++)
         {
-            for (int i = 0; i < MatchManager.Instance.CharacterSelected.Count; i++)
+            var players = NetworkManager.Singleton.ConnectedClientsList;
+            var byteCharacter = MatchManager.Instance.CharacterSelected[i];
+            if ((Characters)byteCharacter != Characters.NONE)
             {
-                var players = NetworkManager.Singleton.ConnectedClientsList;
-                var byteCharacter = MatchManager.Instance.CharacterSelected[i];
-                if (byteCharacter != (byte)Characters.NONE)
-                {
-                    //if ((MatchManager.Instance.LocalPlayersID.Contains(players[i].ClientId) && MatchManager.Instance.LocalPlayersID.Contains(NetworkManager.Singleton.LocalClientId))
-                    //    || (MatchManager.Instance.VisitantPlayersID.Contains(players[i].ClientId) && MatchManager.Instance.VisitantPlayersID.Contains(NetworkManager.Singleton.LocalClientId)))
-                    //{
-                    //    characterSelectButtons[byteCharacter].enabled = false;
-                    //}
-                    characterSelectButtons[byteCharacter].enabled = false;
-                }
+                characterSelectButtons[byteCharacter].gameObject.SetActive(false);
+                Debug.Log($"Button locked");
+            }
+            else
+            {
+                characterSelectButtons[byteCharacter].gameObject.SetActive(true);
+                Debug.Log($"Button activated again");
             }
         }
     }

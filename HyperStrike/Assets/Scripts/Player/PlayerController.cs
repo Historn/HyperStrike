@@ -159,10 +159,12 @@ public class PlayerController : NetworkBehaviour
     // Physics-based + Rigidbody Actions
     private void FixedUpdate()
     {
+        if (MatchManager.Instance && !MatchManager.Instance.allowMovement.Value) return;
+
         isGrounded = HyperStrikeUtils.CheckGrounded(transform, characterHeight);
         isWallRunning = HyperStrikeUtils.CheckWalls(transform, ref wallHit);
 
-        if (IsClient && IsOwner && GameManager.Instance.allowMovement)
+        if (IsClient && IsOwner)
         {
             InputData data = new InputData
             {
@@ -199,7 +201,7 @@ public class PlayerController : NetworkBehaviour
         isShootingHash = Animator.StringToHash("isShooting");
     }
 
-    [ServerRpc(Delivery = RpcDelivery.Unreliable)]
+    [ServerRpc]
     void SendInputServerRPC(InputData input)
     {
         // Only send when changed

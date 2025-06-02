@@ -71,6 +71,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  allowMovement:
+    m_InternalValue: 0
   charactersPrefabs:
   - {fileID: 5560394306431470110, guid: 67517a22e1ce0dc459c7ddd49f33728f, type: 3}
   - {fileID: 4220784000810643060, guid: 865caeaf8c17fec4fadf61810ea01809, type: 3}
@@ -83,9 +85,9 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   characterSelectionTime:
-    m_InternalValue: 15
+    m_InternalValue: 30
   currentWaitTime:
-    m_InternalValue: 6
+    m_InternalValue: 5
   maxTime: 300
   currentMatchTime:
     m_InternalValue: 300
@@ -93,5 +95,4 @@ MonoBehaviour:
     m_InternalValue: 0
   visitantGoals:
     m_InternalValue: 0
-  localGoalVFX: {fileID: 0}
-  visitantGoalVFX: {fileID: 0}
+  ballPrefab: {fileID: 8379585553693324858, guid: e4da653cc54f17e428caa2723bfd66f5, type: 3}

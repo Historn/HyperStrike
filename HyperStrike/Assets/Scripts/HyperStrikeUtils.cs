@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 
 public class HyperStrikeUtils
@@ -31,5 +32,33 @@ public class HyperStrikeUtils
         }
 
         return wall;
+    }
+
+    public static bool CheckObjectInsideCollision(Transform transform)
+    {
+        bool[] completelyInside = new bool[]
+        {
+            false, false, false, false, false, false,
+        };
+
+        Vector3[] directions = new Vector3[]
+        {
+            transform.right,
+            transform.forward,
+            transform.up,
+            -transform.right,
+            -transform.forward,
+            -transform.up
+        };
+
+        for (int i = 0; i < directions.Length && i < completelyInside.Length; i++)
+        {
+            Debug.DrawLine(transform.position, transform.position + (directions[i] * 3), UnityEngine.Color.green);
+            completelyInside[i] = Physics.Raycast(transform.position, directions[i], transform.localScale.magnitude);
+        }
+
+        bool ret = completelyInside.Contains(false);
+
+        return completelyInside.Contains(false) ? false : true;
     }
 }
