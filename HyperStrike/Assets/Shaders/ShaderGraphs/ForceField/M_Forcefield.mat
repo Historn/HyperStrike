@@ -65,6 +65,7 @@ Material:
     - _scanSize: 1
     - _scanSpeed: 0.2
     m_Colors:
+    - _RimColor: {r: 0.052356005, g: 1.853713, b: 2, a: 0}
     - _baseColor: {r: 0.6698113, g: 0.6698113, b: 0.6698113, a: 1}
     - _fillOffset: {r: 0, g: 0, b: 0, a: 0}
     - _fillTiling: {r: 50, g: 50, b: 0, a: 0}

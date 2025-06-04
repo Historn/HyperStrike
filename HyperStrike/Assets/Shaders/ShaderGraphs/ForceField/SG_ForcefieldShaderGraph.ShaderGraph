@@ -3631,7 +3631,7 @@
 }
 
 {
-    "m_SGVersion": 2,
+    "m_SGVersion": 3,
     "m_Type": "UnityEditor.ShaderGraph.Internal.ColorShaderProperty",
     "m_ObjectId": "37dd154b1c021a8abe24d5274a500cfb",
     "m_Guid": {
@@ -3641,7 +3641,7 @@
     "m_DefaultRefNameVersion": 0,
     "m_RefNameGeneratedByDisplayName": "",
     "m_DefaultReferenceName": "Color_F28FFCFC",
-    "m_OverrideReferenceName": "_rimColor",
+    "m_OverrideReferenceName": "_RimColor",
     "m_GeneratePropertyBlock": true,
     "m_UseCustomSlotLabel": false,
     "m_CustomSlotLabel": "",
