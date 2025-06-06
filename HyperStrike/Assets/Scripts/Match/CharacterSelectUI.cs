@@ -15,14 +15,14 @@ public class CharacterSelectUI : NetworkBehaviour
 
     [SerializeField] private List<Button> characterSelectButtons;
 
-    private void OnEnable()
+    [SerializeField] private int currentSelectedButton;
+
+    public override void OnNetworkSpawn()
     {
-        MatchManager.Instance.characterSelectionTime.OnValueChanged += (previous, current) => UpdateCharSelectTimerAsText();
+        if (!IsClient) return;
+        MatchManager.Instance.CharacterSelected.OnListChanged += OnClientSelectCharacter;
+        MatchManager.Instance.characterSelectionTime.OnValueChanged += UpdateCharSelectTimerAsText;
         MatchManager.Instance.characterSelectionTime.OnValueChanged += (previous, current) => { if (MatchManager.Instance.GetCurrentCharSelectTime() < 0.0f) gameObject.SetActive(false); };
-        if (IsOwner)
-        {
-            MatchManager.Instance.CharacterSelected.OnListChanged += OnClientSelectCharacter;
-        }
     }
 
     private void Awake()
@@ -54,7 +54,7 @@ public class CharacterSelectUI : NetworkBehaviour
         }
     }
 
-    void UpdateCharSelectTimerAsText()
+    void UpdateCharSelectTimerAsText(float previous, float current)
     {
         if (characterSelectTimerText == null) return;
 
@@ -70,18 +70,17 @@ public class CharacterSelectUI : NetworkBehaviour
     {
         for (int i = 0; i < MatchManager.Instance.CharacterSelected.Count; i++)
         {
-            var players = NetworkManager.Singleton.ConnectedClientsList;
             var byteCharacter = MatchManager.Instance.CharacterSelected[i];
-            if ((Characters)byteCharacter != Characters.NONE)
+            if ((Characters)byteCharacter == Characters.NONE)
             {
-                characterSelectButtons[byteCharacter].gameObject.SetActive(false);
-                Debug.Log($"Button locked");
-            }
-            else
-            {
-                characterSelectButtons[byteCharacter].gameObject.SetActive(true);
-                Debug.Log($"Button activated again");
+                //characterSelectButtons[currentSelectedButton].interactable = true;
             }
         }
+    }
+
+    private void OnDisable()
+    {
+        if (!IsOwner) return;
+        MatchManager.Instance.CharacterSelected.OnListChanged -= OnClientSelectCharacter;
     }
 }

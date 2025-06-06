@@ -10,7 +10,7 @@ public class Goal : NetworkBehaviour
         if (other != null && other.CompareTag("Ball"))
         {
             bool goal = other.GetComponent<BallController>().IsGoal;
-            Debug.Log(goal);
+            //Debug.Log(goal);
             if (goal)
             {
                 if (isLocalGoal)

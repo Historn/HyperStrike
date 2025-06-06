@@ -17,6 +17,8 @@ public class BallController : NetworkBehaviour
 
     void FixedUpdate()
     {
+        if (!MatchManager.Instance.allowMovement.Value) rb.linearVelocity = Vector3.zero;
+
         //Ground Check
         isGrounded = HyperStrikeUtils.CheckGrounded(transform);
         IsGoal = HyperStrikeUtils.CheckObjectInsideCollision(transform);
