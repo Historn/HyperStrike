@@ -11,10 +11,10 @@ GameObject:
   - component: {fileID: 7163229690030565289}
   m_Layer: 0
   m_Name: PF_Bouncer
-  m_TagString: Untagged
+  m_TagString: Bouncer
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &7163229690030565289
 Transform:
@@ -92,6 +92,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8475018772658091717, guid: a39453dea8a44334cb678c3fb21a0c50, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: -6353819466569395494, guid: a39453dea8a44334cb678c3fb21a0c50, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -108,9 +112,25 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: d82e1768055c88446a1af4aa2288b726, type: 2}
+    - target: {fileID: -1719742463459427146, guid: a39453dea8a44334cb678c3fb21a0c50, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: a39453dea8a44334cb678c3fb21a0c50, type: 3}
       propertyPath: m_Name
       value: SM_Bouncer
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: a39453dea8a44334cb678c3fb21a0c50, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 1657585233702650151, guid: a39453dea8a44334cb678c3fb21a0c50, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 4678687080845725719, guid: a39453dea8a44334cb678c3fb21a0c50, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -171,7 +191,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 43033679
+  GlobalObjectIdHash: 1660147271
   InScenePlacedSourceGlobalObjectIdHash: 3242667643
   DeferredDespawnTick: 0
   Ownership: 1
