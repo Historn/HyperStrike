@@ -13,16 +13,14 @@ public class MatchUI : NetworkBehaviour
     [SerializeField] private TextMeshProUGUI localScoreText;
     [SerializeField] private TextMeshProUGUI visitantScoreText;
 
-    private void Awake()
-    {
-        MatchManager.Instance.OnDisplayCharacterSelection += DisplayCharacterSelectionRpc;
-        MatchManager.Instance.currentWaitTime.OnValueChanged += UpdateWaitTimerText;
-        MatchManager.Instance.currentMatchTime.OnValueChanged += UpdateMatchTimerAsText;
-    }
-
     public override void OnNetworkSpawn()
     {
+        if (IsServer) MatchManager.Instance.OnDisplayCharacterSelection += DisplayCharacterSelectionRpc; // This invokwed by server
+
         if (!IsClient) return;
+
+        MatchManager.Instance.currentWaitTime.OnValueChanged += UpdateWaitTimerText;
+        MatchManager.Instance.currentMatchTime.OnValueChanged += UpdateMatchTimerAsText;
 
         MatchManager.Instance.localGoals.OnValueChanged += UpdateView;
         MatchManager.Instance.visitantGoals.OnValueChanged += UpdateView;
@@ -55,7 +53,6 @@ public class MatchUI : NetworkBehaviour
     {
         Cursor.lockState = CursorLockMode.Confined;
         Cursor.visible = true;
-        characterSelection.SetActive(true);
     }
 
     public void UpdateView(int previous, int current)

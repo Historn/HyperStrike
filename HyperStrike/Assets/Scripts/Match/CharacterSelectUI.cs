@@ -68,14 +68,36 @@ public class CharacterSelectUI : NetworkBehaviour
 
     private void OnClientSelectCharacter(NetworkListEvent<byte> changeEvent)
     {
-        for (int i = 0; i < MatchManager.Instance.CharacterSelected.Count; i++)
-        {
-            var byteCharacter = MatchManager.Instance.CharacterSelected[i];
-            if ((Characters)byteCharacter == Characters.NONE)
-            {
-                //characterSelectButtons[currentSelectedButton].interactable = true;
-            }
-        }
+        if (changeEvent.Type != NetworkListEvent<byte>.EventType.Value) return;
+
+        Debug.Log(((Characters)changeEvent.Value).ToString());
+
+        //switch (changeEvent.Index)
+        //{
+        //    case 0:
+        //    case 3:
+        //        characterSelectButtons[0].interactable = false;
+        //        break;
+        //    case 1:
+        //    case 4:
+        //        characterSelectButtons[1].interactable = false;
+        //        break;
+        //    case 2:
+        //    case 5:
+        //        characterSelectButtons[2].interactable = false;
+        //        break;
+        //    default:
+        //        break;
+        //}
+
+        //for (int i = 0; i < MatchManager.Instance.CharacterSelected.Count; i++)
+        //{
+        //    var byteCharacter = MatchManager.Instance.CharacterSelected[i];
+        //    if ((Characters)byteCharacter == Characters.NONE)
+        //    {
+        //        //characterSelectButtons[currentSelectedButton].interactable = true;
+        //    }
+        //}
     }
 
     private void OnDisable()

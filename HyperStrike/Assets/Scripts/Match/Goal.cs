@@ -14,14 +14,16 @@ public class Goal : NetworkBehaviour
             if (goal)
             {
                 if (isLocalGoal)
-                    MatchManager.Instance.localGoals.Value++;
-                else
                     MatchManager.Instance.visitantGoals.Value++;
+                else
+                    MatchManager.Instance.localGoals.Value++;
 
                 // Increase goals
                 TriggerGoalVFX(other.transform.position);
 
                 Destroy(other.gameObject);
+
+                MatchManager.Instance.SetMatchState(MatchState.GOAL);
             }
         }
     }
