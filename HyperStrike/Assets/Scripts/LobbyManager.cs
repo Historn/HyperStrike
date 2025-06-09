@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 public enum LobbyState : byte
 {
     NONE = 0,
+    CONNECTING,
     WAIT,
     COMPLETED
 }
@@ -21,6 +22,23 @@ public class LobbyManager : NetworkBehaviour
 
     private IEnumerator completedTimerCoroutine;
 
+    public override void OnNetworkSpawn()
+    {
+        if(!IsServer) return;
+
+        NetworkManager.Singleton.OnClientConnectedCallback += (clientId) =>
+        { 
+            if (NetworkManager.Singleton.ConnectedClientsList.Count > 5 && State.Value == LobbyState.CONNECTING)
+            {
+                SetLobbyState(LobbyState.WAIT);
+            }
+            else if (NetworkManager.Singleton.ConnectedClientsList.Count >= 6)
+            {
+                NetworkManager.DisconnectClient(clientId, "Server is full");
+            }
+        };
+    }
+
     void Awake()
     {
         // Destroy, we dont want it to be in the other scenes, not needed
@@ -34,12 +52,8 @@ public class LobbyManager : NetworkBehaviour
         }
 
         completedTimerCoroutine = LobbyCompletedTimer();
-    }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
+        SetLobbyState(LobbyState.CONNECTING);
     }
 
     // Update is called once per frame
@@ -56,15 +70,21 @@ public class LobbyManager : NetworkBehaviour
         switch (State.Value)
         {
             case LobbyState.NONE:
+            case LobbyState.CONNECTING:
+                {
+                    if (completedTimerCoroutine != null)
+                        StopCoroutine(completedTimerCoroutine);
+
+                    completedTimerCoroutine = LobbyCompletedTimer();
+                }
                 break;
-            case LobbyState.WAIT:   
+            case LobbyState.WAIT:
                 {
                     // Once all 6 players are in the lobby, init Coroutine with timer, then change scene in server.
                     StartCoroutine(completedTimerCoroutine);
-                    
                 }
                 break;
-            case LobbyState.COMPLETED: 
+            case LobbyState.COMPLETED:
                 {
                     var status = NetworkManager.Singleton.SceneManager.LoadScene("PinballTest", LoadSceneMode.Single);
                     if (status != SceneEventProgressStatus.Started)
@@ -81,7 +101,7 @@ public class LobbyManager : NetworkBehaviour
 
     public void SetLobbyState(LobbyState state)
     {
-        if (IsServer)
+        if (IsServer && State.Value != state)
         {
             State.Value = state;
             LobbyStateBehaviour();

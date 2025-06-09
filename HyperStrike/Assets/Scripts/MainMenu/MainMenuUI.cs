@@ -63,7 +63,7 @@ public class MainMenuUI : MonoBehaviour
     {
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("0.0.0.0", 7777);
         NetworkManager.Singleton.StartServer();
-        var status = NetworkManager.Singleton.SceneManager.LoadScene("LobbyTest", LoadSceneMode.Single);
+        var status = NetworkManager.Singleton.SceneManager.LoadScene("LobbyRoom", LoadSceneMode.Single);
         if (status != SceneEventProgressStatus.Started)
         {
             Debug.LogWarning($"Failed to load Lobby" +
