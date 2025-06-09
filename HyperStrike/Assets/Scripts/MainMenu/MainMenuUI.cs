@@ -42,7 +42,11 @@ public class MainMenuUI : MonoBehaviour
 
     void FindMatch()
     {
+#if UNITY_EDITOR
+        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("127.0.0.1", 7777);
+#else
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("192.168.1.22", 7777);
+#endif
         var success = NetworkManager.Singleton.StartClient();
         if (success)
         {

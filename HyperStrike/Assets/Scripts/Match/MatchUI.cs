@@ -8,15 +8,28 @@ public class MatchUI : NetworkBehaviour
 
     [SerializeField] private GameObject characterSelection;
 
-    private void Awake()
+    [Header("UI Match Display")]
+    [SerializeField] private TextMeshProUGUI timerText;
+    [SerializeField] private TextMeshProUGUI localScoreText;
+    [SerializeField] private TextMeshProUGUI visitantScoreText;
+
+    public override void OnNetworkSpawn()
     {
-        MatchManager.Instance.OnDisplayCharacterSelection += DisplayCharacterSelectionRpc;
-        MatchManager.Instance.currentWaitTime.OnValueChanged += (previous, current) => UpdateWaitTimerText();
-        MatchManager.Instance.currentMatchTime.OnValueChanged += (previous, current) => UpdateMatchTimerAsText();
+        if (IsServer) MatchManager.Instance.OnDisplayCharacterSelection += DisplayCharacterSelectionRpc; // This invokwed by server
+
+        if (!IsClient) return;
+
+        MatchManager.Instance.currentWaitTime.OnValueChanged += UpdateWaitTimerText;
+        MatchManager.Instance.currentMatchTime.OnValueChanged += UpdateMatchTimerAsText;
+
+        MatchManager.Instance.localGoals.OnValueChanged += UpdateView;
+        MatchManager.Instance.visitantGoals.OnValueChanged += UpdateView;
     }
 
-    void UpdateWaitTimerText()
+    void UpdateWaitTimerText(float previous, float current)
     {
+        // INTERPOLATE BETWEEN PREVIOUS AND CURRENT?
+
         if (initTimerText != null)
         {
             int time = Mathf.FloorToInt(MatchManager.Instance.GetCurrentWaitTime());
@@ -26,14 +39,13 @@ public class MatchUI : NetworkBehaviour
         }
     }
 
-    string UpdateMatchTimerAsText()
+    void UpdateMatchTimerAsText(float previous, float current)
     {
         int minutes = Mathf.FloorToInt(MatchManager.Instance.GetCurrentMatchTime() / 60f);
         int seconds = Mathf.FloorToInt(MatchManager.Instance.GetCurrentMatchTime() % 60f);
 
         string timeText = $"{minutes:D2}:{seconds:D2}";
-
-        return timeText;
+        timerText.text = timeText;
     }
 
     [Rpc(SendTo.NotServer)]
@@ -41,6 +53,11 @@ public class MatchUI : NetworkBehaviour
     {
         Cursor.lockState = CursorLockMode.Confined;
         Cursor.visible = true;
-        characterSelection.SetActive(true);
+    }
+
+    public void UpdateView(int previous, int current)
+    {
+        localScoreText.text = MatchManager.Instance.localGoals.Value.ToString();
+        visitantScoreText.text = MatchManager.Instance.visitantGoals.Value.ToString();
     }
 }

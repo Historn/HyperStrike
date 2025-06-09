@@ -2210,7 +2210,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Visible: 1
-  m_MaxRefreshRate: 30
+  m_MaxRefreshRate: 60
   <CustomStyleSheet>k__BackingField: {fileID: 0}
   <PanelSettingsOverride>k__BackingField: {fileID: 0}
   <Position>k__BackingField:
@@ -21423,15 +21423,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_PresetAsset: {fileID: 0}
   m_PresetReference:
-    rid: 2505631514876706972
+    rid: 9021015748503666809
   m_Scenario:
-    rid: 2505631514876706973
+    rid: -2
   m_IsScenarioSettingsFolded: 1
-  AutoRunScenario: 1
+  AutoRunScenario: 0
   references:
     version: 2
     RefIds:
-    - rid: 2505631514876706972
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 9021015748503666809
       type: {class: NetworkSimulatorPreset, ns: Unity.Multiplayer.Tools.NetworkSimulator.Runtime, asm: Unity.Multiplayer.Tools.NetworkSimulator.Runtime}
       data:
         <Name>k__BackingField: 'Home Fiber [Best real-world scenario]'
@@ -21441,14 +21443,6 @@ MonoBehaviour:
         <PacketJitterMs>k__BackingField: 1
         <PacketLossInterval>k__BackingField: 0
         <PacketLossPercent>k__BackingField: 0
-    - rid: 2505631514876706973
-      type: {class: ConnectionsCycle, ns: Unity.Multiplayer.Tools.NetworkSimulator.Runtime.BuiltInScenarios, asm: Unity.Multiplayer.Tools.NetworkSimulator.Runtime}
-      data:
-        m_Configurations:
-        - m_ClassPreset:
-            rid: 2505631514876706972
-          m_ScriptableObjectPreset: {fileID: 0}
-          ChangeIntervalMilliseconds: 5000
 --- !u!4 &1447318443
 Transform:
   m_ObjectHideFlags: 0

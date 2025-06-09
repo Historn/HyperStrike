@@ -14,8 +14,8 @@ public enum MatchState : byte
     WAIT,
     INIT,
     PLAY,
-    WON,
-    LOOSE,
+    GOAL,
+    FINALIZED
 }
 
 public enum Characters : byte
@@ -34,6 +34,7 @@ public class MatchManager : NetworkBehaviour
     public event Action OnUpdateMatchScore;
 
     public NetworkVariable<MatchState> State { get; private set; } = new NetworkVariable<MatchState>(MatchState.NONE);
+    public NetworkVariable<bool> allowMovement = new NetworkVariable<bool>(false);
     public NetworkList<ulong> LocalPlayersID;
     public NetworkList<ulong> VisitantPlayersID;
 
@@ -53,8 +54,8 @@ public class MatchManager : NetworkBehaviour
 
     #region "WAIT TIME"
     [Header("Wait Conditions")]
-    float waitTime = 6f; // Wait for 5 seconds
-    public NetworkVariable<float> currentWaitTime = new NetworkVariable<float>(6.0f);
+    float waitTime = 5f; // Wait for 5 seconds
+    public NetworkVariable<float> currentWaitTime = new NetworkVariable<float>(5.0f);
     #endregion
 
     #region "MATCH VARIABLES"
@@ -64,10 +65,8 @@ public class MatchManager : NetworkBehaviour
     public NetworkVariable<int> localGoals = new NetworkVariable<int>(0);
     public NetworkVariable<int> visitantGoals = new NetworkVariable<int>(0);
     #endregion
-       
-    [Header("VFX References")]
-    [SerializeField] private GameObject localGoalVFX;
-    [SerializeField] private GameObject visitantGoalVFX;
+
+    [SerializeField] private GameObject ballPrefab;
 
     void Awake()
     {
@@ -84,29 +83,23 @@ public class MatchManager : NetworkBehaviour
         // SYNCHRONIZATION EVENT PROCESS
         NetworkManager.Singleton.SceneManager.OnLoadComplete += OnSceneLoaded;
 
-        // Init Enumerators
-        characterSelectTimerCoroutine = CharacterSelectionTimer();
-        matchTimerCoroutine = MatchTimer();
-        initTimerCoroutine = PlayMatch();
-
         CharacterSelected = new NetworkList<byte>();
         LocalPlayersID = new NetworkList<ulong>();
         VisitantPlayersID = new NetworkList<ulong>();
+
         if (IsServer)
         {
             State.Value = MatchState.NONE;
-            GameManager.Instance.allowMovement = false;
+            allowMovement.Value = false;
         }
     }
 
     private void OnSceneLoaded(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
     {
-        if (NetworkManager.Singleton?.ConnectedClientsList.Count > 1) SetMatchState(MatchState.CHARACTER_SELECTION);
-    }
-
-    public void SceneManager_OnSynchronizeComplete(ulong clientId)
-    {
-        if (NetworkManager.Singleton?.ConnectedClientsList.Count > 1) SetMatchState(MatchState.CHARACTER_SELECTION);
+        if (NetworkManager.Singleton?.ConnectedClientsList.Count > 1)
+        {
+            SetMatchState(MatchState.CHARACTER_SELECTION);
+        }
     }
 
     void MatchStateBehavior()
@@ -114,8 +107,6 @@ public class MatchManager : NetworkBehaviour
         switch (State.Value)
         {
             case MatchState.NONE:
-
-                break;
             case MatchState.CHARACTER_SELECTION:
                 {
                     // ASSIGN PLAYERS TO A TEAM HARDCODED NOW
@@ -130,11 +121,13 @@ public class MatchManager : NetworkBehaviour
                             VisitantPlayersID.Add(NetworkManager.Singleton.ConnectedClientsList[i].ClientId);
                         }
 
-                        CharacterSelected.Add((byte)Characters.NONE);
+                        if (CharacterSelected.Count < 6) CharacterSelected.Add((byte)Characters.NONE);
                     }
 
                     // DISPLAY CHARACTER SELECTION WHEN ALL PLAYERS ARE CONNECTED AND SYNCED
                     OnDisplayCharacterSelection?.Invoke();
+
+                    characterSelectTimerCoroutine = CharacterSelectionTimer();
 
                     if (characterSelectTimerCoroutine != null)
                         StartCoroutine(characterSelectTimerCoroutine);
@@ -155,9 +148,15 @@ public class MatchManager : NetworkBehaviour
                     for (int i = 0; i < CharacterSelected.Count; i++)
                     {
                         var character = CharacterSelected[i];
+
+                        Characters[] enumValues = (Characters[])System.Enum.GetValues(typeof(Characters));
+
+                        if (character == (byte)Characters.NONE && i < NetworkManager.Singleton.ConnectedClientsList.Count) 
+                            character = (byte)UnityEngine.Random.Range(0, (enumValues.Length-2));
+
                         if (character != (byte)Characters.NONE && charactersPrefabs[character] != null && spawnPositions[i] != null)
                         {
-                            GameObject player = Instantiate(charactersPrefabs[character], spawnPositions[i].position, spawnPositions[i].rotation);
+                            GameObject player = Instantiate(charactersPrefabs[character], spawnPositions[i].position, Quaternion.identity);
                             player.GetComponent<NetworkObject>().SpawnAsPlayerObject(NetworkManager.Singleton.ConnectedClientsList[i].ClientId, true);
                         }
                     }
@@ -182,38 +181,50 @@ public class MatchManager : NetworkBehaviour
                 {
                     currentWaitTime.Value = waitTime;
 
+                    initTimerCoroutine = PlayMatch(); // recreate the IEnumerator
+
                     if (initTimerCoroutine != null)
                         StartCoroutine(initTimerCoroutine);
                 }
                 break;
             case MatchState.PLAY:
                 {
-                    GameManager.Instance.allowMovement = true;
+                    allowMovement.Value = true;
 
                     if (initTimerCoroutine != null)
                         StopCoroutine(initTimerCoroutine);
+
+                    matchTimerCoroutine = MatchTimer();
 
                     // Starts timer
                     if (matchTimerCoroutine != null)
                         StartCoroutine(matchTimerCoroutine);
 
-                    // LET PLAYERS AND BALL MOVE
-                    // HANDLE PLAY BEHAVIOR
-                    // Score go to WAIT and reset positions
-                    //if (scores)
-                    //{
-                    //    OnUpdateMatchScore.Invoke();
-                    //    SetMatchState(MatchState.WAIT);
-                    //}
+                    // HANDLE PLAY BEHAVIOR --> GOALS
                 }
                 break;
-            case MatchState.WON:
-                // STOP THE PLAYERS AND BALL
-                // Show win UI to the players
+            case MatchState.GOAL:
+                {
+                    Debug.Log($"Local: {localGoals.Value} - {visitantGoals.Value} :Visitant");
+                    OnUpdateMatchScore?.Invoke();
+                    SetMatchState(MatchState.WAIT);
+                }
                 break;
-            case MatchState.LOOSE:
-                // STOP THE PLAYERS AND BALL
-                // Show loose UI to the players
+            case MatchState.FINALIZED:
+                {
+                    // Stop the match timer coroutine
+                    if (matchTimerCoroutine != null)
+                    {
+                        StopCoroutine(matchTimerCoroutine);
+                    }
+
+                    allowMovement.Value = false;
+
+                    Debug.Log("Match Ended!");
+                    Debug.Log($"Final Score: Local {localGoals.Value} - {visitantGoals.Value} Visitant");
+                    // STOP THE PLAYERS AND BALL
+                    // Show UI to the players depending if they won or lost
+                }
                 break;
             default:
                 break;
@@ -222,7 +233,7 @@ public class MatchManager : NetworkBehaviour
 
     public void SetMatchState(MatchState state)
     {
-        if (IsServer)
+        if (IsServer && State.Value != state)
         {
             State.Value = state;
             MatchStateBehavior();
@@ -252,6 +263,7 @@ public class MatchManager : NetworkBehaviour
         {
             if (NetworkManager.Singleton.ConnectedClientsList[i].ClientId.Equals(clientID))
             {
+                Debug.Log(character.ToString());
                 CharacterSelected[i] = (byte)character;
             }
         }
@@ -270,12 +282,6 @@ public class MatchManager : NetworkBehaviour
 
     void ResetMatch()
     {
-        // Stop the match timer coroutine
-        if (matchTimerCoroutine != null)
-        {
-            StopCoroutine(matchTimerCoroutine);
-        }
-
         // Reset Match vars
         localGoals.Value = 0;
         visitantGoals.Value = 0;
@@ -285,52 +291,29 @@ public class MatchManager : NetworkBehaviour
 
     void ResetPositions()
     {
+        allowMovement.Value = false;
 
-    }
-
-    private void EndMatch()
-    {
-        // Stop the match timer coroutine
-        if (matchTimerCoroutine != null)
+        for (int i = 0; i < NetworkManager.Singleton.ConnectedClientsIds.Count; i++)
         {
-            StopCoroutine(matchTimerCoroutine);
+            var player = NetworkManager.Singleton.SpawnManager.PlayerObjects[i];
+
+            player.gameObject.transform.SetPositionAndRotation(spawnPositions[i].position, Quaternion.identity);
         }
 
-        // Set the match state to WON or LOOSE based on the score after finishing the time
-        MatchState st = localGoals.Value > visitantGoals.Value ? MatchState.WON : MatchState.LOOSE;
-        SetMatchState(st);
-
-        Debug.Log("Match Ended!");
-        Debug.Log($"Final Score: Local {localGoals} - {visitantGoals} Visitant");
+        GameObject ball = Instantiate(ballPrefab, new Vector3(0, 5, 0), Quaternion.identity);
+        ball.GetComponent<NetworkObject>().Spawn(true);
+        Debug.Log("SpawnedBall");
     }
 
     private IEnumerator MatchTimer()
     {
-        while (currentMatchTime.Value > 0)
+        while (currentMatchTime.Value > 0 || localGoals.Value == visitantGoals.Value)
         {
             yield return new WaitForSeconds(1f);
             currentMatchTime.Value--;
-            //UpdateTimerUI();
         }
 
-        EndMatch();
-    }
-
-    void UpdateMatchScore()
-    {
-        OnUpdateMatchScore.Invoke();
-        Debug.Log("Match score updated!");
-    }
-
-    private void TriggerGoalVFX(GameObject vfxPrefab, Vector3 goalPosition)
-    {
-        if (vfxPrefab != null)
-        {
-            // Instantiate the VFX at the goal's position
-            GameObject vfxInstance = Instantiate(vfxPrefab, goalPosition, Quaternion.identity);
-
-            Destroy(vfxInstance, 3f);
-        }
+        SetMatchState(MatchState.FINALIZED);
     }
 
     public float GetCurrentCharSelectTime()

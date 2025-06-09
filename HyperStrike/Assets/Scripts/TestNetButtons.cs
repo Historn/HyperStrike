@@ -48,9 +48,6 @@ public class TestNetButtons : MonoBehaviour
     {
         NetworkManager.Singleton.StartServer();
 
-        // SYNCHRONIZATION EVENT PROCESS
-        NetworkManager.Singleton.SceneManager.OnSynchronizeComplete += MatchManager.Instance.SceneManager_OnSynchronizeComplete;
-
         DeactivateButtons();
     }
 

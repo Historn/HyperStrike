@@ -6,6 +6,7 @@ public class BallController : NetworkBehaviour
     private Rigidbody rb;
 
     [SerializeField] bool isGrounded;
+    public bool IsGoal;
 
     void Start()
     {
@@ -16,10 +17,11 @@ public class BallController : NetworkBehaviour
 
     void FixedUpdate()
     {
+        if (!MatchManager.Instance.allowMovement.Value) rb.linearVelocity = Vector3.zero;
+
         //Ground Check
-        Vector3 endRayPos = new Vector3(transform.position.x, transform.position.y - (transform.localScale.x * 0.5f + 0.1f), transform.position.z);
-        Debug.DrawLine(transform.position, endRayPos, UnityEngine.Color.red);
-        isGrounded = Physics.Raycast(transform.position, Vector3.down, transform.localScale.x * 0.5f + 0.2f);
+        isGrounded = HyperStrikeUtils.CheckGrounded(transform);
+        IsGoal = HyperStrikeUtils.CheckObjectInsideCollision(transform);
     }
 
     private void OnCollisionEnter(Collision other)

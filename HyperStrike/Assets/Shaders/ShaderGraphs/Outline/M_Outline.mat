@@ -38,7 +38,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _Color_Threshold: 3.21
-    - _Normal_Threshold: 1.32
+    - _Normal_Threshold: 1.12
     - _OVERLAY: 0
     - _Visibility: 1
     m_Colors:
