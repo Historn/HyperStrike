@@ -90,6 +90,8 @@ public class PlayerController : NetworkBehaviour
 
     #endregion
 
+    HyperStrikeUtils hyperStrikeUtils;
+
     private void OnEnable()
     {
         input?.Player.Enable();
@@ -141,6 +143,8 @@ public class PlayerController : NetworkBehaviour
 
         // Init Attack Variables
         shootReady = true;
+
+        hyperStrikeUtils = new HyperStrikeUtils();
     }
 
     private void Start()
@@ -161,8 +165,8 @@ public class PlayerController : NetworkBehaviour
     {
         if (MatchManager.Instance && !MatchManager.Instance.allowMovement.Value) return;
 
-        isGrounded = HyperStrikeUtils.CheckGrounded(transform, characterHeight);
-        isWallRunning = HyperStrikeUtils.CheckWalls(transform, ref wallHit);
+        isGrounded = hyperStrikeUtils.CheckGrounded(transform, characterHeight);
+        isWallRunning = hyperStrikeUtils.CheckWalls(transform, ref wallHit);
 
         if (IsClient && IsOwner)
         {

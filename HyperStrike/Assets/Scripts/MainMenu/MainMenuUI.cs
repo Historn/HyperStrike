@@ -1,4 +1,4 @@
-using System;
+using Unity.Multiplayer;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
@@ -31,6 +31,9 @@ public class MainMenuUI : MonoBehaviour
             var eventSystem = new GameObject("EventSystem", typeof(EventSystem), inputType);
             eventSystem.transform.SetParent(transform);
         }
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     // Start is called before the first frame update
@@ -38,6 +41,8 @@ public class MainMenuUI : MonoBehaviour
     {
         if (m_StartServerButton) m_StartServerButton.onClick.AddListener(StartServer);
         if (m_FindMatchButton) m_FindMatchButton.onClick.AddListener(FindMatch);
+
+        if (MultiplayerRolesManager.ActiveMultiplayerRoleMask == MultiplayerRoleFlags.Server) StartServer(); 
     }
 
     void FindMatch()

@@ -17,14 +17,17 @@ public class LobbyManager : NetworkBehaviour
 
     public NetworkVariable<LobbyState> State { get; private set; } = new NetworkVariable<LobbyState>(LobbyState.NONE);
 
-
     public NetworkVariable<float> currentWaitTime = new NetworkVariable<float>(5.0f);
 
     private IEnumerator completedTimerCoroutine;
 
+    [SerializeField] private GameObject ballPrefab;
+
     public override void OnNetworkSpawn()
     {
-        if(!IsServer) return;
+        if (IsClient) NetworkManager.Singleton.OnClientDisconnectCallback += (_) => { SceneManager.LoadScene("MainMenu", LoadSceneMode.Single); };
+
+        if (!IsServer) return;
 
         NetworkManager.Singleton.OnClientConnectedCallback += (clientId) =>
         { 
@@ -32,11 +35,14 @@ public class LobbyManager : NetworkBehaviour
             {
                 SetLobbyState(LobbyState.WAIT);
             }
-            else if (NetworkManager.Singleton.ConnectedClientsList.Count >= 6)
+            else if (NetworkManager.Singleton.ConnectedClientsList.Count > 6)
             {
                 NetworkManager.DisconnectClient(clientId, "Server is full");
             }
         };
+
+        GameObject ball = Instantiate(ballPrefab, new Vector3(0, 1, 0), Quaternion.identity);
+        ball.GetComponent<NetworkObject>().Spawn(true);
     }
 
     void Awake()

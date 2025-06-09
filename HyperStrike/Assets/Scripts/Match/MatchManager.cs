@@ -67,6 +67,7 @@ public class MatchManager : NetworkBehaviour
     #endregion
 
     [SerializeField] private GameObject ballPrefab;
+    private GameObject currentBall;
 
     void Awake()
     {
@@ -191,6 +192,8 @@ public class MatchManager : NetworkBehaviour
                 {
                     allowMovement.Value = true;
 
+                    currentBall.GetComponent<Rigidbody>().isKinematic = false;
+
                     if (initTimerCoroutine != null)
                         StopCoroutine(initTimerCoroutine);
 
@@ -302,6 +305,8 @@ public class MatchManager : NetworkBehaviour
 
         GameObject ball = Instantiate(ballPrefab, new Vector3(0, 5, 0), Quaternion.identity);
         ball.GetComponent<NetworkObject>().Spawn(true);
+        ball.GetComponent<Rigidbody>().isKinematic = true;
+        currentBall = ball;
         Debug.Log("SpawnedBall");
     }
 

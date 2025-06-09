@@ -3,19 +3,23 @@ using UnityEngine;
 
 public class HyperStrikeUtils
 {
-    public static bool CheckGrounded(Transform transform, float objHeight = 1.0f)
+    public bool CheckGrounded(Transform transform, float objHeight = 1.0f)
     {
         if (transform == null) return false;
 
         float dist = objHeight * 0.5f + 0.1f;
-        Vector3 endRayPos = new Vector3(transform.position.x, transform.position.y - dist, transform.position.z);
-        Debug.DrawLine(transform.position, endRayPos, UnityEngine.Color.red);
-        return Physics.Raycast(transform.position, Vector3.down, dist);
+        Vector3 og = new Vector3(transform.position.x, transform.position.y + (objHeight*0.5f), transform.position.z);
+        Debug.DrawLine(og, transform.position, UnityEngine.Color.red);
+        return Physics.Raycast(og, Vector3.down, dist);
     }
 
-    public static bool CheckWalls(Transform transform, ref RaycastHit wallHit)
+    public bool CheckWalls(Transform transform, ref RaycastHit wallHit)
     {
-        bool wall = false;
+        bool[] wallChecked = new bool[]
+        {
+            false, false, false, false, false
+        };
+
         Vector3[] directions = new Vector3[]
         {
             transform.right,
@@ -27,14 +31,15 @@ public class HyperStrikeUtils
 
         for (int i = 0; i < directions.Length; i++)
         {
-            Debug.DrawLine(transform.position, transform.position + directions[i], UnityEngine.Color.green);
-            wall = Physics.Raycast(transform.position, directions[i], out wallHit, transform.localScale.x + 0.15f);
+            Vector3 og = new Vector3(transform.position.x, transform.position.y + (transform.localScale.y), transform.position.z);
+            Debug.DrawLine(og, og + directions[i], UnityEngine.Color.green);
+            wallChecked[i] = Physics.Raycast(og, og + directions[i], out wallHit, 0.15f);
         }
 
-        return wall;
+        return wallChecked.Contains(true) ? true : false;
     }
 
-    public static bool CheckObjectInsideCollision(Transform transform)
+    public bool CheckObjectInsideCollision(Transform transform)
     {
         bool[] completelyInside = new bool[]
         {
@@ -53,11 +58,9 @@ public class HyperStrikeUtils
 
         for (int i = 0; i < directions.Length && i < completelyInside.Length; i++)
         {
-            Debug.DrawLine(transform.position, transform.position + (directions[i] * 3), UnityEngine.Color.green);
-            completelyInside[i] = Physics.Raycast(transform.position, directions[i], transform.localScale.magnitude);
+            Debug.DrawLine(transform.position, transform.position + directions[i], UnityEngine.Color.green);
+            completelyInside[i] = Physics.Raycast(transform.position, transform.position + directions[i], transform.localScale.magnitude/2);
         }
-
-        bool ret = completelyInside.Contains(false);
 
         return completelyInside.Contains(false) ? false : true;
     }

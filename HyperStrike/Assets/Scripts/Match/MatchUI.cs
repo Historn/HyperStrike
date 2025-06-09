@@ -28,8 +28,6 @@ public class MatchUI : NetworkBehaviour
 
     void UpdateWaitTimerText(float previous, float current)
     {
-        // INTERPOLATE BETWEEN PREVIOUS AND CURRENT?
-
         if (initTimerText != null)
         {
             int time = Mathf.FloorToInt(MatchManager.Instance.GetCurrentWaitTime());

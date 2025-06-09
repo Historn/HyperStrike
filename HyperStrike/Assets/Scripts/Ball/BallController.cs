@@ -8,6 +8,13 @@ public class BallController : NetworkBehaviour
     [SerializeField] bool isGrounded;
     public bool IsGoal;
 
+    HyperStrikeUtils hyperStrikeUtils;
+
+    private void Awake()
+    {
+        hyperStrikeUtils = new HyperStrikeUtils();
+    }
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -17,11 +24,9 @@ public class BallController : NetworkBehaviour
 
     void FixedUpdate()
     {
-        if (!MatchManager.Instance.allowMovement.Value) rb.linearVelocity = Vector3.zero;
-
         //Ground Check
-        isGrounded = HyperStrikeUtils.CheckGrounded(transform);
-        IsGoal = HyperStrikeUtils.CheckObjectInsideCollision(transform);
+        isGrounded = hyperStrikeUtils.CheckGrounded(transform);
+        IsGoal = hyperStrikeUtils.CheckObjectInsideCollision(transform);
     }
 
     private void OnCollisionEnter(Collision other)

@@ -1217,6 +1217,7 @@ GameObject:
   - component: {fileID: 8571771154224556951}
   - component: {fileID: 1299542609377371396}
   - component: {fileID: 7792390286715653550}
+  - component: {fileID: 7679960963000521798}
   m_Layer: 0
   m_Name: Char_Nanoflow
   m_TagString: Player
@@ -1330,9 +1331,6 @@ MonoBehaviour:
   leaderboardPanel: {fileID: 0}
   scoreText: {fileID: 0}
   characterNameText: {fileID: 0}
-  timerText: {fileID: 0}
-  localScoreText: {fileID: 0}
-  visitantScoreText: {fileID: 0}
 --- !u!114 &8723292194729945805
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1471,6 +1469,14 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   TransitionStateInfoList: []
   m_Animator: {fileID: 2798649970309977460}
+--- !u!81 &7679960963000521798
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4092117151816693018}
+  m_Enabled: 1
 --- !u!1 &4169559647624653032
 GameObject:
   m_ObjectHideFlags: 0
@@ -2543,7 +2549,6 @@ GameObject:
   - component: {fileID: 4284149652456873147}
   - component: {fileID: 777318031589837471}
   - component: {fileID: 566790723095091884}
-  - component: {fileID: 2750332204253117753}
   m_Layer: 0
   m_Name: CinemachineBrain
   m_TagString: Untagged
@@ -2739,14 +2744,6 @@ MonoBehaviour:
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
---- !u!81 &2750332204253117753
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6572253354404910553}
-  m_Enabled: 1
 --- !u!1 &6738584472990326744
 GameObject:
   m_ObjectHideFlags: 0

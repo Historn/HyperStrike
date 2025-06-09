@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 1707024567
-  InScenePlacedSourceGlobalObjectIdHash: 0
+  InScenePlacedSourceGlobalObjectIdHash: 1717419814
   DeferredDespawnTick: 0
   Ownership: 1
   AlwaysReplicateAsRoot: 0
@@ -73,3 +73,4 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   currentWaitTime:
     m_InternalValue: 30
+  ballPrefab: {fileID: 8379585553693324858, guid: e4da653cc54f17e428caa2723bfd66f5, type: 3}
