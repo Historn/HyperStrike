@@ -122,11 +122,11 @@ public class MatchManager : NetworkBehaviour
                     // ASSIGN PLAYERS TO A TEAM HARDCODED NOW
                     for (int i = 0; i < NetworkManager.Singleton.ConnectedClientsList.Count; i++)
                     {
-                        if (i < 3 && LocalPlayersID.Count < 3)
+                        if ((i % 2 == 0) && LocalPlayersID.Count < 3)
                         {
                             LocalPlayersID.Add(NetworkManager.Singleton.ConnectedClientsList[i].ClientId);
                         }
-                        else if (i >= 3 && VisitantPlayersID.Count < 3)
+                        else if ((i % 2 != 0) && VisitantPlayersID.Count < 3)
                         {
                             VisitantPlayersID.Add(NetworkManager.Singleton.ConnectedClientsList[i].ClientId);
                         }
@@ -148,8 +148,6 @@ public class MatchManager : NetworkBehaviour
                     if (characterSelectTimerCoroutine != null)
                         StopCoroutine(characterSelectTimerCoroutine);
 
-                    
-
                     /*SPAWN EACH TEAM PLAYER PREFABS TO SPAWN POSITIONS*/
                     for (int i = 0; i < CharacterSelected.Count; i++)
                     {
@@ -157,12 +155,12 @@ public class MatchManager : NetworkBehaviour
 
                         Characters[] enumValues = (Characters[])System.Enum.GetValues(typeof(Characters));
 
-                        if (character == (byte)Characters.NONE && i < NetworkManager.Singleton.ConnectedClientsList.Count) 
-                            character = (byte)UnityEngine.Random.Range(0, (enumValues.Length-2));
+                        if (character == (byte)Characters.NONE && i < NetworkManager.Singleton.ConnectedClientsList.Count)
+                            character = (byte)UnityEngine.Random.Range(0, (enumValues.Length - 2));
 
                         if (character != (byte)Characters.NONE && charactersPrefabs[character] != null && spawnPositions[i] != null)
                         {
-                            GameObject player = Instantiate(charactersPrefabs[character], spawnPositions[i].position, Quaternion.identity);
+                            GameObject player = Instantiate(charactersPrefabs[character], spawnPositions[i].position, spawnPositions[i].rotation);
                             player.GetComponent<NetworkObject>().SpawnAsPlayerObject(NetworkManager.Singleton.ConnectedClientsList[i].ClientId, true);
                         }
                     }
@@ -228,7 +226,7 @@ public class MatchManager : NetworkBehaviour
 
                     allowMovement.Value = false;
 
-                    closeMatchGameTime.Value = 5f;
+                    closeMatchGameTime.Value = 3f;
                     closeMatchGameTimerCoroutine = CloseMatchGameTimer();
 
                     if (closeMatchGameTimerCoroutine != null)
@@ -329,7 +327,7 @@ public class MatchManager : NetworkBehaviour
 
         SetMatchState(MatchState.FINALIZED);
     }
-    
+
     private IEnumerator CloseMatchGameTimer()
     {
         while (closeMatchGameTime.Value > 0)

@@ -111,6 +111,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bb9e5fe85a2333d44b2b3c53727799f1, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6427510313766515244}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bb9e5fe85a2333d44b2b3c53727799f1, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 994316964804917662}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bb9e5fe85a2333d44b2b3c53727799f1, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8350539268584624893}
   m_SourcePrefab: {fileID: 100100000, guid: bb9e5fe85a2333d44b2b3c53727799f1, type: 3}
 --- !u!1 &4024938816904328726 stripped
 GameObject:
@@ -139,6 +145,48 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 5599696630410123000, guid: bb9e5fe85a2333d44b2b3c53727799f1, type: 3}
+--- !u!114 &994316964804917662
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4024938816904328726}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 0
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
+--- !u!114 &8350539268584624893
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4024938816904328726}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed17e1b899ee39044a231182db186a71, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  force: 100
+  allowedTags:
+  - Player
+  - Ball
 --- !u!4 &4364168547588582572 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: bb9e5fe85a2333d44b2b3c53727799f1, type: 3}

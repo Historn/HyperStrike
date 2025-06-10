@@ -31,22 +31,34 @@ public class LobbyManager : NetworkBehaviour
 
         if (!IsServer) return;
 
-        NetworkManager.Singleton.OnClientConnectedCallback += (clientId) =>
-        { 
-            if (NetworkManager.Singleton.ConnectedClientsList.Count > 5 && State.Value == LobbyState.CONNECTING)
-            {
-                SetLobbyState(LobbyState.WAIT);
-            }
-            else if (NetworkManager.Singleton.ConnectedClientsList.Count > 6)
-            {
-                NetworkManager.DisconnectClient(clientId, "Server is full");
-            }
-        };
+        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+
+        NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
 
         GameObject ball = Instantiate(ballPrefab, new Vector3(0, 1, 0), Quaternion.identity);
         ball.GetComponent<NetworkObject>().Spawn(true);
 
         SetLobbyState(LobbyState.CONNECTING);
+    }
+
+    void OnClientConnected(ulong clientId)
+    {
+        if (NetworkManager.Singleton.ConnectedClientsList.Count >= 5)
+        {
+            SetLobbyState(LobbyState.WAIT);
+        }
+        else if (NetworkManager.Singleton.ConnectedClientsList.Count > 5)
+        {
+            NetworkManager.DisconnectClient(clientId, "Server is full");
+        }
+    }
+    
+    void OnClientDisconnected(ulong clientId)
+    {
+        if (NetworkManager.Singleton.ConnectedClientsList.Count < 5)
+        {
+            SetLobbyState(LobbyState.CONNECTING);
+        }
     }
 
     void Awake()
@@ -83,7 +95,7 @@ public class LobbyManager : NetworkBehaviour
 
                     currentWaitTime.Value = waitTime;
 
-                    completedTimerCoroutine = LobbyCompletedTimer(); 
+                    completedTimerCoroutine = LobbyCompletedTimer();
                 }
                 break;
             case LobbyState.WAIT:
@@ -94,10 +106,10 @@ public class LobbyManager : NetworkBehaviour
                 break;
             case LobbyState.COMPLETED:
                 {
-                    var status = NetworkManager.Singleton.SceneManager.LoadScene("PinballTest", LoadSceneMode.Single);
+                    var status = NetworkManager.Singleton.SceneManager.LoadScene("ArenaRoom", LoadSceneMode.Single);
                     if (status != SceneEventProgressStatus.Started)
                     {
-                        Debug.LogWarning($"Failed to load Match Scene" +
+                        Debug.LogWarning($"Failed to load Arena Room Scene" +
                               $"with a {nameof(SceneEventProgressStatus)}: {status}");
                     }
                 }

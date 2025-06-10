@@ -1,13 +1,16 @@
-using UnityEditor;
 using UnityEngine;
 using System.Collections.Generic;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 [ExecuteInEditMode]
 public class PathVisualizer : MonoBehaviour
 {
-    // Player positions
     public List<Vector3> playerPath = new List<Vector3>();
 
+#if UNITY_EDITOR
     void OnDrawGizmos()
     {
         if (playerPath == null || playerPath.Count < 2)
@@ -19,4 +22,5 @@ public class PathVisualizer : MonoBehaviour
             Handles.DrawLine(playerPath[i], playerPath[i + 1]);
         }
     }
+#endif
 }
