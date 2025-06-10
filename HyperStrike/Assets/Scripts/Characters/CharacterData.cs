@@ -7,6 +7,7 @@ namespace HyperStrike
     {
         public string characterName;
         public int health;
+        public int maxHealth;
         public float speed;
         public float sprintSpeed;
         public float wallRunSpeed;

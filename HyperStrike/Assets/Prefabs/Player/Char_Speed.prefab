@@ -1477,8 +1477,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3520141469846233796}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -0.8388495, z: 0, w: 0.54436344}
-  m_LocalPosition: {x: 6.3, y: 1.22, z: -2.84}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.55, z: 0.15}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1547,9 +1547,9 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.1
-  far clip plane: 5000
-  field of view: 60
+  near clip plane: 0.01
+  far clip plane: 500
+  field of view: 65
   orthographic: 0
   orthographic size: 10
   m_Depth: 0
@@ -2417,13 +2417,15 @@ GameObject:
   - component: {fileID: 6507632688674329374}
   - component: {fileID: 4656851203376338753}
   - component: {fileID: 3564819868973584986}
-  - component: {fileID: 6459366816758444367}
   - component: {fileID: 9015245848071529902}
+  - component: {fileID: 550458959400188235}
+  - component: {fileID: 6459366816758444367}
   - component: {fileID: 8862662987425679454}
   - component: {fileID: 4662636310076599720}
   - component: {fileID: 4326943606440057839}
   - component: {fileID: 1820654785331639308}
   - component: {fileID: 6142821008091826370}
+  - component: {fileID: 3038221327139667878}
   - component: {fileID: 623013758756019153}
   m_Layer: 0
   m_Name: Char_Speed
@@ -2523,21 +2525,6 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 1
---- !u!114 &6459366816758444367
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5560394306431470110}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 091083a5d8a577d45af5c4a74117809b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  leaderboardPanel: {fileID: 0}
-  scoreText: {fileID: 0}
-  characterNameText: {fileID: 0}
 --- !u!114 &9015245848071529902
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2563,6 +2550,38 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
+--- !u!114 &550458959400188235
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5560394306431470110}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 196262c0e5ee0fd41bbfe58dcc957f98, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  PlayerName: PlayerName
+  PlayerId: 0
+  Team: 0
+  Character: {fileID: 11400000, guid: 9d4e3ba57a1756c44ac3868b3c2b2ba0, type: 2}
+--- !u!114 &6459366816758444367
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5560394306431470110}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 091083a5d8a577d45af5c4a74117809b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  leaderboardPanel: {fileID: 0}
+  scoreText: {fileID: 0}
+  characterNameText: {fileID: 0}
 --- !u!114 &8862662987425679454
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2576,7 +2595,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  characterData: {fileID: 11400000, guid: 9d4e3ba57a1756c44ac3868b3c2b2ba0, type: 2}
   cinemachineCamera: {fileID: 8151215585591512193}
   mainCameraTransform: {fileID: 3753914034975536623}
   cameraWeaponTransform: {fileID: 6913581130208829720}
@@ -2676,6 +2694,24 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   TransitionStateInfoList: []
   m_Animator: {fileID: 6507632688674329374}
+--- !u!114 &3038221327139667878
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5560394306431470110}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5fbfe0a5e373c64ab760fd60f0cb423, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnDeath:
+    m_PersistentCalls:
+      m_Calls: []
+  OnReceiveDamage:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!81 &623013758756019153
 AudioListener:
   m_ObjectHideFlags: 0

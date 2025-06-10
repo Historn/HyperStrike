@@ -33,10 +33,6 @@ if ($requestType === 'insert') {
     $timestamp = $data['Timestamp'] ?? null;
     $position = $data['Position'] ?? null;
 
-    $enemyEventType = $data['EnemyEventType'] ?? null;
-    $enemyTimestamp = $data['EnemyTimestamp'] ?? null;
-    $enemyPosition = $data['EnemyPosition'] ?? null;
-
     if ($eventType && $timestamp && $position) {
         $positionEscaped = $conn->real_escape_string($position);
 
@@ -49,18 +45,7 @@ if ($requestType === 'insert') {
             echo "Error: " . $sql->error;
         }
     } 
-    else if ($enemyEventType && $enemyTimestamp && $enemyPosition) {
-        $enemyPositionEscaped = $conn->real_escape_string($enemyPosition);
-        
-        $sql = $conn->prepare("INSERT INTO enemyEvents (EnemyEventType, EnemyTimestamp, EnemyPosition) VALUES (?, ?, ?)");
-        $sql->bind_param("sss", $enemyEventType, $enemyTimestamp, $enemyPosition);
-
-        if ($sql->execute()) {
-            echo "Enemy data inserted successfully.";
-        } else {
-            echo "Error: " . $sql->error;
-        }
-    } else {
+    else {
         echo "Error: Missing required fields.";
     }
 } else if ($requestType === 'fetch') {
@@ -83,27 +68,7 @@ if ($requestType === 'insert') {
     }
 
     echo json_encode($output);
-} else if ($requestType === 'fetchEnemies') {
-    // Fetch data for ENEMIES heatmap
-    $enemyEventType = $_GET['enemyEventType'] ?? '';
-    if (empty($enemyEventType)) {
-        echo "Error: Missing 'enemyEventType' parameter.";
-        exit;
-    }
-
-    $sql = "SELECT EnemyPosition, COUNT(*) as Count FROM enemyEvents WHERE EnemyEventType = ? GROUP BY EnemyPosition";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $enemyEventType);
-    $stmt->execute();
-
-    $result = $stmt->get_result();
-    $output = [];
-    while ($row = $result->fetch_assoc()) {
-        $output[] = $row;
-    }
-
-    echo json_encode($output);
-} 
+}  
 else {
     echo "Error: Invalid request type.";
 }

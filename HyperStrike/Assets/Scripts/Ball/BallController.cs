@@ -10,6 +10,9 @@ public class BallController : NetworkBehaviour
 
     HyperStrikeUtils hyperStrikeUtils;
 
+    private ulong lastPlayerHitId = 0;
+    public Vector3 lastPlayerHitPosition;
+
     private void Awake()
     {
         hyperStrikeUtils = new HyperStrikeUtils();
@@ -35,7 +38,13 @@ public class BallController : NetworkBehaviour
 
         if (other != null)
         {
+            GameObject obj = other.gameObject;
             // Check hit with players to detect the last hit for the score
+            if (obj.CompareTag("Player") && this.lastPlayerHitId != obj.GetComponent<NetworkObject>().NetworkObjectId)
+            {
+                this.lastPlayerHitId = obj.GetComponent<NetworkObject>().NetworkObjectId;
+                lastPlayerHitPosition = other.GetContact(0).point;
+            }
         }
     }
 }

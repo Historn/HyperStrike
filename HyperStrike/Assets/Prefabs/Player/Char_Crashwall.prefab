@@ -1533,13 +1533,15 @@ GameObject:
   - component: {fileID: 8481038106078476341}
   - component: {fileID: 691643650769974266}
   - component: {fileID: 254224479936705988}
-  - component: {fileID: 809806070144721770}
   - component: {fileID: 3579566077529719877}
+  - component: {fileID: 6584229728866544548}
+  - component: {fileID: 809806070144721770}
   - component: {fileID: 3926596907345101699}
   - component: {fileID: 1649760058704436797}
   - component: {fileID: 1230830037057109791}
   - component: {fileID: 9111312294474141383}
   - component: {fileID: 4192695101507940902}
+  - component: {fileID: 3470698923360697021}
   - component: {fileID: 7181881467820568513}
   m_Layer: 0
   m_Name: Char_Crashwall
@@ -1639,21 +1641,6 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 1
---- !u!114 &809806070144721770
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4220784000810643060}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 091083a5d8a577d45af5c4a74117809b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  leaderboardPanel: {fileID: 0}
-  scoreText: {fileID: 0}
-  characterNameText: {fileID: 0}
 --- !u!114 &3579566077529719877
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1679,6 +1666,38 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
+--- !u!114 &6584229728866544548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4220784000810643060}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 196262c0e5ee0fd41bbfe58dcc957f98, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  PlayerName: PlayerName
+  PlayerId: 0
+  Team: 0
+  Character: {fileID: 11400000, guid: 9d4e3ba57a1756c44ac3868b3c2b2ba0, type: 2}
+--- !u!114 &809806070144721770
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4220784000810643060}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 091083a5d8a577d45af5c4a74117809b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  leaderboardPanel: {fileID: 0}
+  scoreText: {fileID: 0}
+  characterNameText: {fileID: 0}
 --- !u!114 &3926596907345101699
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1692,7 +1711,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  characterData: {fileID: 11400000, guid: 9d4e3ba57a1756c44ac3868b3c2b2ba0, type: 2}
   cinemachineCamera: {fileID: 5597745592086380383}
   mainCameraTransform: {fileID: 3942679449315371580}
   cameraWeaponTransform: {fileID: 5824176364377182903}
@@ -1792,6 +1810,24 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   TransitionStateInfoList: []
   m_Animator: {fileID: 8481038106078476341}
+--- !u!114 &3470698923360697021
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4220784000810643060}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5fbfe0a5e373c64ab760fd60f0cb423, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnDeath:
+    m_PersistentCalls:
+      m_Calls: []
+  OnReceiveDamage:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!81 &7181881467820568513
 AudioListener:
   m_ObjectHideFlags: 0

@@ -39,7 +39,6 @@ public class PlayerController : NetworkBehaviour
     #region "Model-View Player"
     private Player player;
     private PlayerView view;
-    public Character characterData;
     #endregion
 
     NetworkAnimator animator;
@@ -72,7 +71,6 @@ public class PlayerController : NetworkBehaviour
 
     // Wall run
     [SerializeField] bool isWallRunning;
-    float minimumHeight = 0.2f;
     RaycastHit wallHit;
     //float angleRoll = 25.0f; // Var to rotate camera while wallrunning
 
@@ -123,12 +121,11 @@ public class PlayerController : NetworkBehaviour
         }
 
         // Init Player MVC
-        player = new Player();
-        player.Character = characterData;
+        player = GetComponent<Player>(); ;
         view = GetComponent<PlayerView>();
 
         // Net Owner Only?
-        player.Score = 0;
+        if (IsServer) player.Score.Value = 0;
         view.UpdateView(player);
 
         // Init Physics variables
@@ -326,6 +323,7 @@ public class PlayerController : NetworkBehaviour
             shootReady = false;
 
             GameObject projectileGO = Instantiate(player.Character.projectilePrefab, projectileSpawnOffset.position + cameraWeaponTransform.forward * player.Character.shootOffset, cameraWeaponTransform.rotation);
+            projectileGO.GetComponent<Projectile>().playerOwnerId = this.NetworkObjectId;
             projectileGO.GetComponent<NetworkObject>().Spawn(true);
             Invoke(nameof(ResetShoot), player.Character.shootCooldown);    //Delay for attack to reset
             animator?.Animator.SetBool(isShootingHash, isAttacking);
@@ -346,7 +344,7 @@ public class PlayerController : NetworkBehaviour
     #region "Player Data Visualization Methods"
     public void IncreaseScore(int amount)
     {
-        player.Score += amount;
+        if (IsServer) player.Score.Value += amount;
         view.UpdateView(player);
     }
     #endregion
