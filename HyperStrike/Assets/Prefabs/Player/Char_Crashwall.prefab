@@ -1540,6 +1540,7 @@ GameObject:
   - component: {fileID: 1230830037057109791}
   - component: {fileID: 9111312294474141383}
   - component: {fileID: 4192695101507940902}
+  - component: {fileID: 7181881467820568513}
   m_Layer: 0
   m_Name: Char_Crashwall
   m_TagString: Player
@@ -1653,9 +1654,6 @@ MonoBehaviour:
   leaderboardPanel: {fileID: 0}
   scoreText: {fileID: 0}
   characterNameText: {fileID: 0}
-  timerText: {fileID: 0}
-  localScoreText: {fileID: 0}
-  visitantScoreText: {fileID: 0}
 --- !u!114 &3579566077529719877
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1794,6 +1792,14 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   TransitionStateInfoList: []
   m_Animator: {fileID: 8481038106078476341}
+--- !u!81 &7181881467820568513
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4220784000810643060}
+  m_Enabled: 1
 --- !u!1 &4334296682727988998
 GameObject:
   m_ObjectHideFlags: 0
@@ -2732,7 +2738,6 @@ GameObject:
   - component: {fileID: 6002213709474285774}
   - component: {fileID: 4611782684056818027}
   - component: {fileID: 744161872872801659}
-  - component: {fileID: 1514519444750005995}
   m_Layer: 0
   m_Name: CinemachineBrain
   m_TagString: Untagged
@@ -2928,14 +2933,6 @@ MonoBehaviour:
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
---- !u!81 &1514519444750005995
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6793755597473198337}
-  m_Enabled: 1
 --- !u!1 &6975057056925068219
 GameObject:
   m_ObjectHideFlags: 0
