@@ -19,6 +19,8 @@ public class LobbyManager : NetworkBehaviour
 
     public NetworkVariable<float> currentWaitTime = new NetworkVariable<float>(5.0f);
 
+    float waitTime = 10f;
+
     private IEnumerator completedTimerCoroutine;
 
     [SerializeField] private GameObject ballPrefab;
@@ -43,6 +45,8 @@ public class LobbyManager : NetworkBehaviour
 
         GameObject ball = Instantiate(ballPrefab, new Vector3(0, 1, 0), Quaternion.identity);
         ball.GetComponent<NetworkObject>().Spawn(true);
+
+        SetLobbyState(LobbyState.CONNECTING);
     }
 
     void Awake()
@@ -56,10 +60,6 @@ public class LobbyManager : NetworkBehaviour
         {
             Destroy(gameObject);
         }
-
-        completedTimerCoroutine = LobbyCompletedTimer();
-
-        SetLobbyState(LobbyState.CONNECTING);
     }
 
     // Update is called once per frame
@@ -81,7 +81,10 @@ public class LobbyManager : NetworkBehaviour
                     if (completedTimerCoroutine != null)
                         StopCoroutine(completedTimerCoroutine);
 
-                    completedTimerCoroutine = LobbyCompletedTimer();
+                    currentWaitTime.Value = waitTime;
+
+                    completedTimerCoroutine = LobbyCompletedTimer(); 
+                    Debug.Log($"Waiting for players to connect");
                 }
                 break;
             case LobbyState.WAIT:

@@ -73,4 +73,5 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   currentWaitTime:
     m_InternalValue: 30
+  waitTime: 30
   ballPrefab: {fileID: 8379585553693324858, guid: e4da653cc54f17e428caa2723bfd66f5, type: 3}

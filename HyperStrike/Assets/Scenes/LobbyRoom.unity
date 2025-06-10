@@ -784,7 +784,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_PresetAsset: {fileID: 0}
   m_PresetReference:
-    rid: 9021015935245615105
+    rid: 9021015950664401001
   m_Scenario:
     rid: -2
   m_IsScenarioSettingsFolded: 1
@@ -794,7 +794,7 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 9021015935245615105
+    - rid: 9021015950664401001
       type: {class: NetworkSimulatorPreset, ns: Unity.Multiplayer.Tools.NetworkSimulator.Runtime, asm: Unity.Multiplayer.Tools.NetworkSimulator.Runtime}
       data:
         <Name>k__BackingField: 'Home Fiber [Best real-world scenario]'

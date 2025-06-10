@@ -62,7 +62,7 @@ public class PlayerController : NetworkBehaviour
 
     // Jump Vars
     bool readyToJump;
-    float jumpCooldown = 0.0f;
+    float jumpCooldown = 0.5f;
     float jumpForce = 10.0f;
 
     // Ground Vars
@@ -72,6 +72,7 @@ public class PlayerController : NetworkBehaviour
 
     // Wall run
     [SerializeField] bool isWallRunning;
+    float minimumHeight = 0.2f;
     RaycastHit wallHit;
     //float angleRoll = 25.0f; // Var to rotate camera while wallrunning
 
@@ -218,13 +219,7 @@ public class PlayerController : NetworkBehaviour
             wasSprinting = input.sprint;
         }
 
-        if (input.moveInProgress != wasWallRunning || input.jump != wasJumpPressed)
-        {
-            WallRun(input.moveInProgress, input.jump);
-            // Rotate camera a bit on the z-axis
-            wasWallRunning = input.moveInProgress;
-            wasJumpPressed = input.jump;
-        }
+        WallRun(input.moveInProgress, input.jump);
 
         if (input.slide != wasSliding)
         {
@@ -268,12 +263,15 @@ public class PlayerController : NetworkBehaviour
     void WalkAndRun(Vector2 moveValue, bool isWalking, bool isSprinting)
     {
         animator?.Animator.SetBool(isWalkingHash, isWalking);
+
+        if (isWallRunning && !isGrounded) return;
+
         // Sprint
         float speed = player.Character.speed;
         if (isSprinting && isGrounded) speed = player.Character.sprintSpeed;
 
         Vector3 dir = transform.forward * moveValue.y + transform.right * moveValue.x;
-        if (!isWallRunning) rb.AddForce(dir.normalized * speed, ForceMode.Force);
+        rb.AddForce(dir.normalized * speed, ForceMode.Force);
     }
 
     void Slide(bool isSliding)
@@ -298,7 +296,7 @@ public class PlayerController : NetworkBehaviour
             readyToJump = false;
             //Reset Y Velocity
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
-            rb.AddForce((transform.up + jumpDir) * jumpForce, ForceMode.Impulse);
+            rb.AddForce((transform.up + jumpDir.normalized) * jumpForce, ForceMode.Impulse);
             animator?.Animator.SetBool(isJumpingHash, isJumping);
             Invoke(nameof(ResetJump), jumpCooldown);    //Delay for jump to reset
         }
@@ -313,7 +311,8 @@ public class PlayerController : NetworkBehaviour
     {
         if (!isGrounded && isWallRunning && isMoving)
         {
-            rb.AddForce(transform.forward * player.Character.wallRunSpeed + transform.up * 0.8f, ForceMode.Force); // Reduce gravity to stay more time in the wall but not infinite
+            rb.AddForce((transform.forward * player.Character.wallRunSpeed) + (transform.up * 15), ForceMode.Force); // Reduce gravity to stay more time in the wall but not infinite
+            Debug.Log("WallRunning");
             Jump(isJumping, wallHit.normal);
         }
     }

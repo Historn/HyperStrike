@@ -31,12 +31,14 @@ public class HyperStrikeUtils
 
         for (int i = 0; i < directions.Length; i++)
         {
+            RaycastHit hit;
             Vector3 og = new Vector3(transform.position.x, transform.position.y + (transform.localScale.y), transform.position.z);
-            Debug.DrawLine(og, og + directions[i], UnityEngine.Color.green);
-            wallChecked[i] = Physics.Raycast(og, og + directions[i], out wallHit, 0.15f);
+            Debug.DrawLine(og, og + (directions[i]*(transform.localScale.x*0.5f + 0.01f)), UnityEngine.Color.green);
+            wallChecked[i] = Physics.Raycast(og, directions[i], out hit, transform.localScale.x*0.5f + 0.01f);
+            if (wallChecked[i]) wallHit = hit;
         }
 
-        return wallChecked.Contains(true) ? true : false;
+        return wallChecked.Contains(true);
     }
 
     public bool CheckObjectInsideCollision(Transform transform)
@@ -62,6 +64,6 @@ public class HyperStrikeUtils
             completelyInside[i] = Physics.Raycast(transform.position, transform.position + directions[i], transform.localScale.magnitude/2);
         }
 
-        return completelyInside.Contains(false) ? false : true;
+        return !completelyInside.Contains(false);
     }
 }
