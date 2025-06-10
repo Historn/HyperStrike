@@ -84,7 +84,6 @@ public class LobbyManager : NetworkBehaviour
                     currentWaitTime.Value = waitTime;
 
                     completedTimerCoroutine = LobbyCompletedTimer(); 
-                    Debug.Log($"Waiting for players to connect");
                 }
                 break;
             case LobbyState.WAIT:

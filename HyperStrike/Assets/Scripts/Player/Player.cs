@@ -33,6 +33,8 @@ public class Player : NetworkBehaviour
 
     public void ApplyDamage(int damage)
     {
+        if (!MatchManager.Instance) return;
+
         Character.health -= damage;
         if (Character.health <= 0) 
         {

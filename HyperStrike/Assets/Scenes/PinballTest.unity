@@ -15344,6 +15344,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 505503891623635684, guid: 8fbab53b1b2f9b243b675741dc8e442b, type: 3}
+      propertyPath: maxTime
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 505503891623635684, guid: 8fbab53b1b2f9b243b675741dc8e442b, type: 3}
       propertyPath: 'spawnPositions.Array.data[0]'
       value: 
       objectReference: {fileID: 966155857}
@@ -15367,6 +15371,10 @@ PrefabInstance:
       propertyPath: 'spawnPositions.Array.data[5]'
       value: 
       objectReference: {fileID: 25088987}
+    - target: {fileID: 505503891623635684, guid: 8fbab53b1b2f9b243b675741dc8e442b, type: 3}
+      propertyPath: currentMatchTime.m_InternalValue
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 1458797476019838591, guid: 8fbab53b1b2f9b243b675741dc8e442b, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 2799265188

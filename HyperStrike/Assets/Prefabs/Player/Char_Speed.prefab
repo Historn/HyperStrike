@@ -2565,8 +2565,15 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   PlayerName: PlayerName
   PlayerId: 0
-  Team: 0
+  Team:
+    m_InternalValue: 0
+  Score:
+    m_InternalValue: 0
+  Goals:
+    m_InternalValue: 0
   Character: {fileID: 11400000, guid: 9d4e3ba57a1756c44ac3868b3c2b2ba0, type: 2}
+  deadTime:
+    m_InternalValue: 5
 --- !u!114 &6459366816758444367
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2652,12 +2659,12 @@ MonoBehaviour:
   SyncScaleX: 0
   SyncScaleY: 0
   SyncScaleZ: 0
-  PositionThreshold: 0.001
-  RotAngleThreshold: 0.01
+  PositionThreshold: 0.1
+  RotAngleThreshold: 0.1
   ScaleThreshold: 0.01
   UseQuaternionSynchronization: 1
-  UseQuaternionCompression: 0
-  UseHalfFloatPrecision: 0
+  UseQuaternionCompression: 1
+  UseHalfFloatPrecision: 1
   InLocalSpace: 0
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
@@ -2676,7 +2683,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkRigidbodyBaseExpanded: 0
-  UseRigidBodyForMotion: 0
+  UseRigidBodyForMotion: 1
   AutoUpdateKinematicState: 1
   AutoSetKinematicOnDespawn: 1
 --- !u!114 &6142821008091826370
