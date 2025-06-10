@@ -72,6 +72,14 @@ public class MatchManager : NetworkBehaviour
     [SerializeField] private GameObject ballPrefab;
     private GameObject currentBall;
 
+    public override void OnNetworkSpawn()
+    {
+        // SYNCHRONIZATION EVENT PROCESS
+        NetworkManager.Singleton.SceneManager.OnLoadComplete += OnSceneLoaded;
+        if (IsClient) NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
+
+    }
+
     void Awake()
     {
         // Destroy, we dont want it to be in the other scenes, not needed
@@ -84,9 +92,6 @@ public class MatchManager : NetworkBehaviour
             Destroy(gameObject);
         }
 
-        // SYNCHRONIZATION EVENT PROCESS
-        NetworkManager.Singleton.SceneManager.OnLoadComplete += OnSceneLoaded;
-
         CharacterSelected = new NetworkList<byte>();
         LocalPlayersID = new NetworkList<ulong>();
         VisitantPlayersID = new NetworkList<ulong>();
@@ -96,6 +101,11 @@ public class MatchManager : NetworkBehaviour
             State.Value = MatchState.NONE;
             allowMovement.Value = false;
         }
+    }
+
+    private void OnClientDisconnected(ulong obj)
+    {
+        SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
     }
 
     private void OnSceneLoaded(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
@@ -360,4 +370,12 @@ public class MatchManager : NetworkBehaviour
     {
         return currentMatchTime.Value;
     }
+
+    //void OnDestroy()
+    //{
+    //    if (NetworkManager.Singleton == null) return;
+
+    //    NetworkManager.Singleton.SceneManager.OnLoadComplete -= OnSceneLoaded;
+    //    NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
+    //}
 }

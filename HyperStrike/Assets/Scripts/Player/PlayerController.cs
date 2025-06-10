@@ -309,7 +309,6 @@ public class PlayerController : NetworkBehaviour
         if (!isGrounded && isWallRunning && isMoving)
         {
             rb.AddForce((transform.forward * player.Character.wallRunSpeed) + (transform.up * 15), ForceMode.Force); // Reduce gravity to stay more time in the wall but not infinite
-            Debug.Log("WallRunning");
             Jump(isJumping, wallHit.normal);
         }
     }

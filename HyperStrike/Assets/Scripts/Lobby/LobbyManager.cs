@@ -27,13 +27,11 @@ public class LobbyManager : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        if (IsClient) NetworkManager.Singleton.OnClientDisconnectCallback += (_) => { SceneManager.LoadScene("MainMenu", LoadSceneMode.Single); };
-
-        if (!IsServer) return;
-
         NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
 
         NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
+
+        if (!IsServer) return;
 
         GameObject ball = Instantiate(ballPrefab, new Vector3(0, 1, 0), Quaternion.identity);
         ball.GetComponent<NetworkObject>().Spawn(true);
@@ -43,6 +41,8 @@ public class LobbyManager : NetworkBehaviour
 
     void OnClientConnected(ulong clientId)
     {
+        if (!IsServer) return;
+
         if (NetworkManager.Singleton.ConnectedClientsList.Count >= 5)
         {
             SetLobbyState(LobbyState.WAIT);
@@ -55,6 +55,12 @@ public class LobbyManager : NetworkBehaviour
     
     void OnClientDisconnected(ulong clientId)
     {
+        if (IsClient)
+        {
+            SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
+            return;
+        }
+
         if (NetworkManager.Singleton.ConnectedClientsList.Count < 5)
         {
             SetLobbyState(LobbyState.CONNECTING);
@@ -137,5 +143,13 @@ public class LobbyManager : NetworkBehaviour
         }
 
         SetLobbyState(LobbyState.COMPLETED);
+    }
+
+    void OnDestroy()
+    {
+        if (NetworkManager.Singleton == null) return;
+
+        NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
+        NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
     }
 }
