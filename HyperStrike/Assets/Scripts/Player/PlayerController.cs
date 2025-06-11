@@ -103,23 +103,6 @@ public class PlayerController : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        if (IsClient && IsOwner)
-        {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
-
-            input = new PlayerInput();
-            input?.Player.Enable();
-
-            HideMeshRenderer();
-
-            cinemachineCamera.Priority = 1;
-        }
-        else
-        {
-            cinemachineCamera.Priority = -1;
-        }
-
         // Init Player MVC
         player = GetComponent<Player>(); ;
         view = GetComponent<PlayerView>();
@@ -133,9 +116,32 @@ public class PlayerController : NetworkBehaviour
         rb.freezeRotation = true;
         rb.maxLinearVelocity = player.Character.maxSpeed;
 
+        if (IsClient && IsOwner)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+
+            input = new PlayerInput();
+            input?.Player.Enable();
+
+            HideMeshRenderer();
+
+            cinemachineCamera.Priority = 1;
+
+            rb.isKinematic = true;
+            rb.interpolation = RigidbodyInterpolation.Interpolate;
+        }
+        else
+        {
+            cinemachineCamera.Priority = -1;
+
+            rb.isKinematic = false;
+            rb.interpolation = RigidbodyInterpolation.None;
+            characterHeight = GetComponent<CapsuleCollider>().height;
+        }
+
         readyToJump = true;
 
-        characterHeight = GetComponent<CapsuleCollider>().height;
         isGrounded = false;
         isWallRunning = false;
 
@@ -162,9 +168,6 @@ public class PlayerController : NetworkBehaviour
     private void FixedUpdate()
     {
         if (MatchManager.Instance && !MatchManager.Instance.allowMovement.Value) return;
-
-        isGrounded = hyperStrikeUtils.CheckGrounded(transform, characterHeight);
-        isWallRunning = hyperStrikeUtils.CheckWalls(transform, ref wallHit);
 
         if (IsClient && IsOwner)
         {
@@ -206,6 +209,9 @@ public class PlayerController : NetworkBehaviour
     [ServerRpc]
     void SendInputServerRPC(InputData input)
     {
+        isGrounded = hyperStrikeUtils.CheckGrounded(transform, characterHeight);
+        isWallRunning = hyperStrikeUtils.CheckWalls(transform, ref wallHit);
+
         // Only send when changed
         if (input.look != Vector2.zero)
             RotatePlayerWithCamera(input.look);

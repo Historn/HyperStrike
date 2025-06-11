@@ -203,6 +203,12 @@ public class MatchManager : NetworkBehaviour
                 break;
             case MatchState.PLAY:
                 {
+                    for (int i = 0; i < NetworkManager.Singleton.ConnectedClientsIds.Count; i++)
+                    {
+                        var player = NetworkManager.Singleton.SpawnManager.PlayerObjects[i];
+                        player.GetComponent<Rigidbody>().isKinematic = false;
+                    }
+
                     allowMovement.Value = true;
 
                     currentBall.GetComponent<Rigidbody>().isKinematic = false;
@@ -317,8 +323,8 @@ public class MatchManager : NetworkBehaviour
         for (int i = 0; i < NetworkManager.Singleton.ConnectedClientsIds.Count; i++)
         {
             var player = NetworkManager.Singleton.SpawnManager.PlayerObjects[i];
-
-            player.gameObject.transform.SetPositionAndRotation(spawnPositions[i].position, Quaternion.identity);
+            player.GetComponent<Rigidbody>().isKinematic = true;
+            player.gameObject.transform.SetPositionAndRotation(spawnPositions[i].position, spawnPositions[i].rotation);
         }
 
         GameObject ball = Instantiate(ballPrefab, new Vector3(0, 5, 0), Quaternion.identity);

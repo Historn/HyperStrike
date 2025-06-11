@@ -83499,6 +83499,10 @@ PrefabInstance:
       propertyPath: GlobalObjectIdHash
       value: 4156470409
       objectReference: {fileID: 0}
+    - target: {fileID: 994316964804917662, guid: 8aa3f8f6a3c27214297898197e95b4ad, type: 3}
+      propertyPath: SceneMigrationSynchronization
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3232327753599342531, guid: 8aa3f8f6a3c27214297898197e95b4ad, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -90894,6 +90898,10 @@ PrefabInstance:
     - target: {fileID: 994316964804917662, guid: 8aa3f8f6a3c27214297898197e95b4ad, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 334479363
+      objectReference: {fileID: 0}
+    - target: {fileID: 994316964804917662, guid: 8aa3f8f6a3c27214297898197e95b4ad, type: 3}
+      propertyPath: SceneMigrationSynchronization
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4052829107542663760, guid: 8aa3f8f6a3c27214297898197e95b4ad, type: 3}
       propertyPath: m_Name
@@ -118622,6 +118630,10 @@ PrefabInstance:
       propertyPath: GlobalObjectIdHash
       value: 4189824147
       objectReference: {fileID: 0}
+    - target: {fileID: 994316964804917662, guid: 8aa3f8f6a3c27214297898197e95b4ad, type: 3}
+      propertyPath: SceneMigrationSynchronization
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3232327753599342531, guid: 8aa3f8f6a3c27214297898197e95b4ad, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -119573,6 +119585,10 @@ PrefabInstance:
       propertyPath: GlobalObjectIdHash
       value: 679318831
       objectReference: {fileID: 0}
+    - target: {fileID: 994316964804917662, guid: 8aa3f8f6a3c27214297898197e95b4ad, type: 3}
+      propertyPath: SceneMigrationSynchronization
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4024938816904328726, guid: 8aa3f8f6a3c27214297898197e95b4ad, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
@@ -119584,6 +119600,10 @@ PrefabInstance:
     - target: {fileID: 4052829107542663760, guid: 8aa3f8f6a3c27214297898197e95b4ad, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 6427510313766515244, guid: 8aa3f8f6a3c27214297898197e95b4ad, type: 3}
+      propertyPath: m_Convex
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7549541833852599162, guid: 8aa3f8f6a3c27214297898197e95b4ad, type: 3}
       propertyPath: m_LocalPosition.x

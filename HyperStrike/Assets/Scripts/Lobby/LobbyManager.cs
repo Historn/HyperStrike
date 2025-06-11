@@ -43,11 +43,11 @@ public class LobbyManager : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        if (NetworkManager.Singleton.ConnectedClientsList.Count >= 5)
+        if (NetworkManager.Singleton.ConnectedClientsIds.Count >= 6)
         {
             SetLobbyState(LobbyState.WAIT);
         }
-        else if (NetworkManager.Singleton.ConnectedClientsList.Count > 5)
+        else if (NetworkManager.Singleton.ConnectedClientsIds.Count > 6)
         {
             NetworkManager.DisconnectClient(clientId, "Server is full");
         }
@@ -61,7 +61,7 @@ public class LobbyManager : NetworkBehaviour
             return;
         }
 
-        if (NetworkManager.Singleton.ConnectedClientsList.Count < 5)
+        if (NetworkManager.Singleton.ConnectedClientsIds.Count < 6)
         {
             SetLobbyState(LobbyState.CONNECTING);
         }
