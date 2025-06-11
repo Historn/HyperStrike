@@ -20,6 +20,9 @@ public class MainMenuUI : MonoBehaviour
     [SerializeField]
     Button m_FindMatchButton;
 
+    [SerializeField]
+    TMPro.TMP_InputField m_InputField;
+
     void Awake()
     {
         if (!FindAnyObjectByType<EventSystem>())
@@ -42,7 +45,7 @@ public class MainMenuUI : MonoBehaviour
         if (m_StartServerButton) m_StartServerButton.onClick.AddListener(StartServer);
         if (m_FindMatchButton) m_FindMatchButton.onClick.AddListener(FindMatch);
 
-        if (MultiplayerRolesManager.ActiveMultiplayerRoleMask == MultiplayerRoleFlags.Server) StartServer(); 
+        if (MultiplayerRolesManager.ActiveMultiplayerRoleMask == MultiplayerRoleFlags.Server) StartServer();
     }
 
     void FindMatch()
@@ -50,7 +53,8 @@ public class MainMenuUI : MonoBehaviour
 #if UNITY_EDITOR
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("127.0.0.1", 8100);
 #else
-        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("192.168.1.22", 8100); //Set Online Server IP
+        if(m_InputField.text != "") { NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(m_InputField.text, 8100); }
+        //NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("192.168.1.22", 8100); //Set Online Server IP
 #endif
         var success = NetworkManager.Singleton.StartClient();
         if (success)
