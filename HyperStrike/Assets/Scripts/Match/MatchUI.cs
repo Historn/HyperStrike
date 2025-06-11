@@ -28,8 +28,6 @@ public class MatchUI : NetworkBehaviour
 
     void UpdateWaitTimerText(float previous, float current)
     {
-        // INTERPOLATE BETWEEN PREVIOUS AND CURRENT?
-
         if (initTimerText != null)
         {
             int time = Mathf.FloorToInt(MatchManager.Instance.GetCurrentWaitTime());
@@ -41,11 +39,13 @@ public class MatchUI : NetworkBehaviour
 
     void UpdateMatchTimerAsText(float previous, float current)
     {
-        int minutes = Mathf.FloorToInt(MatchManager.Instance.GetCurrentMatchTime() / 60f);
-        int seconds = Mathf.FloorToInt(MatchManager.Instance.GetCurrentMatchTime() % 60f);
+        int minutes = Mathf.FloorToInt(current / 60f);
+        int seconds = Mathf.FloorToInt(current % 60f);
 
         string timeText = $"{minutes:D2}:{seconds:D2}";
-        timerText.text = timeText;
+
+        if (current <= 0.0f) timerText.text = "OVERTIME";
+        else timerText.text = timeText;
     }
 
     [Rpc(SendTo.NotServer)]

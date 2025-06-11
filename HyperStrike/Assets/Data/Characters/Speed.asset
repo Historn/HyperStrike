@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterName: Speed
   health: 100
+  maxHealth: 100
   speed: 30
   sprintSpeed: 50
   wallRunSpeed: 100

@@ -1,4 +1,4 @@
-using System;
+using Unity.Multiplayer;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
@@ -20,6 +20,9 @@ public class MainMenuUI : MonoBehaviour
     [SerializeField]
     Button m_FindMatchButton;
 
+    [SerializeField]
+    TMPro.TMP_InputField m_InputField;
+
     void Awake()
     {
         if (!FindAnyObjectByType<EventSystem>())
@@ -31,6 +34,9 @@ public class MainMenuUI : MonoBehaviour
             var eventSystem = new GameObject("EventSystem", typeof(EventSystem), inputType);
             eventSystem.transform.SetParent(transform);
         }
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     // Start is called before the first frame update
@@ -38,14 +44,17 @@ public class MainMenuUI : MonoBehaviour
     {
         if (m_StartServerButton) m_StartServerButton.onClick.AddListener(StartServer);
         if (m_FindMatchButton) m_FindMatchButton.onClick.AddListener(FindMatch);
+
+        if (MultiplayerRolesManager.ActiveMultiplayerRoleMask == MultiplayerRoleFlags.Server) StartServer();
     }
 
     void FindMatch()
     {
 #if UNITY_EDITOR
-        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("127.0.0.1", 7777);
+        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("127.0.0.1", 8100);
 #else
-        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("192.168.1.22", 7777);
+        if(m_InputField.text != "") { NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(m_InputField.text, 8100); }
+        //NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("192.168.1.22", 8100); //Set Online Server IP
 #endif
         var success = NetworkManager.Singleton.StartClient();
         if (success)
@@ -61,9 +70,9 @@ public class MainMenuUI : MonoBehaviour
 
     void StartServer()
     {
-        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("0.0.0.0", 7777);
+        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("0.0.0.0", 8100);
         NetworkManager.Singleton.StartServer();
-        var status = NetworkManager.Singleton.SceneManager.LoadScene("LobbyTest", LoadSceneMode.Single);
+        var status = NetworkManager.Singleton.SceneManager.LoadScene("LobbyRoom", LoadSceneMode.Single);
         if (status != SceneEventProgressStatus.Started)
         {
             Debug.LogWarning($"Failed to load Lobby" +

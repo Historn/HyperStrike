@@ -1210,13 +1210,16 @@ GameObject:
   - component: {fileID: 2798649970309977460}
   - component: {fileID: 4759604346841510657}
   - component: {fileID: 921084569291357457}
-  - component: {fileID: 1045003419213193080}
   - component: {fileID: 8723292194729945805}
+  - component: {fileID: -1014032555163157668}
+  - component: {fileID: 1045003419213193080}
   - component: {fileID: 8111726804037897081}
   - component: {fileID: 7988653307774528591}
   - component: {fileID: 8571771154224556951}
   - component: {fileID: 1299542609377371396}
   - component: {fileID: 7792390286715653550}
+  - component: {fileID: 2546059434779413597}
+  - component: {fileID: 7679960963000521798}
   m_Layer: 0
   m_Name: Char_Nanoflow
   m_TagString: Player
@@ -1315,24 +1318,6 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 1
---- !u!114 &1045003419213193080
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4092117151816693018}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 091083a5d8a577d45af5c4a74117809b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  leaderboardPanel: {fileID: 0}
-  scoreText: {fileID: 0}
-  characterNameText: {fileID: 0}
-  timerText: {fileID: 0}
-  localScoreText: {fileID: 0}
-  visitantScoreText: {fileID: 0}
 --- !u!114 &8723292194729945805
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1358,6 +1343,45 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
+--- !u!114 &-1014032555163157668
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4092117151816693018}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 196262c0e5ee0fd41bbfe58dcc957f98, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  PlayerName: PlayerName
+  PlayerId: 0
+  Team:
+    m_InternalValue: 0
+  Score:
+    m_InternalValue: 0
+  Goals:
+    m_InternalValue: 0
+  Character: {fileID: 11400000, guid: 9d4e3ba57a1756c44ac3868b3c2b2ba0, type: 2}
+  deadTime:
+    m_InternalValue: 5
+--- !u!114 &1045003419213193080
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4092117151816693018}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 091083a5d8a577d45af5c4a74117809b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  leaderboardPanel: {fileID: 0}
+  scoreText: {fileID: 0}
+  characterNameText: {fileID: 0}
 --- !u!114 &8111726804037897081
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1371,7 +1395,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  characterData: {fileID: 11400000, guid: 9d4e3ba57a1756c44ac3868b3c2b2ba0, type: 2}
   cinemachineCamera: {fileID: 9140496699916306519}
   mainCameraTransform: {fileID: 237924521647347322}
   cameraWeaponTransform: {fileID: 5763571179399681349}
@@ -1426,15 +1449,15 @@ MonoBehaviour:
   SyncRotAngleX: 1
   SyncRotAngleY: 1
   SyncRotAngleZ: 1
-  SyncScaleX: 1
-  SyncScaleY: 1
-  SyncScaleZ: 1
-  PositionThreshold: 0.001
-  RotAngleThreshold: 0.01
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
+  PositionThreshold: 0.1
+  RotAngleThreshold: 0.1
   ScaleThreshold: 0.01
   UseQuaternionSynchronization: 1
-  UseQuaternionCompression: 0
-  UseHalfFloatPrecision: 0
+  UseQuaternionCompression: 1
+  UseHalfFloatPrecision: 1
   InLocalSpace: 0
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
@@ -1453,7 +1476,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkRigidbodyBaseExpanded: 0
-  UseRigidBodyForMotion: 0
+  UseRigidBodyForMotion: 1
   AutoUpdateKinematicState: 1
   AutoSetKinematicOnDespawn: 1
 --- !u!114 &7792390286715653550
@@ -1471,6 +1494,32 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   TransitionStateInfoList: []
   m_Animator: {fileID: 2798649970309977460}
+--- !u!114 &2546059434779413597
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4092117151816693018}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5fbfe0a5e373c64ab760fd60f0cb423, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnDeath:
+    m_PersistentCalls:
+      m_Calls: []
+  OnReceiveDamage:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!81 &7679960963000521798
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4092117151816693018}
+  m_Enabled: 1
 --- !u!1 &4169559647624653032
 GameObject:
   m_ObjectHideFlags: 0
@@ -2543,7 +2592,6 @@ GameObject:
   - component: {fileID: 4284149652456873147}
   - component: {fileID: 777318031589837471}
   - component: {fileID: 566790723095091884}
-  - component: {fileID: 2750332204253117753}
   m_Layer: 0
   m_Name: CinemachineBrain
   m_TagString: Untagged
@@ -2739,14 +2787,6 @@ MonoBehaviour:
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
---- !u!81 &2750332204253117753
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6572253354404910553}
-  m_Enabled: 1
 --- !u!1 &6738584472990326744
 GameObject:
   m_ObjectHideFlags: 0
