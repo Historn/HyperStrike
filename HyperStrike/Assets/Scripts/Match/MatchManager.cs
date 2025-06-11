@@ -328,6 +328,7 @@ public class MatchManager : NetworkBehaviour
         }
 
         GameObject ball = Instantiate(ballPrefab, new Vector3(0, 5, 0), Quaternion.identity);
+        ball.transform.localScale = new Vector3(10, 10, 10);
         ball.GetComponent<NetworkObject>().Spawn(true);
         ball.GetComponent<Rigidbody>().isKinematic = true;
         currentBall = ball;

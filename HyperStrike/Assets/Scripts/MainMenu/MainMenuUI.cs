@@ -48,9 +48,9 @@ public class MainMenuUI : MonoBehaviour
     void FindMatch()
     {
 #if UNITY_EDITOR
-        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("127.0.0.1", 7777);
+        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("127.0.0.1", 8100);
 #else
-        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("192.168.1.22", 7777);
+        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("192.168.1.22", 8100); //Set Online Server IP
 #endif
         var success = NetworkManager.Singleton.StartClient();
         if (success)
@@ -66,7 +66,7 @@ public class MainMenuUI : MonoBehaviour
 
     void StartServer()
     {
-        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("0.0.0.0", 7777);
+        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("0.0.0.0", 8100);
         NetworkManager.Singleton.StartServer();
         var status = NetworkManager.Singleton.SceneManager.LoadScene("LobbyRoom", LoadSceneMode.Single);
         if (status != SceneEventProgressStatus.Started)

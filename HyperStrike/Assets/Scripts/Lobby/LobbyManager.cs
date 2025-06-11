@@ -83,7 +83,7 @@ public class LobbyManager : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.P) && NetworkManager.Singleton?.ConnectedClientsList.Count > 1 && State.Value != LobbyState.WAIT)
+        if (Input.GetKeyDown(KeyCode.P) && State.Value != LobbyState.WAIT)
         {
             SetLobbyState(LobbyState.WAIT);
         }
