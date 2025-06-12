@@ -75,8 +75,8 @@ public class MatchManager : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         // SYNCHRONIZATION EVENT PROCESS
-        NetworkManager.Singleton.SceneManager.OnLoadComplete += OnSceneLoaded;
-        if (IsClient) NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
+        if (IsServer) NetworkManager.Singleton.SceneManager.OnLoadComplete += OnSceneLoaded;
+        else if (IsClient) NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
 
     }
 
@@ -110,7 +110,7 @@ public class MatchManager : NetworkBehaviour
 
     private void OnSceneLoaded(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
     {
-        if (NetworkManager.Singleton?.ConnectedClientsList.Count > 1)
+        if (NetworkManager.Singleton?.ConnectedClientsList.Count > 5)
         {
             SetMatchState(MatchState.CHARACTER_SELECTION);
         }
