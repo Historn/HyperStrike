@@ -1501,8 +1501,8 @@ MonoBehaviour:
   IgnoreTimeScale: 0
   WorldUpOverride: {fileID: 0}
   ChannelMask: -1
-  UpdateMethod: 0
-  BlendUpdateMethod: 0
+  UpdateMethod: 2
+  BlendUpdateMethod: 1
   LensModeOverride:
     Enabled: 0
     DefaultMode: 2
@@ -2421,7 +2421,7 @@ GameObject:
   - component: {fileID: 550458959400188235}
   - component: {fileID: 6459366816758444367}
   - component: {fileID: 8862662987425679454}
-  - component: {fileID: 4662636310076599720}
+  - component: {fileID: 5850214212879513311}
   - component: {fileID: 4326943606440057839}
   - component: {fileID: 1820654785331639308}
   - component: {fileID: 6142821008091826370}
@@ -2506,7 +2506,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5560394306431470110}
   serializedVersion: 4
-  m_Mass: 1.75
+  m_Mass: 1.65
   m_Drag: 0.2
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: -1, z: 0}
@@ -2571,9 +2571,9 @@ MonoBehaviour:
     m_InternalValue: 0
   Goals:
     m_InternalValue: 0
-  Character: {fileID: 11400000, guid: 9d4e3ba57a1756c44ac3868b3c2b2ba0, type: 2}
   deadTime:
     m_InternalValue: 5
+  Character: {fileID: 11400000, guid: 9d4e3ba57a1756c44ac3868b3c2b2ba0, type: 2}
 --- !u!114 &6459366816758444367
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2608,21 +2608,20 @@ MonoBehaviour:
   isGrounded: 0
   isWallRunning: 0
   projectileSpawnOffset: {fileID: 5722620188708603574}
---- !u!114 &4662636310076599720
+--- !u!114 &5850214212879513311
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5560394306431470110}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: faeb8f8da6afce04e96fc63f8d8dd559, type: 3}
+  m_Script: {fileID: 11500000, guid: c9849c35918686f408b7c8be8735a698, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  abilitySlots:
-  - ability: {fileID: 11400000, guid: c63efe8cb4f7fb8489cb63f4eca8c40f, type: 2}
-    activationKey: 101
+  ShowTopMostFoldoutHeaderGroup: 1
+  abilities: []
 --- !u!114 &4326943606440057839
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3624,7 +3623,7 @@ MonoBehaviour:
   m_StreamingVersion: 20241001
   m_LegacyPriority: 0
   Target:
-    TrackingTarget: {fileID: 6913581130208829720}
+    TrackingTarget: {fileID: 0}
     LookAtTarget: {fileID: 0}
     CustomLookAtTarget: 0
   Lens:

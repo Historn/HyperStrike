@@ -20,8 +20,6 @@ namespace HyperStrike
         public float shootOffset; // Forward offset for the projectile spawn
 
         [Header("Character Abilities")]
-        public Ability ability1;
-        public Ability ability2;
-        public Ability ability3;
+        public Ability[] abilities = new Ability[3];
     }
 }

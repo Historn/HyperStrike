@@ -1,3 +1,4 @@
+using Unity.Netcode;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "New Movement Ability", menuName = "HyperStrike/Movement Ability")]
@@ -8,67 +9,31 @@ public class MovementAbility : Ability
     public float dashSpeed;
     public bool canDamageEnemies;
     public float damageAmount;
+    public Vector3 dashDirection;
+    public bool isForwardDirection;
     public LayerMask collisionLayers;
 
-    private Vector3 dashDirection;
-    private float dashProgress;
-
-    public override bool CanUseAbility(AbilityHolder user)
+    public override void ServerCast(ulong clientId)
     {
-        // Check for obstacles, valid direction, etc.
-        // Could trace the path to ensure it's valid
-        return true;
+        base.ServerCast(clientId);
+
+        // Movmeent behaviour on server
+        if (isForwardDirection) dashDirection = owner.transform.forward;
+        Debug.Log("Movement Abilty");
+        owner.GetComponent<Rigidbody>().MovePosition(dashDirection);
+
+        PlayEffects(owner.transform.position);
     }
 
-    public override void InitiateAbility(AbilityHolder user)
+    public override void PlayEffects(Vector3 position)
     {
-        // Store the direction to dash in
-        dashDirection = user.transform.forward;
-        dashProgress = 0f;
+        // Play VFX/SFX on all clients
+        PlayEffectsClientRpc(position);
     }
 
-    public override void ExecuteAbility(AbilityHolder user)
+    [ClientRpc]
+    private void PlayEffectsClientRpc(Vector3 position)
     {
-        // This will be called if it's an instant ability,
-        // but for movement, we usually want to use UpdateAbility
-    }
-
-    public override void UpdateAbility(AbilityHolder user)
-    {
-        // Move the character over time during cast time
-        CharacterController controller = user.GetComponent<CharacterController>();
-        if (controller != null)
-        {
-            float distanceThisFrame = dashSpeed * Time.deltaTime;
-            controller.Move(dashDirection * distanceThisFrame);
-
-            dashProgress += distanceThisFrame;
-
-            // Check for enemies to damage
-            if (canDamageEnemies)
-            {
-                Collider[] hits = Physics.OverlapSphere(
-                    user.transform.position,
-                    1.0f,
-                    collisionLayers
-                );
-
-                foreach (var hit in hits)
-                {
-                    // Apply damage or effects to hit objects
-                    Player target = hit.GetComponent<Player>();
-                    if (target != null)
-                    {
-                        Debug.Log("Hit a Player has to take damage!");
-                        //target.TakeDamage(damageAmount);
-                    }
-                }
-            }
-        }
-    }
-
-    public override void EndAbility(AbilityHolder user)
-    {
-        // Apply ending effects, momentum reduction, etc.
+        // Instantiate visual/audio effects
     }
 }

@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -110,10 +111,17 @@ public class MatchManager : NetworkBehaviour
 
     private void OnSceneLoaded(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
     {
+#if UNITY_EDITOR
+        if (NetworkManager.Singleton?.ConnectedClientsList.Count > 0)
+        {
+            SetMatchState(MatchState.CHARACTER_SELECTION);
+        }
+#else
         if (NetworkManager.Singleton?.ConnectedClientsList.Count > 5)
         {
             SetMatchState(MatchState.CHARACTER_SELECTION);
         }
+#endif
     }
 
     void MatchStateBehavior()
