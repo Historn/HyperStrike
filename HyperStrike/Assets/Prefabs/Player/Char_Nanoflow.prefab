@@ -1214,7 +1214,7 @@ GameObject:
   - component: {fileID: -1014032555163157668}
   - component: {fileID: 1045003419213193080}
   - component: {fileID: 8111726804037897081}
-  - component: {fileID: 7988653307774528591}
+  - component: {fileID: -2863389504996472070}
   - component: {fileID: 8571771154224556951}
   - component: {fileID: 1299542609377371396}
   - component: {fileID: 7792390286715653550}
@@ -1299,7 +1299,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4092117151816693018}
   serializedVersion: 4
-  m_Mass: 2
+  m_Mass: 1.5
   m_Drag: 0.2
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: -1, z: 0}
@@ -1364,9 +1364,9 @@ MonoBehaviour:
     m_InternalValue: 0
   Goals:
     m_InternalValue: 0
-  Character: {fileID: 11400000, guid: 9d4e3ba57a1756c44ac3868b3c2b2ba0, type: 2}
   deadTime:
     m_InternalValue: 5
+  Character: {fileID: 11400000, guid: cc05325b4fa6c654db258df26d90e4cf, type: 2}
 --- !u!114 &1045003419213193080
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1401,21 +1401,20 @@ MonoBehaviour:
   isGrounded: 0
   isWallRunning: 0
   projectileSpawnOffset: {fileID: 4323292641096265402}
---- !u!114 &7988653307774528591
+--- !u!114 &-2863389504996472070
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4092117151816693018}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: faeb8f8da6afce04e96fc63f8d8dd559, type: 3}
+  m_Script: {fileID: 11500000, guid: c9849c35918686f408b7c8be8735a698, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  abilitySlots:
-  - ability: {fileID: 11400000, guid: c63efe8cb4f7fb8489cb63f4eca8c40f, type: 2}
-    activationKey: 101
+  ShowTopMostFoldoutHeaderGroup: 1
+  abilities: []
 --- !u!114 &8571771154224556951
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2115,7 +2114,7 @@ MonoBehaviour:
   m_StreamingVersion: 20241001
   m_LegacyPriority: 0
   Target:
-    TrackingTarget: {fileID: 5763571179399681349}
+    TrackingTarget: {fileID: 0}
     LookAtTarget: {fileID: 0}
     CustomLookAtTarget: 0
   Lens:
@@ -2607,7 +2606,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6572253354404910553}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1.375, z: 0.135}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -2631,8 +2630,8 @@ MonoBehaviour:
   IgnoreTimeScale: 0
   WorldUpOverride: {fileID: 0}
   ChannelMask: -1
-  UpdateMethod: 0
-  BlendUpdateMethod: 0
+  UpdateMethod: 2
+  BlendUpdateMethod: 1
   LensModeOverride:
     Enabled: 0
     DefaultMode: 2

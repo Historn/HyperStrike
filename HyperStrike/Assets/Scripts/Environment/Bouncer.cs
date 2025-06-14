@@ -19,6 +19,7 @@ public class Bouncer : NetworkBehaviour
                 if (rb != null)
                 {
                     Vector3 dir = rb.position - transform.position;
+                    //Vector3 dir = other.GetContact(0).normal; // Player doesnt bounce
 
                     rb.AddForce(dir.normalized * force, ForceMode.Impulse);
                 }

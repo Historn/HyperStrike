@@ -15,12 +15,11 @@ public class Player : NetworkBehaviour
     public NetworkVariable<byte> Team = new NetworkVariable<byte>(0);
     public NetworkVariable<int> Score = new NetworkVariable<int>(0);
     public NetworkVariable<int> Goals = new NetworkVariable<int>(0);
+    public NetworkVariable<float> deadTime = new NetworkVariable<float>(5.0f);
 
     public Character Character;
 
     private PlayerEventSubscriber playerEventSubscriber;
-
-    public NetworkVariable<float> deadTime = new NetworkVariable<float>(5.0f);
 
     public override void OnNetworkSpawn()
     {

@@ -10,20 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4d8b07d2e65637e4899ad7f00722b1a5, type: 3}
-  m_Name: Speed
+  m_Name: Crashwall
   m_EditorClassIdentifier: 
-  characterName: Speed
+  characterName: Crashwall
   health: 100
   maxHealth: 100
   speed: 30
-  sprintSpeed: 60
+  sprintSpeed: 50
   wallRunSpeed: 100
   maxSpeed: 15
   maxSlidingSpeed: 30
   projectilePrefab: {fileID: 4480140288178342511, guid: 4bb923ba4b889c64da67ffff59974caa, type: 3}
   shootCooldown: 0.5
   shootOffset: 1
-  abilities:
-  - {fileID: 11400000, guid: 5f790c7d76bdd8a42880c959f4feb73e, type: 2}
-  - {fileID: 11400000, guid: c63efe8cb4f7fb8489cb63f4eca8c40f, type: 2}
-  - {fileID: 11400000, guid: 20bda653ad971264e926e1092e8d83f6, type: 2}
+  ability1: {fileID: 11400000, guid: c63efe8cb4f7fb8489cb63f4eca8c40f, type: 2}
+  ability2: {fileID: 11400000, guid: 5f790c7d76bdd8a42880c959f4feb73e, type: 2}
+  ability3: {fileID: 0}

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Unity.Netcode;
 using UnityEngine;
 
 //[CreateAssetMenu(fileName = "New Ability", menuName = "HyperStrike/Ability Data")]
@@ -7,27 +8,36 @@ public abstract class Ability : ScriptableObject
 {
     [Header("Basic Info")]
     public string abilityName;
-    public Sprite abilityIcon;
-    public string description;
-
-    [Header("Timing")]
-    public float cooldownDuration;
-    private float cooldownTimer;
+    public Sprite icon;
+    public float chargeRechargeTime;
+    public float fullCooldown;
     public float castTime;
-    public float duration;
-    public bool canMoveWhileCasting;
+    public int maxCharges;
 
-    [Header("Resources")]
-    public float energyCost;
-    
-    public bool isReady { get; private set; }
+    [Header("Networking")]
+    public NetworkVariable<int> currentCharges = new NetworkVariable<int>(3);
+    private bool isRecharging;
+    public bool requiresTarget;
+    public NetworkVariable<bool> isOnCooldown = new NetworkVariable<bool>();
 
-    // Core methods that each ability will implement
-    public abstract bool CanUseAbility(AbilityHolder user);
-    public abstract void InitiateAbility(AbilityHolder user);
-    public abstract void ExecuteAbility(AbilityHolder user);
-    public abstract void EndAbility(AbilityHolder user);
+    // Reference to the player who owns this ability instance
+    protected PlayerAbilityController owner;
 
-    // Optional override for ability update logic (continuous effects)
-    public virtual void UpdateAbility(AbilityHolder user) { }
+    // Called when ability is assigned to a player
+    public virtual void Initialize(PlayerAbilityController player)
+    {
+        owner = player;
+    }
+
+    // Called when player presses the ability button (client-side prediction)
+    public virtual void OnStartCast(ulong clientId) { }
+
+    // Server-side validation and execution
+    public virtual void ServerCast(ulong clientId) { }
+
+    // Called when ability is done (cleanup, etc.)
+    public virtual void OnFinishCast() { }
+
+    // Visual/audio effects that run on all clients
+    public virtual void PlayEffects(Vector3 position) { }
 }

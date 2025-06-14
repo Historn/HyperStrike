@@ -10,20 +10,23 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2b40c5a0ffb473346be08937d187a6a9, type: 3}
-  m_Name: DashAbility
+  m_Name: Speed_GroundQuake
   m_EditorClassIdentifier: 
-  abilityName: Dash
-  abilityIcon: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
-  description: dsf
-  cooldownDuration: 0
+  abilityName: Ground Quake
+  icon: {fileID: 0}
+  chargeRechargeTime: 5
+  fullCooldown: 5
   castTime: 0
-  duration: 0
-  canMoveWhileCasting: 1
-  energyCost: 0
-  dashDistance: 6
-  dashSpeed: 12
-  canDamageEnemies: 0
-  damageAmount: 0
+  maxCharges: 3
+  requiresTarget: 0
+  isOnCooldown:
+    m_InternalValue: 0
+  dashDistance: 100
+  dashSpeed: 100
+  canDamageEnemies: 1
+  damageAmount: 30
+  dashDirection: {x: 0, y: -1, z: 0}
+  isForwardDirection: 0
   collisionLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 4294967295
