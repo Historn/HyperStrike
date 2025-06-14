@@ -10,6 +10,7 @@ TagManager:
   - Metal
   - Tile
   - Glass
+  - Goal
   layers:
   - Default
   - TransparentFX

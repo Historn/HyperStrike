@@ -3,8 +3,11 @@ using UnityEngine;
 
 public class Goal : NetworkBehaviour
 {
-    [SerializeField] private GameObject goalVfx;
     [SerializeField] private bool isLocalGoal;
+    [SerializeField] private GameObject goalVfx;
+    
+    [SerializeField] private AudioClip goalSFX;
+    private AudioSource goalAudioSource;
 
     private GoalEventSubscriber goalEventSubscriber;
 
@@ -13,6 +16,7 @@ public class Goal : NetworkBehaviour
         if (IsServer)
         {
             goalEventSubscriber = GetComponent<GoalEventSubscriber>();
+            goalAudioSource = GetComponent<AudioSource>();
         }
     }
 
@@ -33,6 +37,7 @@ public class Goal : NetworkBehaviour
 
             // Increase goals
             TriggerGoalVFX(other.transform.position);
+            TriggerGoalSFX();
 
             Destroy(other.gameObject);
 
@@ -48,6 +53,18 @@ public class Goal : NetworkBehaviour
             GameObject vfxInstance = Instantiate(goalVfx, position, Quaternion.identity);
             vfxInstance.GetComponent<NetworkObject>().Spawn(true);
             Destroy(vfxInstance, 5f);
+        }
+    }
+
+    private void TriggerGoalSFX()
+    {
+        if (goalSFX != null && IsServer)
+        {
+            goalAudioSource.volume = Random.Range(0.8f, 1.0f);
+            goalAudioSource.pitch = Random.Range(0.8f, 1.0f);
+            
+            // Play Goal SFX
+            goalAudioSource.PlayOneShot(goalSFX);
         }
     }
 }
