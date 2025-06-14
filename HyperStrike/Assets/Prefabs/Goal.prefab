@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 4792459554691813628}
   - component: {fileID: 6099210979351027831}
   - component: {fileID: 1066547957085744111}
+  - component: {fileID: 8772677395519443276}
   m_Layer: 0
   m_Name: Goal
   m_TagString: Untagged
@@ -109,8 +110,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 0.875, y: 2, z: 0.8666658}
+  m_Center: {x: -2.2204029e-16, y: 0.5, z: -0.066666216}
 --- !u!1652712579 &4792459554691813628
 MultiplayerRolesData:
   m_ObjectHideFlags: 2
@@ -142,7 +143,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2255939048
+  GlobalObjectIdHash: 344621174
   InScenePlacedSourceGlobalObjectIdHash: 1552259670
   DeferredDespawnTick: 0
   Ownership: 1
@@ -169,3 +170,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   goalVfx: {fileID: 1546897667432260974, guid: fe8a487245448f640925f8455a9ff42b, type: 3}
+  isLocalGoal: 0
+--- !u!114 &8772677395519443276
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7520282126169163746}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3649f9cf29fa8242977a72583fdbf8f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnPlayerHitBallScored:
+    m_PersistentCalls:
+      m_Calls: []

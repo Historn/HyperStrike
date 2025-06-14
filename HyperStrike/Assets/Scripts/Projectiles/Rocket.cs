@@ -1,5 +1,6 @@
 using HyperStrike;
 using System.Collections;
+using Unity.Netcode;
 using UnityEngine;
 
 public class Rocket : Projectile
@@ -13,7 +14,7 @@ public class Rocket : Projectile
     public override void OnNetworkSpawn()
     {
         SpawnParticles(shootFX, 0.3f);
-        damage = 20.0f;
+        damage = 20;
         speed = 30f;
 
         // Spawns from the player that shot
@@ -69,6 +70,11 @@ public class Rocket : Projectile
                 Vector3 dir = rb.position - transform.position;
 
                 rb.AddForce(dir.normalized * explosionForce, ForceMode.Impulse);
+
+                if (collider.CompareTag("Player") && this.playerOwnerId != collider.GetComponent<NetworkObject>().NetworkObjectId)
+                {
+                    collider.GetComponent<Player>().ApplyDamage(damage);
+                }
             }
         }
     }

@@ -8,6 +8,16 @@ public class BallController : NetworkBehaviour
     [SerializeField] bool isGrounded;
     public bool IsGoal;
 
+    HyperStrikeUtils hyperStrikeUtils;
+
+    private ulong lastPlayerHitId = 0;
+    public Vector3 lastPlayerHitPosition;
+
+    private void Awake()
+    {
+        hyperStrikeUtils = new HyperStrikeUtils();
+    }
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -17,11 +27,9 @@ public class BallController : NetworkBehaviour
 
     void FixedUpdate()
     {
-        if (!MatchManager.Instance.allowMovement.Value) rb.linearVelocity = Vector3.zero;
-
         //Ground Check
-        isGrounded = HyperStrikeUtils.CheckGrounded(transform);
-        IsGoal = HyperStrikeUtils.CheckObjectInsideCollision(transform);
+        isGrounded = hyperStrikeUtils.CheckGrounded(transform);
+        IsGoal = hyperStrikeUtils.CheckObjectInsideCollision(transform);
     }
 
     private void OnCollisionEnter(Collision other)
@@ -30,7 +38,13 @@ public class BallController : NetworkBehaviour
 
         if (other != null)
         {
+            GameObject obj = other.gameObject;
             // Check hit with players to detect the last hit for the score
+            if (obj.CompareTag("Player") && this.lastPlayerHitId != obj.GetComponent<NetworkObject>().NetworkObjectId)
+            {
+                this.lastPlayerHitId = obj.GetComponent<NetworkObject>().NetworkObjectId;
+                lastPlayerHitPosition = other.GetContact(0).point;
+            }
         }
     }
 }

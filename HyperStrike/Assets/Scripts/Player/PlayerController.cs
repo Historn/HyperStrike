@@ -39,7 +39,6 @@ public class PlayerController : NetworkBehaviour
     #region "Model-View Player"
     private Player player;
     private PlayerView view;
-    public Character characterData;
     #endregion
 
     NetworkAnimator animator;
@@ -62,7 +61,7 @@ public class PlayerController : NetworkBehaviour
 
     // Jump Vars
     bool readyToJump;
-    float jumpCooldown = 0.0f;
+    float jumpCooldown = 0.5f;
     float jumpForce = 10.0f;
 
     // Ground Vars
@@ -90,6 +89,8 @@ public class PlayerController : NetworkBehaviour
 
     #endregion
 
+    HyperStrikeUtils hyperStrikeUtils;
+
     private void OnEnable()
     {
         input?.Player.Enable();
@@ -102,6 +103,19 @@ public class PlayerController : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+        // Init Player MVC
+        player = GetComponent<Player>(); ;
+        view = GetComponent<PlayerView>();
+
+        // Net Owner Only?
+        if (IsServer) player.Score.Value = 0;
+        view.UpdateView(player);
+
+        // Init Physics variables
+        rb = GetComponent<Rigidbody>();
+        rb.freezeRotation = true;
+        rb.maxLinearVelocity = player.Character.maxSpeed;
+
         if (IsClient && IsOwner)
         {
             Cursor.lockState = CursorLockMode.Locked;
@@ -113,34 +127,28 @@ public class PlayerController : NetworkBehaviour
             HideMeshRenderer();
 
             cinemachineCamera.Priority = 1;
+
+            rb.isKinematic = true;
+            rb.interpolation = RigidbodyInterpolation.Interpolate;
         }
         else
         {
             cinemachineCamera.Priority = -1;
+
+            rb.isKinematic = false;
+            rb.interpolation = RigidbodyInterpolation.None;
+            characterHeight = GetComponent<CapsuleCollider>().height;
         }
-
-        // Init Player MVC
-        player = new Player();
-        player.Character = characterData;
-        view = GetComponent<PlayerView>();
-
-        // Net Owner Only?
-        player.Score = 0;
-        view.UpdateView(player);
-
-        // Init Physics variables
-        rb = GetComponent<Rigidbody>();
-        rb.freezeRotation = true;
-        rb.maxLinearVelocity = player.Character.maxSpeed;
 
         readyToJump = true;
 
-        characterHeight = GetComponent<CapsuleCollider>().height;
         isGrounded = false;
         isWallRunning = false;
 
         // Init Attack Variables
         shootReady = true;
+
+        hyperStrikeUtils = new HyperStrikeUtils();
     }
 
     private void Start()
@@ -160,9 +168,6 @@ public class PlayerController : NetworkBehaviour
     private void FixedUpdate()
     {
         if (MatchManager.Instance && !MatchManager.Instance.allowMovement.Value) return;
-
-        isGrounded = HyperStrikeUtils.CheckGrounded(transform, characterHeight);
-        isWallRunning = HyperStrikeUtils.CheckWalls(transform, ref wallHit);
 
         if (IsClient && IsOwner)
         {
@@ -204,6 +209,9 @@ public class PlayerController : NetworkBehaviour
     [ServerRpc]
     void SendInputServerRPC(InputData input)
     {
+        isGrounded = hyperStrikeUtils.CheckGrounded(transform, characterHeight);
+        isWallRunning = hyperStrikeUtils.CheckWalls(transform, ref wallHit);
+
         // Only send when changed
         if (input.look != Vector2.zero)
             RotatePlayerWithCamera(input.look);
@@ -214,13 +222,7 @@ public class PlayerController : NetworkBehaviour
             wasSprinting = input.sprint;
         }
 
-        if (input.moveInProgress != wasWallRunning || input.jump != wasJumpPressed)
-        {
-            WallRun(input.moveInProgress, input.jump);
-            // Rotate camera a bit on the z-axis
-            wasWallRunning = input.moveInProgress;
-            wasJumpPressed = input.jump;
-        }
+        WallRun(input.moveInProgress, input.jump);
 
         if (input.slide != wasSliding)
         {
@@ -264,12 +266,15 @@ public class PlayerController : NetworkBehaviour
     void WalkAndRun(Vector2 moveValue, bool isWalking, bool isSprinting)
     {
         animator?.Animator.SetBool(isWalkingHash, isWalking);
+
+        if (isWallRunning && !isGrounded) return;
+
         // Sprint
         float speed = player.Character.speed;
         if (isSprinting && isGrounded) speed = player.Character.sprintSpeed;
 
         Vector3 dir = transform.forward * moveValue.y + transform.right * moveValue.x;
-        if (!isWallRunning) rb.AddForce(dir.normalized * speed, ForceMode.Force);
+        rb.AddForce(dir.normalized * speed, ForceMode.Force);
     }
 
     void Slide(bool isSliding)
@@ -294,7 +299,7 @@ public class PlayerController : NetworkBehaviour
             readyToJump = false;
             //Reset Y Velocity
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
-            rb.AddForce((transform.up + jumpDir) * jumpForce, ForceMode.Impulse);
+            rb.AddForce((transform.up + jumpDir.normalized) * jumpForce, ForceMode.Impulse);
             animator?.Animator.SetBool(isJumpingHash, isJumping);
             Invoke(nameof(ResetJump), jumpCooldown);    //Delay for jump to reset
         }
@@ -309,7 +314,7 @@ public class PlayerController : NetworkBehaviour
     {
         if (!isGrounded && isWallRunning && isMoving)
         {
-            rb.AddForce(transform.forward * player.Character.wallRunSpeed + transform.up * 0.8f, ForceMode.Force); // Reduce gravity to stay more time in the wall but not infinite
+            rb.AddForce((transform.forward * player.Character.wallRunSpeed) + (transform.up * 15), ForceMode.Force); // Reduce gravity to stay more time in the wall but not infinite
             Jump(isJumping, wallHit.normal);
         }
     }
@@ -323,6 +328,7 @@ public class PlayerController : NetworkBehaviour
             shootReady = false;
 
             GameObject projectileGO = Instantiate(player.Character.projectilePrefab, projectileSpawnOffset.position + cameraWeaponTransform.forward * player.Character.shootOffset, cameraWeaponTransform.rotation);
+            projectileGO.GetComponent<Projectile>().playerOwnerId = this.NetworkObjectId;
             projectileGO.GetComponent<NetworkObject>().Spawn(true);
             Invoke(nameof(ResetShoot), player.Character.shootCooldown);    //Delay for attack to reset
             animator?.Animator.SetBool(isShootingHash, isAttacking);
@@ -343,7 +349,7 @@ public class PlayerController : NetworkBehaviour
     #region "Player Data Visualization Methods"
     public void IncreaseScore(int amount)
     {
-        player.Score += amount;
+        if (IsServer) player.Score.Value += amount;
         view.UpdateView(player);
     }
     #endregion
