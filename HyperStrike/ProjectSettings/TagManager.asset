@@ -9,6 +9,7 @@ TagManager:
   - Grass
   - Metal
   - Tile
+  - Glass
   layers:
   - Default
   - TransparentFX

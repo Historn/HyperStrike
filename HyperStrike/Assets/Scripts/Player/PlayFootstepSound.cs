@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
-using TMPro;
 
 public class PlayFootstepSound : MonoBehaviour
 {
@@ -32,7 +31,7 @@ public class PlayFootstepSound : MonoBehaviour
             case "Metal":
                 myAudioSource.PlayOneShot(footstepsOnMetal[Random.Range(0, footstepsOnMetal.Length)]);
                 break;
-            
+
             case "Tile":
                 myAudioSource.PlayOneShot(footstepsOnTile[Random.Range(0, footstepsOnTile.Length)]);
                 break;
@@ -46,12 +45,9 @@ public class PlayFootstepSound : MonoBehaviour
     {
         switch (collision.gameObject.tag)
         {
-            case "Ground":
-            case "Wood":
-            case "Floor":
-            case "Rock":
+            case "Grass":
             case "Metal":
-            case "Water":
+            case "Tile":
                 material = collision.gameObject.tag;
                 WhenPlayingFootstepSound();
                 break;
@@ -61,3 +57,4 @@ public class PlayFootstepSound : MonoBehaviour
         }
     }
 }
+
