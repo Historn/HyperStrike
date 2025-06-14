@@ -6,6 +6,9 @@ TagManager:
   tags:
   - Bouncer
   - Ball
+  - Grass
+  - Metal
+  - Tile
   layers:
   - Default
   - TransparentFX

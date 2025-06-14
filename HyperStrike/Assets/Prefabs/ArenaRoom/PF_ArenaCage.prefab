@@ -117,6 +117,10 @@ PrefabInstance:
       value: 2147483647
       objectReference: {fileID: 0}
     - target: {fileID: 2505471001550745897, guid: f94e7c7a24e8ec8439353454bcec2e2a, type: 3}
+      propertyPath: m_TagString
+      value: Metal
+      objectReference: {fileID: 0}
+    - target: {fileID: 2505471001550745897, guid: f94e7c7a24e8ec8439353454bcec2e2a, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
