@@ -309,25 +309,25 @@ public class PlayerController : NetworkBehaviour
             MeleeAttack(input.melee);
             wasMelee = input.melee;
         }
-        
+
         if (input.shoot != wasShooting)
         {
             Shoot(input.shoot);
             wasShooting = input.shoot;
         }
-        
+
         if (input.ability1 != wasAbility1)
         {
             ActivateAbility1(input.ability1);
             wasAbility1 = input.ability1;
         }
-        
+
         if (input.ability2 != wasAbility2)
         {
             ActivateAbility2(input.ability2);
             wasAbility2 = input.ability2;
         }
-        
+
         if (input.ultimate != wasAbilityUltimate)
         {
             ActivateUltimate(input.ultimate);
@@ -447,21 +447,21 @@ public class PlayerController : NetworkBehaviour
 
     void ActivateAbility1(bool isAb1)
     {
-        Debug.Log("Trying to activate ABILITY 1");
+        //Debug.Log("Trying to activate ABILITY 1");
         abilityController.TryCastAbility(0);
         return;
     }
 
     void ActivateAbility2(bool isAb2)
     {
-        Debug.Log("Trying to activate ABILITY 2");
+        //Debug.Log("Trying to activate ABILITY 2");
         abilityController.TryCastAbility(1);
         return;
     }
-    
+
     void ActivateUltimate(bool isUlt)
     {
-        Debug.Log("Trying to activate ULTIMATE");
+        //Debug.Log("Trying to activate ULTIMATE");
         abilityController.TryCastAbility(2);
         return;
     }

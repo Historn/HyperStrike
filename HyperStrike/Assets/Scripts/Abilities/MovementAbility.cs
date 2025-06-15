@@ -19,7 +19,7 @@ public class MovementAbility : Ability
 
         // Movmeent behaviour on server
         if (isForwardDirection) dashDirection = owner.transform.forward;
-        Debug.Log("Movement Abilty");
+
         owner.GetComponent<Rigidbody>().MovePosition(dashDirection);
 
         PlayEffects(owner.transform.position);

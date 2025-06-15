@@ -70,8 +70,6 @@ public class CharacterSelectUI : NetworkBehaviour
     {
         if (changeEvent.Type != NetworkListEvent<byte>.EventType.Value) return;
 
-        Debug.Log(((Characters)changeEvent.Value).ToString());
-
         //switch (changeEvent.Index)
         //{
         //    case 0:

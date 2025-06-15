@@ -1,89 +1,67 @@
 using System.Collections;
-using Unity.Cinemachine;
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Windows;
 
 [RequireComponent(typeof(NetworkObject))]
 public class PlayerAbilityController : NetworkBehaviour
 {
     [SerializeField, Header("Ability Slots")]
-    private Ability[] abilities;
+    private List<Ability> abilityInstances = new List<Ability>();
 
     private NetworkVariable<int> currentSelectedAbility = new NetworkVariable<int>();
 
     private Player player;
-    private PlayerInput input;
-
-    private void OnEnable()
-    {
-        input?.Player.Enable();
-    }
-
-    private void OnDisable()
-    {
-        input?.Player.Disable();
-    }
 
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
         player = GetComponent<Player>(); ;
 
-        abilities = player.Character.abilities;
-
         // Initialize all abilities
-        foreach (var ability in abilities)
-        {
-            if (ability != null) ability.Initialize(this);
-        }
-
         if (IsServer)
         {
-            foreach (var ability in abilities)
+            foreach (var ability in player.Character.abilities)
             {
                 if (ability != null)
                 {
-                    ability.currentCharges.Value = ability.maxCharges;
-                    ability.isOnCooldown.Value = false;
+                    var instance = Instantiate(ability);
+                    instance.Initialize(this);
+                    abilityInstances.Add(instance);
                 }
             }
-        }
-
-        if (IsClient && IsOwner)
-        {
-            input = new PlayerInput();
-            input?.Player.Enable();
         }
     }
 
     public void CastAbility(int abilityIndex, ulong clientId)
     {
-        Debug.Log(abilities[abilityIndex].abilityName);
-        Debug.Log(abilities[abilityIndex].isOnCooldown.Value);
+        if (abilityIndex < 0 || abilityIndex >= abilityInstances.Count) return;
 
-        if (abilityIndex < 0 || abilityIndex >= abilities.Length) return;
-        if (abilities[abilityIndex] == null) return;
-        if (abilities[abilityIndex].isOnCooldown.Value) return;
+        var ability = abilityInstances[abilityIndex];
 
-        Debug.Log(abilities[abilityIndex].abilityName);
-        abilities[abilityIndex].ServerCast(clientId);
-        abilities[abilityIndex].isOnCooldown.Value = true;
+        if (ability == null) return;
+        if (ability.isOnCooldown) return;
+
+        //Debug.Log(abilities[abilityIndex].abilityName);
+        ability.ServerCast(clientId);
+        ability.isOnCooldown = true;
 
         // Start cooldown timer
-        StartCoroutine(StartCooldown(abilityIndex, abilities[abilityIndex].fullCooldown));
+        StartCoroutine(StartCooldown(abilityIndex));
     }
 
-    private IEnumerator StartCooldown(int index, float duration)
+    private IEnumerator StartCooldown(int index)
     {
-        yield return new WaitForSeconds(duration);
-        abilities[index].isOnCooldown.Value = false;
+        var ability = abilityInstances[index];
+
+        yield return new WaitForSeconds(ability.fullCooldown);
+        ability.isOnCooldown = false;
     }
      
     public void TryCastAbility(int index)
     {
         // Client-side prediction
-        abilities[index]?.OnStartCast(OwnerClientId);
+        abilityInstances[index]?.OnStartCast(OwnerClientId);
         // Send to server
         CastAbility(index, OwnerClientId);
     }

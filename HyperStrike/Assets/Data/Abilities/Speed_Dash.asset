@@ -18,10 +18,13 @@ MonoBehaviour:
   fullCooldown: 5
   castTime: 0
   maxCharges: 3
+  currentCharges:
+    m_InternalValue: 3
   requiresTarget: 0
   isOnCooldown:
     m_InternalValue: 0
   dashDistance: 100
+  dashDuration: 0.3
   dashSpeed: 100
   canDamageEnemies: 0
   damageAmount: 0

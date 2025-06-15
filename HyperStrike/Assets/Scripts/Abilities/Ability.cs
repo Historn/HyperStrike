@@ -15,10 +15,10 @@ public abstract class Ability : ScriptableObject
     public int maxCharges;
 
     [Header("Networking")]
-    public NetworkVariable<int> currentCharges = new NetworkVariable<int>(3);
+    public int currentCharges;
     private bool isRecharging;
     public bool requiresTarget;
-    public NetworkVariable<bool> isOnCooldown = new NetworkVariable<bool>();
+    public bool isOnCooldown;
 
     // Reference to the player who owns this ability instance
     protected PlayerAbilityController owner;
@@ -27,6 +27,7 @@ public abstract class Ability : ScriptableObject
     public virtual void Initialize(PlayerAbilityController player)
     {
         owner = player;
+        isOnCooldown = false;
     }
 
     // Called when player presses the ability button (client-side prediction)
