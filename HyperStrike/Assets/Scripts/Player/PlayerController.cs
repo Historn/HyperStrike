@@ -25,11 +25,6 @@ public struct InputData : INetworkSerializable
     public bool sprint;
     public bool jump;
     public bool slide;
-    //public bool melee;
-    //public bool shoot;
-    //public bool ability1;
-    //public bool ability2;
-    //public bool ultimate;
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
@@ -39,11 +34,6 @@ public struct InputData : INetworkSerializable
         serializer.SerializeValue(ref sprint);
         serializer.SerializeValue(ref jump);
         serializer.SerializeValue(ref slide);
-        //serializer.SerializeValue(ref melee);
-        //serializer.SerializeValue(ref shoot);
-        //serializer.SerializeValue(ref ability1);
-        //serializer.SerializeValue(ref ability2);
-        //serializer.SerializeValue(ref ultimate);
     }
 }
 
@@ -57,12 +47,19 @@ public class PlayerController : NetworkBehaviour
     private PlayerAbilityController abilityController;
     #endregion
 
+    #region "ANIMATIONS"
     NetworkAnimator animator;
-    int velocityHash;
-    int isWalkingHash;
-    int isJumpingHash;
-    int isSlidingHash;
-    int isShootingHash;
+    int VelocityHash;
+    int GroundHash;
+    int WalkingHash;
+    int JumpingHash;
+    int SlidingHash;
+    int MeleeHash;
+    int ShootHash;
+    int Ability1Hash;
+    int Ability2Hash;
+    int UltimateHash;
+    #endregion
 
     PlayerInput input;
 
@@ -93,7 +90,6 @@ public class PlayerController : NetworkBehaviour
     float stickWallForce = 10f;
 
     // Checkers
-    private bool wasSprinting;
     private bool wasJumpPressed;
     private bool wasSliding;
     private bool wasWallRunning;
@@ -232,9 +228,6 @@ public class PlayerController : NetworkBehaviour
             };
             SendInputServerRPC(data);
         }
-
-        if (IsServer)
-            animator?.Animator.SetFloat(velocityHash, rb.linearVelocity.magnitude);
     }
 
     private void LateUpdate()
@@ -267,6 +260,7 @@ public class PlayerController : NetworkBehaviour
     private void InitInputs()
     {
         input.Player.MeleeAttack.started += ctx => MeleeAttackServerRPC();
+        input.Player.MeleeAttack.performed += ctx => animator?.Animator.SetTrigger(MeleeHash);
         input.Player.Attack.started += ctx => ShootServerRPC();
         input.Player.Ability1.started += ctx => ActivateAbility1ServerRPC();
         input.Player.Ability2.started += ctx => ActivateAbility2ServerRPC();
@@ -275,17 +269,23 @@ public class PlayerController : NetworkBehaviour
 
     void InitAnimatorHashes()
     {
-        velocityHash = Animator.StringToHash("Velocity");
-        isWalkingHash = Animator.StringToHash("isWalking");
-        isJumpingHash = Animator.StringToHash("isJumping");
-        isSlidingHash = Animator.StringToHash("isSliding");
-        isShootingHash = Animator.StringToHash("isShooting");
+        VelocityHash = Animator.StringToHash("Velocity");
+        GroundHash = Animator.StringToHash("Ground");
+        WalkingHash = Animator.StringToHash("Walking");
+        JumpingHash = Animator.StringToHash("Jumping");
+        SlidingHash = Animator.StringToHash("Sliding");
+        MeleeHash = Animator.StringToHash("Melee");
+        ShootHash = Animator.StringToHash("Shoot");
+        Ability1Hash = Animator.StringToHash("Ability1");
+        Ability2Hash = Animator.StringToHash("Ability2");
+        UltimateHash = Animator.StringToHash("Ultimate");
     }
 
     [ServerRpc]
     void SendInputServerRPC(InputData input)
     {
         isGrounded = hyperStrikeUtils.CheckGrounded(transform, characterHeight);
+        animator?.Animator.SetBool(GroundHash, isGrounded);
         isWallRunning = hyperStrikeUtils.CheckWalls(transform, ref wallHit, ref refCameraTilt);
 
         // Only send when changed
@@ -294,11 +294,15 @@ public class PlayerController : NetworkBehaviour
 
         if (input.move != Vector2.zero)
         {
-            WalkAndRun(input.move, input.moveInProgress, input.sprint);
-            wasSprinting = input.sprint;
-        }
+            WalkAndRun(input.move, input.sprint);
 
-        WallRun(input.moveInProgress, input.jump);
+            WallRun(input.jump);
+        }
+        else
+        {
+            animator?.Animator.ResetTrigger(WalkingHash);
+            //animator?.Animator.ResetTrigger(WallrunHash);
+        }
 
         if (input.slide != wasSliding)
         {
@@ -311,35 +315,7 @@ public class PlayerController : NetworkBehaviour
             Jump(input.jump, Vector3.zero);
         }
 
-        //if (input.melee != wasMelee)
-        //{
-        //    MeleeAttack(input.melee);
-        //    wasMelee = input.melee;
-        //}
-
-        //if (input.shoot != wasShooting)
-        //{
-        //    Shoot(input.shoot);
-        //    wasShooting = input.shoot;
-        //}
-
-        //if (input.ability1 != wasAbility1)
-        //{
-        //    ActivateAbility1(input.ability1);
-        //    wasAbility1 = input.ability1;
-        //}
-
-        //if (input.ability2 != wasAbility2)
-        //{
-        //    ActivateAbility2(input.ability2);
-        //    wasAbility2 = input.ability2;
-        //}
-
-        //if (input.ultimate != wasAbilityUltimate)
-        //{
-        //    ActivateUltimate(input.ultimate);
-        //    wasAbilityUltimate = input.ultimate;
-        //}
+        animator?.Animator.SetFloat(VelocityHash, rb.linearVelocity.magnitude);
     }
 
     #region "Movement Mechanics Methods"
@@ -363,16 +339,16 @@ public class PlayerController : NetworkBehaviour
         rb.rotation = Quaternion.Euler(0, yRotation, 0);
     }
 
-    void WalkAndRun(Vector2 moveValue, bool isWalking, bool isSprinting)
+    void WalkAndRun(Vector2 moveValue, bool isSprinting)
     {
-        animator?.Animator.SetBool(isWalkingHash, isWalking);
-
         if (isWallRunning && !isGrounded) return;
 
         float speed = isSprinting && isGrounded ? player.Character.sprintSpeed : player.Character.speed;
 
         Vector3 dir = transform.forward * moveValue.y + transform.right * moveValue.x;
         rb.AddForce(dir.normalized * speed, ForceMode.Force);
+
+        animator?.Animator.SetTrigger(WalkingHash);
     }
 
     void Slide(bool isSliding)
@@ -381,13 +357,14 @@ public class PlayerController : NetworkBehaviour
         {
             rb.maxLinearVelocity = player.Character.maxSlidingSpeed;
             rb.linearDamping = 0.1f;
+            animator?.Animator.SetTrigger(SlidingHash);
         }
         else
         {
             rb.maxLinearVelocity = player.Character.maxSpeed;
             rb.linearDamping = 0.2f;
+            animator?.Animator.ResetTrigger(SlidingHash);
         }
-        animator?.Animator.SetBool(isSlidingHash, isSliding);
     }
 
     void Jump(bool isJumping, Vector3 jumpDir, float forceAdd = 0f)
@@ -398,9 +375,10 @@ public class PlayerController : NetworkBehaviour
             //Reset Y Velocity
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
             rb.AddForce((transform.up + jumpDir.normalized) * (jumpForce + forceAdd), ForceMode.Impulse);
-            animator?.Animator.SetBool(isJumpingHash, isJumping);
+            animator?.Animator.SetTrigger(JumpingHash);
             Invoke(nameof(ResetJump), jumpCooldown);    //Delay for jump to reset
         }
+        else animator?.Animator.ResetTrigger(JumpingHash);
     }
 
     void ResetJump()
@@ -408,9 +386,9 @@ public class PlayerController : NetworkBehaviour
         readyToJump = true;
     }
 
-    void WallRun(bool isMoving, bool isJumping)
+    void WallRun(bool isJumping)
     {
-        if (!isGrounded && isWallRunning && isMoving)
+        if (!isGrounded && isWallRunning)
         {
             cameraTilt.Value = refCameraTilt;
             // Stick to wall
@@ -431,6 +409,7 @@ public class PlayerController : NetworkBehaviour
     void MeleeAttackServerRPC()
     {
         Debug.Log("Melee Attack");
+        animator?.Animator.SetTrigger(MeleeHash);
         return;
     }
 
@@ -445,8 +424,9 @@ public class PlayerController : NetworkBehaviour
             projectileGO.GetComponent<Projectile>().playerOwnerId = this.NetworkObjectId;
             projectileGO.GetComponent<NetworkObject>().Spawn(true);
             Invoke(nameof(ResetShoot), player.Character.shootCooldown);    //Delay for attack to reset
-            animator?.Animator.SetBool(isShootingHash, true);
+            //animator?.Animator.SetTrigger(ShootHash);
         }
+        //else animator?.Animator.ResetTrigger(ShootHash);
     }
 
     void ResetShoot()
@@ -476,14 +456,6 @@ public class PlayerController : NetworkBehaviour
         //Debug.Log("Trying to activate ULTIMATE");
         abilityController.TryCastAbility(2);
         return;
-    }
-    #endregion
-
-    #region "Player Data Visualization Methods"
-    public void IncreaseScore(int amount)
-    {
-        if (IsServer) player.Score.Value += amount;
-        view.UpdateView(player);
     }
     #endregion
 }
