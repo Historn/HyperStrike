@@ -9,14 +9,14 @@ public abstract class Ability : ScriptableObject
     [Header("Basic Info")]
     public string abilityName;
     public Sprite icon;
-    public float chargeRechargeTime;
+    public float chargeReloadTime;
     public float fullCooldown;
     public float castTime;
     public int maxCharges;
 
     [Header("Networking")]
     public int currentCharges;
-    private bool isRecharging;
+    public bool isReloading;
     public bool requiresTarget;
     public bool isOnCooldown;
 
@@ -28,13 +28,29 @@ public abstract class Ability : ScriptableObject
     {
         owner = player;
         isOnCooldown = false;
+        isReloading = false;
+        currentCharges = maxCharges;
     }
 
     // Called when player presses the ability button (client-side prediction)
     public virtual void OnStartCast(ulong clientId) { }
 
     // Server-side validation and execution
-    public virtual void ServerCast(ulong clientId) { }
+    public virtual void ServerCast(ulong clientId) 
+    {
+        // Charges
+        currentCharges--;
+        if (currentCharges < 1) 
+        {
+            Debug.Log("Is on cooldown");
+            isOnCooldown = true;
+        }
+        else if (!isOnCooldown && currentCharges < maxCharges)
+        {
+            Debug.Log("Is reloading");
+            isReloading = true;
+        }
+    }
 
     // Called when ability is done (cleanup, etc.)
     public virtual void OnFinishCast() { }

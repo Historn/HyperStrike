@@ -19,16 +19,13 @@ public class PlayerAbilityController : NetworkBehaviour
         player = GetComponent<Player>(); ;
 
         // Initialize all abilities
-        if (IsServer)
+        foreach (var ability in player.Character.abilities)
         {
-            foreach (var ability in player.Character.abilities)
+            if (ability != null)
             {
-                if (ability != null)
-                {
-                    var instance = Instantiate(ability);
-                    instance.Initialize(this);
-                    abilityInstances.Add(instance);
-                }
+                var instance = Instantiate(ability);
+                instance.Initialize(this);
+                abilityInstances.Add(instance);
             }
         }
     }
@@ -40,14 +37,21 @@ public class PlayerAbilityController : NetworkBehaviour
         var ability = abilityInstances[abilityIndex];
 
         if (ability == null) return;
-        if (ability.isOnCooldown) return;
+        if (ability.isOnCooldown || ability.currentCharges <= 0) return;
 
         //Debug.Log(abilities[abilityIndex].abilityName);
         ability.ServerCast(clientId);
-        ability.isOnCooldown = true;
 
         // Start cooldown timer
-        StartCoroutine(StartCooldown(abilityIndex));
+        if (ability.isOnCooldown)
+        {
+            StopCoroutine(StartReloading(abilityIndex));
+            StartCoroutine(StartCooldown(abilityIndex));
+        }
+        else
+        {
+            StartCoroutine(StartReloading(abilityIndex));
+        }
     }
 
     private IEnumerator StartCooldown(int index)
@@ -55,9 +59,27 @@ public class PlayerAbilityController : NetworkBehaviour
         var ability = abilityInstances[index];
 
         yield return new WaitForSeconds(ability.fullCooldown);
+        ability.currentCharges = ability.maxCharges;
         ability.isOnCooldown = false;
     }
-     
+    private IEnumerator StartReloading(int index)
+    {
+        var ability = abilityInstances[index];
+
+        yield return new WaitForSeconds(ability.chargeReloadTime);
+
+        ability.currentCharges++;
+
+        if (ability.currentCharges < ability.maxCharges)
+        {
+            yield return new WaitForSeconds(ability.chargeReloadTime);
+        }
+        else
+        {
+            ability.isReloading = false;
+        }
+    }
+
     public void TryCastAbility(int index)
     {
         // Client-side prediction

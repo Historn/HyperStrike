@@ -3189,6 +3189,10 @@ PrefabInstance:
       value: SM_LockerRoomStructure
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 4e70af5a9d77dce4db28b5a9233d9fe4, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4e70af5a9d77dce4db28b5a9233d9fe4, type: 3}
       propertyPath: m_TagString
       value: Tile
       objectReference: {fileID: 0}

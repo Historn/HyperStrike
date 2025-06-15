@@ -25,11 +25,11 @@ public struct InputData : INetworkSerializable
     public bool sprint;
     public bool jump;
     public bool slide;
-    public bool melee;
-    public bool shoot;
-    public bool ability1;
-    public bool ability2;
-    public bool ultimate;
+    //public bool melee;
+    //public bool shoot;
+    //public bool ability1;
+    //public bool ability2;
+    //public bool ultimate;
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
@@ -39,11 +39,11 @@ public struct InputData : INetworkSerializable
         serializer.SerializeValue(ref sprint);
         serializer.SerializeValue(ref jump);
         serializer.SerializeValue(ref slide);
-        serializer.SerializeValue(ref melee);
-        serializer.SerializeValue(ref shoot);
-        serializer.SerializeValue(ref ability1);
-        serializer.SerializeValue(ref ability2);
-        serializer.SerializeValue(ref ultimate);
+        //serializer.SerializeValue(ref melee);
+        //serializer.SerializeValue(ref shoot);
+        //serializer.SerializeValue(ref ability1);
+        //serializer.SerializeValue(ref ability2);
+        //serializer.SerializeValue(ref ultimate);
     }
 }
 
@@ -144,6 +144,7 @@ public class PlayerController : NetworkBehaviour
 
             input = new PlayerInput();
             input?.Player.Enable();
+            InitInputs();
 
             HideMeshRenderer();
 
@@ -208,6 +209,8 @@ public class PlayerController : NetworkBehaviour
             GetComponentInChildren<Camera>().enabled = false;
             GetComponentInChildren<AudioListener>().enabled = false;
             GetComponentInChildren<CinemachineBrain>().enabled = false;
+            GetComponentInChildren<PlayerController>().enabled = false;
+            GetComponentInChildren<PlayerAbilityController>().enabled = false;
         }
     }
 
@@ -226,11 +229,6 @@ public class PlayerController : NetworkBehaviour
                 sprint = input.Player.Sprint.IsPressed(),
                 jump = input.Player.Jump.IsPressed(),
                 slide = input.Player.Slide.IsPressed(),
-                melee = input.Player.MeleeAttack.IsPressed(),
-                shoot = input.Player.Attack.IsPressed(),
-                ability1 = input.Player.Ability1.IsPressed(),
-                ability2 = input.Player.Ability2.IsPressed(),
-                ultimate = input.Player.Ultimate.IsPressed(),
             };
             SendInputServerRPC(data);
         }
@@ -264,6 +262,15 @@ public class PlayerController : NetworkBehaviour
         {
             if (mesh != null) mesh.enabled = false;
         }
+    }
+
+    private void InitInputs()
+    {
+        input.Player.MeleeAttack.started += ctx => MeleeAttackServerRPC();
+        input.Player.Attack.started += ctx => ShootServerRPC();
+        input.Player.Ability1.started += ctx => ActivateAbility1ServerRPC();
+        input.Player.Ability2.started += ctx => ActivateAbility2ServerRPC();
+        input.Player.Ultimate.started += ctx => ActivateUltimateServerRPC();
     }
 
     void InitAnimatorHashes()
@@ -304,35 +311,35 @@ public class PlayerController : NetworkBehaviour
             Jump(input.jump, Vector3.zero);
         }
 
-        if (input.melee != wasMelee)
-        {
-            MeleeAttack(input.melee);
-            wasMelee = input.melee;
-        }
+        //if (input.melee != wasMelee)
+        //{
+        //    MeleeAttack(input.melee);
+        //    wasMelee = input.melee;
+        //}
 
-        if (input.shoot != wasShooting)
-        {
-            Shoot(input.shoot);
-            wasShooting = input.shoot;
-        }
+        //if (input.shoot != wasShooting)
+        //{
+        //    Shoot(input.shoot);
+        //    wasShooting = input.shoot;
+        //}
 
-        if (input.ability1 != wasAbility1)
-        {
-            ActivateAbility1(input.ability1);
-            wasAbility1 = input.ability1;
-        }
+        //if (input.ability1 != wasAbility1)
+        //{
+        //    ActivateAbility1(input.ability1);
+        //    wasAbility1 = input.ability1;
+        //}
 
-        if (input.ability2 != wasAbility2)
-        {
-            ActivateAbility2(input.ability2);
-            wasAbility2 = input.ability2;
-        }
+        //if (input.ability2 != wasAbility2)
+        //{
+        //    ActivateAbility2(input.ability2);
+        //    wasAbility2 = input.ability2;
+        //}
 
-        if (input.ultimate != wasAbilityUltimate)
-        {
-            ActivateUltimate(input.ultimate);
-            wasAbilityUltimate = input.ultimate;
-        }
+        //if (input.ultimate != wasAbilityUltimate)
+        //{
+        //    ActivateUltimate(input.ultimate);
+        //    wasAbilityUltimate = input.ultimate;
+        //}
     }
 
     #region "Movement Mechanics Methods"
@@ -420,15 +427,17 @@ public class PlayerController : NetworkBehaviour
     #endregion
 
     #region "Attacks and Abilities"
-    void MeleeAttack(bool isAttacking)
+    [ServerRpc]
+    void MeleeAttackServerRPC()
     {
         Debug.Log("Melee Attack");
         return;
     }
 
-    void Shoot(bool isAttacking)
+    [ServerRpc]
+    void ShootServerRPC()
     {
-        if (isAttacking && shootReady && player.Character != null && (projectileSpawnOffset != null && player.Character.projectilePrefab != null))
+        if (shootReady && player.Character != null && (projectileSpawnOffset != null && player.Character.projectilePrefab != null))
         {
             shootReady = false;
 
@@ -436,7 +445,7 @@ public class PlayerController : NetworkBehaviour
             projectileGO.GetComponent<Projectile>().playerOwnerId = this.NetworkObjectId;
             projectileGO.GetComponent<NetworkObject>().Spawn(true);
             Invoke(nameof(ResetShoot), player.Character.shootCooldown);    //Delay for attack to reset
-            animator?.Animator.SetBool(isShootingHash, isAttacking);
+            animator?.Animator.SetBool(isShootingHash, true);
         }
     }
 
@@ -445,21 +454,24 @@ public class PlayerController : NetworkBehaviour
         shootReady = true;
     }
 
-    void ActivateAbility1(bool isAb1)
+    [ServerRpc]
+    void ActivateAbility1ServerRPC()
     {
         //Debug.Log("Trying to activate ABILITY 1");
         abilityController.TryCastAbility(0);
         return;
     }
 
-    void ActivateAbility2(bool isAb2)
+    [ServerRpc]
+    void ActivateAbility2ServerRPC()
     {
         //Debug.Log("Trying to activate ABILITY 2");
         abilityController.TryCastAbility(1);
         return;
     }
 
-    void ActivateUltimate(bool isUlt)
+    [ServerRpc]
+    void ActivateUltimateServerRPC()
     {
         //Debug.Log("Trying to activate ULTIMATE");
         abilityController.TryCastAbility(2);

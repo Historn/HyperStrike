@@ -14,18 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityName: Dash
   icon: {fileID: 0}
-  chargeRechargeTime: 5
-  fullCooldown: 5
+  chargeReloadTime: 5
+  fullCooldown: 20
   castTime: 0
   maxCharges: 3
-  currentCharges:
-    m_InternalValue: 3
+  currentCharges: 0
+  isReloading: 0
   requiresTarget: 0
-  isOnCooldown:
-    m_InternalValue: 0
-  dashDistance: 100
-  dashDuration: 0.3
-  dashSpeed: 100
+  isOnCooldown: 0
+  dashDistance: 10
+  dashDuration: 0.2
+  dashSpeed: 60
   canDamageEnemies: 0
   damageAmount: 0
   dashDirection: {x: 0, y: 0, z: 1}

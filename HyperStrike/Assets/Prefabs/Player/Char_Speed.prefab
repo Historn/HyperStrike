@@ -1477,8 +1477,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3520141469846233796}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.3700705, y: 1.3750001, z: -0.18525195}
+  m_LocalRotation: {x: 0, y: -0.87901556, z: 0, w: 0.47679305}
+  m_LocalPosition: {x: 6.3, y: 1.22, z: -2.84}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1547,9 +1547,9 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.01
-  far clip plane: 500
-  field of view: 65
+  near clip plane: 0.1
+  far clip plane: 5000
+  field of view: 60
   orthographic: 0
   orthographic size: 10
   m_Depth: 0
@@ -2539,7 +2539,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1979166579
+  GlobalObjectIdHash: 15578665
   InScenePlacedSourceGlobalObjectIdHash: 1784338973
   DeferredDespawnTick: 0
   Ownership: 1
@@ -2623,7 +2623,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  abilities: []
+  abilityInstances: []
 --- !u!114 &4326943606440057839
 MonoBehaviour:
   m_ObjectHideFlags: 0

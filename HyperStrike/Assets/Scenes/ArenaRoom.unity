@@ -25406,6 +25406,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: PF_ArenaCage
       objectReference: {fileID: 0}
+    - target: {fileID: 5754151789563448771, guid: 864f112edeff6564d8bd37ed43bf6b4b, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 6922377388906629298, guid: 864f112edeff6564d8bd37ed43bf6b4b, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 7698569418349102695, guid: 864f112edeff6564d8bd37ed43bf6b4b, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.5649948

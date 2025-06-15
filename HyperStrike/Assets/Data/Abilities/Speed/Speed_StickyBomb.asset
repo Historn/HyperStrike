@@ -14,13 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityName: Sticky Bomb
   icon: {fileID: 0}
-  chargeRechargeTime: 1
+  chargeReloadTime: 0
   fullCooldown: 1
   castTime: 1
   maxCharges: 1
+  currentCharges: 0
+  isReloading: 0
   requiresTarget: 0
-  isOnCooldown:
-    m_InternalValue: 0
-  projectilePrefab: {fileID: 4480140288178342511, guid: 4bb923ba4b889c64da67ffff59974caa, type: 3}
+  isOnCooldown: 0
+  projectilePrefab: {fileID: 4480140288178342511, guid: 5860b0fe429457149a4bf1cd0ba807b2, type: 3}
   projectileSpeed: 20
   damage: 50
