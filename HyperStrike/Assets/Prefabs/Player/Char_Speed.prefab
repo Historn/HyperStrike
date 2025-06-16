@@ -1124,13 +1124,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1803902049341158312}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0.6, z: -0}
-  m_LocalScale: {x: 0.14445804, y: 0.4150462, z: 0.14445804}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8137005024056186544}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!1 &1932723617040724720
 GameObject:
   m_ObjectHideFlags: 0
@@ -1477,8 +1477,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3520141469846233796}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -0.87901556, z: 0, w: 0.47679305}
-  m_LocalPosition: {x: 6.3, y: 1.22, z: -2.84}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.55, z: 0.15}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1547,9 +1547,9 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.1
-  far clip plane: 5000
-  field of view: 60
+  near clip plane: 0.01
+  far clip plane: 500
+  field of view: 65
   orthographic: 0
   orthographic size: 10
   m_Depth: 0
@@ -2624,6 +2624,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   abilityInstances: []
+  castTransform: {fileID: 5722620188708603574}
 --- !u!114 &4326943606440057839
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2700,7 +2701,35 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  TransitionStateInfoList: []
+  TransitionStateInfoList:
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: 1962642196
+    DestinationState: 88080842
+    TransitionDuration: 0.25
+    TriggerNameHash: -1078995872
+    TransitionIndex: 1
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: 1962642196
+    DestinationState: 2016411368
+    TransitionDuration: 0.25
+    TriggerNameHash: 237393061
+    TransitionIndex: 3
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: -1373958296
+    DestinationState: 88080842
+    TransitionDuration: 0.25
+    TriggerNameHash: -1078995872
+    TransitionIndex: 2
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: -1373958296
+    DestinationState: 2016411368
+    TransitionDuration: 0.25
+    TriggerNameHash: 237393061
+    TransitionIndex: 3
   m_Animator: {fileID: 6507632688674329374}
 --- !u!114 &3038221327139667878
 MonoBehaviour:

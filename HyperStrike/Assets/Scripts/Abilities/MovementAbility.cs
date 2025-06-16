@@ -19,19 +19,19 @@ public class MovementAbility : Ability
     private float dashTimer = 0f;
     private Vector3 dashEndPosition;
 
-    public override void ServerCast(ulong clientId)
+    public override void ServerCast(ulong clientId, Vector3 initPos, Vector3 dir)
     {
-        base.ServerCast(clientId);
+        base.ServerCast(clientId, initPos, dir);
 
         if (isDashing) return;
 
-        dashDirection = isForwardDirection ? owner.transform.forward : dashDirection.normalized;
+        dashDirection = isForwardDirection ? dir : dashDirection.normalized;
 
         dashEndPosition = CalculateDashEndPosition(owner.transform.position, dashDirection, dashDistance);
 
         owner.StartCoroutine(PerformDash());
 
-        PlayEffects(owner.transform.position);
+        PlayEffects(initPos);
     }
 
     private Vector3 CalculateDashEndPosition(Vector3 startPos, Vector3 direction, float distance)

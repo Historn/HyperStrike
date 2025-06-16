@@ -36,7 +36,7 @@ public abstract class Ability : ScriptableObject
     public virtual void OnStartCast(ulong clientId) { }
 
     // Server-side validation and execution
-    public virtual void ServerCast(ulong clientId) 
+    public virtual void ServerCast(ulong clientId, Vector3 initPos, Vector3 dir) 
     {
         // Charges
         currentCharges--;

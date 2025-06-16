@@ -158,7 +158,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4480140288178342511}
   serializedVersion: 4
-  m_Mass: 2
+  m_Mass: 3
   m_Drag: 0
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -253,14 +253,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  speed: 15
-  damage: 30
+  speed: 40
+  damage: 50
   playerOwnerId: 0
   explosionForce: 15
   explosionRadius: 10
   timeToDestroy: 5
-  isForwardDirection: 0
-  direction: {x: 0, y: 1, z: 1}
+  isForwardDirection: 1
+  direction: {x: 0, y: 1, z: 0}
   spawnFX: {fileID: 1546897667432260974, guid: fe8a487245448f640925f8455a9ff42b, type: 3}
   explosionFX: {fileID: 1546897667432260974, guid: fe8a487245448f640925f8455a9ff42b, type: 3}
   rigidBody: {fileID: 0}

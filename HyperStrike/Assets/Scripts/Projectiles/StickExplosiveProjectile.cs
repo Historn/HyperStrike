@@ -15,7 +15,7 @@ public class StickExplosiveProjectile : ExplosiveProjectile
 
             if (firstHit)
             {
-                if (netObj)
+                if (netObj && netObj.OwnerClientId != this.playerOwnerId)
                 {
                     transform.SetParent(other.transform);
                     transform.position = other.GetContact(0).point;

@@ -65,7 +65,7 @@ public class ExplosiveProjectile : Projectile
     public override void Move()
     {
         if (isForwardDirection) rigidBody.AddForce(transform.forward * speed, ForceMode.Impulse);
-        else rigidBody.AddForce(transform.forward + direction.normalized * speed, ForceMode.Impulse);
+        else rigidBody.AddForce((transform.forward + direction.normalized) * speed, ForceMode.Impulse);
     }
 
     protected virtual void Explode(Collision other)

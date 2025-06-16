@@ -5,20 +5,17 @@ using UnityEngine;
 public class ProjectileAbility : Ability
 {
     public GameObject projectilePrefab;
-    public float projectileSpeed;
-    public int damage;
 
-    public override void ServerCast(ulong clientId)
+    public override void ServerCast(ulong clientId, Vector3 initPos, Vector3 dir)
     {
-        base.ServerCast(clientId);
-
-        Vector3 pos = new Vector3(owner.transform.forward.x, owner.transform.forward.y + 1, owner.transform.forward.z + 1);
+        base.ServerCast(clientId, initPos, dir);
 
         // Spawn projectile on server
-        var projectile = Instantiate(projectilePrefab, owner.transform.position + pos, owner.transform.rotation);
-        projectile.GetComponent<NetworkObject>().SpawnWithOwnership(clientId);
+        var projectile = Instantiate(projectilePrefab, initPos + dir, owner.transform.rotation);
+        projectile.GetComponent<NetworkObject>().Spawn();
+        projectile.GetComponent<Projectile>().playerOwnerId = clientId;
 
-        PlayEffects(owner.transform.position);
+        PlayEffects(initPos);
     }
 
     public override void PlayEffects(Vector3 position)
