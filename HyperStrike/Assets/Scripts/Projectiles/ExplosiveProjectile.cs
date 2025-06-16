@@ -100,8 +100,6 @@ public class ExplosiveProjectile : Projectile
         gameObject.GetComponent<NetworkObject>().Despawn();
     }
 
-    public override void ApplyDamage(GameObject collidedGO) { }
-
     [ClientRpc]
     protected virtual void SpawnParticlesClientRPC(SendParticles sendParticles, float destructionTime = -1f, bool useImpactNormal = false)
     {

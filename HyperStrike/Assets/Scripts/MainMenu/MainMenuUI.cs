@@ -1,3 +1,5 @@
+using System.Collections;
+using TMPro;
 using Unity.Multiplayer;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
@@ -19,6 +21,9 @@ public class MainMenuUI : MonoBehaviour
     Button m_StartServerButton;
     [SerializeField]
     Button m_FindMatchButton;
+    
+    [SerializeField]
+    TextMeshProUGUI m_FindStatusText;
 
     [SerializeField]
     TMPro.TMP_InputField m_InputField;
@@ -37,6 +42,8 @@ public class MainMenuUI : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+
+        NetworkManager.Singleton.OnClientDisconnectCallback += OnDisconnect;
     }
 
     // Start is called before the first frame update
@@ -56,12 +63,11 @@ public class MainMenuUI : MonoBehaviour
         if(m_InputField.text != "") { NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(m_InputField.text, 8100); }
         //NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("192.168.1.22", 8100); //Set Online Server IP
 #endif
-        var success = NetworkManager.Singleton.StartClient();
-        if (success)
-        {
-            NetworkManager.Singleton.SceneManager.OnSynchronize += SceneManager_OnSynchronize; // Must be here, before loading the NetworkObjects from next scene
-        }
-        DeactivateButtons();
+        m_FindStatusText.color = Color.white;
+        m_FindStatusText.text = "Joining Server";
+
+        StartCoroutine(WaitFullSync());
+        if (m_FindMatchButton) m_FindMatchButton.interactable = false;
     }
     private void SceneManager_OnSynchronize(ulong clientId)
     {
@@ -78,7 +84,7 @@ public class MainMenuUI : MonoBehaviour
             Debug.LogWarning($"Failed to load Lobby" +
                   $"with a {nameof(SceneEventProgressStatus)}: {status}");
         }
-        DeactivateButtons();
+        //DeactivateButtons();
     }
 
     void DeactivateButtons()
@@ -86,5 +92,25 @@ public class MainMenuUI : MonoBehaviour
         if (m_StartServerButton) m_StartServerButton.interactable = false;
         if (m_FindMatchButton) m_FindMatchButton.interactable = false;
         gameObject.SetActive(false);
+    }
+
+    private IEnumerator WaitFullSync()
+    {
+        yield return new WaitForSeconds(3);
+
+        var success = NetworkManager.Singleton.StartClient();
+        
+        if (success && NetworkManager.Singleton.IsApproved)
+        {
+            NetworkManager.Singleton.SceneManager.OnSynchronize += SceneManager_OnSynchronize; // Must be here, before loading the NetworkObjects from next scene
+            DeactivateButtons();
+        }
+    }
+
+    void OnDisconnect(ulong obj)
+    {
+        if (m_FindMatchButton) m_FindMatchButton.interactable = true;
+        m_FindStatusText.color = Color.red;
+        m_FindStatusText.text = "Unable to join the server, please try again or check server status.";
     }
 }

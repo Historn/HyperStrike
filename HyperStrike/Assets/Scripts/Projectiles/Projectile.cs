@@ -8,5 +8,4 @@ public abstract class Projectile : NetworkBehaviour
     public ulong playerOwnerId = 0;
 
     public abstract void Move();
-    public abstract void ApplyDamage(GameObject collidedGO);
 }
