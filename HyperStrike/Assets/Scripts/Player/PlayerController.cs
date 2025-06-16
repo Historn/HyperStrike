@@ -59,6 +59,8 @@ public class PlayerController : NetworkBehaviour
     int Ability1Hash;
     int Ability2Hash;
     int UltimateHash;
+    int DanceHash;
+    int BackflipHash;
     #endregion
 
     PlayerInput input;
@@ -265,6 +267,8 @@ public class PlayerController : NetworkBehaviour
         input.Player.Ability1.started += ctx => ActivateAbility1ServerRPC();
         input.Player.Ability2.started += ctx => ActivateAbility2ServerRPC();
         input.Player.Ultimate.started += ctx => ActivateUltimateServerRPC();
+        input.Player.Emote1.started += ctx => Emote1ServerRPC();
+        input.Player.Emote2.started += ctx => Emote2ServerRPC();
     }
 
     void InitAnimatorHashes()
@@ -279,6 +283,8 @@ public class PlayerController : NetworkBehaviour
         Ability1Hash = Animator.StringToHash("Ability1");
         Ability2Hash = Animator.StringToHash("Ability2");
         UltimateHash = Animator.StringToHash("Ultimate");
+        DanceHash = Animator.StringToHash("Dance");
+        BackflipHash = Animator.StringToHash("Backflip");
     }
 
     [ServerRpc]
@@ -456,6 +462,20 @@ public class PlayerController : NetworkBehaviour
         //Debug.Log("Trying to activate ULTIMATE");
         abilityController.TryCastAbility(2);
         return;
+    }
+    #endregion
+
+    #region "Emotes"
+    [ServerRpc]
+    void Emote1ServerRPC()
+    {
+        animator?.Animator.SetTrigger(DanceHash);
+    }
+    
+    [ServerRpc]
+    void Emote2ServerRPC()
+    {
+        animator?.Animator.SetTrigger(BackflipHash);
     }
     #endregion
 }

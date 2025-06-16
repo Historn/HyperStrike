@@ -32,3 +32,4 @@ MonoBehaviour:
   collisionLayers:
     serializedVersion: 2
     m_Bits: 4294967295
+  smoothTransition: 1

@@ -14,6 +14,7 @@ public class MovementAbility : Ability
     public Vector3 dashDirection;
     public bool isForwardDirection;
     public LayerMask collisionLayers;
+    public bool smoothTransition;
 
     private bool isDashing = false;
     private float dashTimer = 0f;
@@ -27,7 +28,7 @@ public class MovementAbility : Ability
 
         dashDirection = isForwardDirection ? dir : dashDirection.normalized;
 
-        dashEndPosition = CalculateDashEndPosition(owner.transform.position, dashDirection, dashDistance);
+        dashEndPosition = CalculateDashEndPosition(initPos, dashDirection, dashDistance);
 
         owner.StartCoroutine(PerformDash());
 
@@ -43,7 +44,7 @@ public class MovementAbility : Ability
         }
         Vector3 endPos = startPos + direction * distance;
 
-        if (Physics.OverlapSphere(endPos, 0.5f, LayerMask.GetMask("Boundary")).Length > 0)
+        if (Physics.OverlapSphere(endPos, 0.5f, LayerMask.GetMask("Boundary")).Length > 0 || endPos.y < 0)
         {
             Vector3 returnPos = (startPos - endPos).normalized;
             endPos = returnPos;
@@ -70,7 +71,10 @@ public class MovementAbility : Ability
 
             float smoothedProgress = Mathf.Sin(progress * Mathf.PI * 0.5f);
 
-            Vector3 newPosition = Vector3.Lerp(startPosition, dashEndPosition, smoothedProgress);
+            Vector3 newPosition = Vector3.zero;
+            if (smoothTransition) newPosition = Vector3.Lerp(startPosition, dashEndPosition, smoothedProgress);
+            else newPosition = Vector3.Lerp(startPosition, dashEndPosition, 1);
+
             rb.MovePosition(newPosition);
 
             yield return null;
