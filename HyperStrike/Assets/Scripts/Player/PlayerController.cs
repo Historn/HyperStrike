@@ -100,6 +100,9 @@ public class PlayerController : NetworkBehaviour
     #endregion
 
     #region "Attack Variables"
+    [Header("Melee Variables")]
+    private bool meleeReady;
+    
     [Header("Shooting Variables")]
     public Transform projectileSpawnOffset;
     private bool shootReady;
@@ -171,6 +174,7 @@ public class PlayerController : NetworkBehaviour
         isWallRunning = false;
 
         // Init Attack Variables
+        meleeReady = true;
         shootReady = true;
 
         hyperStrikeUtils = new HyperStrikeUtils();
@@ -204,8 +208,8 @@ public class PlayerController : NetworkBehaviour
             GetComponentInChildren<Camera>().enabled = false;
             GetComponentInChildren<AudioListener>().enabled = false;
             GetComponentInChildren<CinemachineBrain>().enabled = false;
-            GetComponentInChildren<PlayerController>().enabled = false;
-            GetComponentInChildren<PlayerAbilityController>().enabled = false;
+            //GetComponentInChildren<PlayerController>().enabled = false;
+            //GetComponentInChildren<PlayerAbilityController>().enabled = false;
         }
     }
 
@@ -259,7 +263,6 @@ public class PlayerController : NetworkBehaviour
     private void InitInputs()
     {
         input.Player.MeleeAttack.started += ctx => MeleeAttackServerRPC();
-        input.Player.MeleeAttack.performed += ctx => animator?.Animator.SetTrigger(MeleeHash);
         input.Player.Attack.started += ctx => ShootServerRPC();
         input.Player.Ability1.started += ctx => ActivateAbility1ServerRPC();
         input.Player.Ability2.started += ctx => ActivateAbility2ServerRPC();
@@ -411,9 +414,29 @@ public class PlayerController : NetworkBehaviour
     [ServerRpc]
     void MeleeAttackServerRPC()
     {
-        Debug.Log("Melee Attack");
-        animator?.Animator.SetTrigger(MeleeHash);
-        return;
+        if (meleeReady && player.Character != null)
+        {
+            meleeReady = false;
+
+            if (Physics.Raycast(cameraWeaponTransform.position, cameraWeaponTransform.forward, out RaycastHit hit, player.Character.shootOffset))
+            {
+                Debug.Log("Hit Object");
+                if (hit.transform.TryGetComponent<Player>(out Player p))
+                {
+                    Debug.Log("Hit Player");
+                    p.ApplyDamage(20);
+                }
+            }
+
+            Invoke(nameof(ResetMeleeAttack), 1f);    //Delay for attack to reset
+            Debug.Log("Melee Attack");
+            animator?.Animator.SetTrigger(MeleeHash);
+        }
+    }
+
+    void ResetMeleeAttack()
+    {
+        meleeReady = true;
     }
 
     [ServerRpc]
@@ -427,7 +450,7 @@ public class PlayerController : NetworkBehaviour
             projectileGO.GetComponent<Projectile>().playerOwnerId = this.NetworkObjectId;
             projectileGO.GetComponent<NetworkObject>().Spawn(true);
             Invoke(nameof(ResetShoot), player.Character.shootCooldown);    //Delay for attack to reset
-            //animator?.Animator.SetTrigger(ShootHash);
+            animator?.Animator.SetTrigger(ShootHash);
         }
         //else animator?.Animator.ResetTrigger(ShootHash);
     }

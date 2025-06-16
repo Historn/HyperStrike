@@ -42,8 +42,6 @@ public class MainMenuUI : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
-
-        NetworkManager.Singleton.OnClientDisconnectCallback += OnDisconnect;
     }
 
     // Start is called before the first frame update
@@ -61,7 +59,7 @@ public class MainMenuUI : MonoBehaviour
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("127.0.0.1", 8100);
 #else
         if(m_InputField.text != "") { NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(m_InputField.text, 8100); }
-        //NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("192.168.1.22", 8100); //Set Online Server IP
+        //NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("90.170.224.218", 8100); //Set Online Server IP
 #endif
         m_FindStatusText.color = Color.white;
         m_FindStatusText.text = "Joining Server";
@@ -76,7 +74,7 @@ public class MainMenuUI : MonoBehaviour
 
     void StartServer()
     {
-        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("0.0.0.0", 8100);
+        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("0.0.0.0", 8100, "0.0.0.0");
         NetworkManager.Singleton.StartServer();
         var status = NetworkManager.Singleton.SceneManager.LoadScene("LobbyRoom", LoadSceneMode.Single);
         if (status != SceneEventProgressStatus.Started)
@@ -99,7 +97,7 @@ public class MainMenuUI : MonoBehaviour
         yield return new WaitForSeconds(3);
 
         var success = NetworkManager.Singleton.StartClient();
-        
+        NetworkManager.Singleton.OnClientDisconnectCallback += OnDisconnect;
         if (success && NetworkManager.Singleton.IsApproved)
         {
             NetworkManager.Singleton.SceneManager.OnSynchronize += SceneManager_OnSynchronize; // Must be here, before loading the NetworkObjects from next scene

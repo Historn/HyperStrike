@@ -8,9 +8,6 @@ public class Player : NetworkBehaviour
 {
     public string PlayerName = "PlayerName";
     public ulong PlayerId = 0;
-    //public byte Team = 0;
-    //public int Score { get; set; }
-    //public int Goals { get; set; }
 
     public NetworkVariable<byte> Team = new NetworkVariable<byte>(0);
     public NetworkVariable<int> Score = new NetworkVariable<int>(0);
@@ -38,6 +35,8 @@ public class Player : NetworkBehaviour
         if (Character.health <= 0) 
         {
             playerEventSubscriber.OnDeath.Invoke();
+            gameObject.GetComponent<Rigidbody>().isKinematic = true;
+            StartCoroutine(DeadTimer());
         }
         else
         {
@@ -53,7 +52,7 @@ public class Player : NetworkBehaviour
             deadTime.Value--;
         }
 
-        this.gameObject.GetComponent<Rigidbody>().isKinematic = false;
+        gameObject.GetComponent<Rigidbody>().isKinematic = false;
         Character.health = Character.maxHealth;
     }
 }
