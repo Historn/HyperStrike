@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b40c5a0ffb473346be08937d187a6a9, type: 3}
+  m_Script: {fileID: 11500000, guid: 59d75496e4532a843b5fdf7726357ef3, type: 3}
   m_Name: Speed_GroundQuake
   m_EditorClassIdentifier: 
   abilityName: Ground Quake
@@ -17,7 +17,7 @@ MonoBehaviour:
   chargeReloadTime: 0
   fullCooldown: 5
   castTime: 0
-  maxCharges: 3
+  maxCharges: 1
   currentCharges: 0
   isReloading: 0
   requiresTarget: 0
@@ -33,3 +33,15 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   smoothTransition: 0
+  useForce: 1
+  useDamage: 1
+  useHeal: 0
+  affectSelf: 0
+  affectAllies: 0
+  affectEnemies: 1
+  radius: 15
+  force: 20
+  setManualForceDir: 1
+  forceDir: {x: 0, y: 1, z: 0}
+  damage: 30
+  heal: 0

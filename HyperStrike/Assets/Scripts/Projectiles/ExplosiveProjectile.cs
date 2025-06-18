@@ -6,13 +6,11 @@ using UnityEngine;
 [Serializable]
 public struct SendParticles : INetworkSerializable
 {
-    public ulong particlesFXNetworkId;
     public Vector3 collisionPoint;
     public Vector3 collisionNormal;
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
-        serializer.SerializeValue(ref particlesFXNetworkId);
         serializer.SerializeValue(ref collisionPoint);
         serializer.SerializeValue(ref collisionNormal);
     }
@@ -35,12 +33,11 @@ public class ExplosiveProjectile : Projectile
     {
         SendParticles sendParticles = new SendParticles
         {
-            particlesFXNetworkId = spawnFX.GetComponent<NetworkObject>().NetworkObjectId,
             collisionPoint = Vector3.zero,
             collisionNormal = Vector3.zero
         };
 
-        SpawnParticlesClientRPC(sendParticles, 0.3f);
+        //SpawnParticlesClientRPC(sendParticles, 0.3f);
 
         // Spawns from the player that shot
         rigidBody = GetComponent<Rigidbody>();
@@ -74,7 +71,6 @@ public class ExplosiveProjectile : Projectile
     {
         SendParticles explosion = new SendParticles
         {
-            particlesFXNetworkId = explosionFX.GetComponent<NetworkObject>().NetworkObjectId,
             collisionPoint = Vector3.zero,
             collisionNormal = Vector3.zero
         };
@@ -128,19 +124,13 @@ public class ExplosiveProjectile : Projectile
     [ClientRpc]
     protected virtual void SpawnParticlesClientRPC(SendParticles sendParticles, float destructionTime = -1f, bool useImpactNormal = false)
     {
-        GameObject particlesGO = null;
-
-        if (NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(sendParticles.particlesFXNetworkId, out NetworkObject netObj))
-        {
-            particlesGO = netObj.gameObject;
-        }
-
-        if (particlesGO != null)
+        if (explosionFX != null)
         {
             if (!useImpactNormal)
             {
                 Quaternion spawnRotation = Quaternion.LookRotation(transform.up, transform.forward);
-                GameObject vfxInstance = Instantiate(particlesGO, transform.position, spawnRotation);
+                GameObject vfxInstance = Instantiate(explosionFX, transform.position, spawnRotation);
+                Debug.Log("Particle Active");
                 Destroy(vfxInstance, destructionTime);
             }
             else
@@ -148,12 +138,14 @@ public class ExplosiveProjectile : Projectile
                 // Find the nearest axis to the impact normal
                 Vector3 impactNormal = sendParticles.collisionNormal;
                 Vector3 nearestAxis = FindNearestAxis(impactNormal);
-
+                
                 Quaternion spawnRotation = Quaternion.LookRotation(nearestAxis);
-                GameObject vfxInstance = Instantiate(particlesGO, transform.position, spawnRotation);
+                GameObject vfxInstance = Instantiate(explosionFX, transform.position, spawnRotation);
+                Debug.Log("Particle Active");
                 Destroy(vfxInstance, destructionTime);
             }
         }
+        else Debug.Log("PARTICLE NULL");
     }
 
     private Vector3 FindNearestAxis(Vector3 normal)

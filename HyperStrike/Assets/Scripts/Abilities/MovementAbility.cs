@@ -10,13 +10,13 @@ public class MovementAbility : Ability
     public float dashDuration;
     public float dashSpeed;
     public bool canDamageEnemies;
-    public float damageAmount;
+    public int damageAmount;
     public Vector3 dashDirection;
     public bool isForwardDirection;
     public LayerMask collisionLayers;
     public bool smoothTransition;
 
-    private bool isDashing = false;
+    protected bool isDashing = false;
     private float dashTimer = 0f;
     private Vector3 dashEndPosition;
 

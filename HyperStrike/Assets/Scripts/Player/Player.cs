@@ -44,6 +44,17 @@ public class Player : NetworkBehaviour
         playerEventSubscriber.OnReceiveDamage.Invoke();
     }
 
+    public void ApplyHeal(int heal)
+    {
+        if (!MatchManager.Instance) return;
+
+        Character.health += heal;
+        if (Character.health >= Character.maxHealth)
+        {
+            Character.health = Character.maxHealth;
+        }
+    }
+
     private IEnumerator DeadTimer()
     {
         while (deadTime.Value >= 0.0f)

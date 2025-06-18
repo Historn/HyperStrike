@@ -3,7 +3,6 @@ using UnityEngine;
 
 public class StickExplosiveProjectile : ExplosiveProjectile
 {
-    float time = 50f;
     bool firstHit = true;
 
     private void OnCollisionEnter(Collision other)
