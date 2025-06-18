@@ -253,11 +253,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  speed: 40
+  speed: 80
   damage: 50
   playerOwnerId: 0
   explosionForce: 15
-  explosionRadius: 10
+  explosionRadius: 3
   timeToDestroy: 5
   isForwardDirection: 1
   direction: {x: 0, y: 1, z: 0}

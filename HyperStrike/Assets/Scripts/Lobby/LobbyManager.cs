@@ -145,8 +145,10 @@ public class LobbyManager : NetworkBehaviour
         SetLobbyState(LobbyState.COMPLETED);
     }
 
-    void OnDestroy()
+    public override void OnNetworkDespawn()
     {
+        base.OnNetworkDespawn();
+
         if (NetworkManager.Singleton == null) return;
 
         NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;

@@ -5,30 +5,28 @@ public class StickExplosiveProjectile : ExplosiveProjectile
 {
     float time = 50f;
     bool firstHit = true;
+
     private void OnCollisionEnter(Collision other)
     {
-        if (!enabled && !IsServer) return;
+        if (!enabled || !IsServer || other == null) return;
 
-        if (other != null)
+        collision = other;
+        NetworkObject netObj = other.gameObject.GetComponent<NetworkObject>();
+        SphereCollider sphereCollider = GetComponent<SphereCollider>();
+
+        if (firstHit)
         {
-            NetworkObject netObj = other.gameObject.GetComponent<NetworkObject>();
-
-            if (firstHit)
+            if (netObj && netObj.OwnerClientId != this.playerOwnerId)
             {
-                if (netObj && netObj.OwnerClientId != this.playerOwnerId)
-                {
-                    transform.SetParent(other.transform);
-                    transform.position = other.GetContact(0).point;
-                }
-                else
-                {
-                    rigidBody.isKinematic = true;
-                }
-                firstHit = false;
+                sphereCollider.isTrigger = true;
+                rigidBody.isKinematic = true;
+                transform.SetParent(other.transform);
             }
-
-            time -= Time.deltaTime;
-            if (time < 0) Explode(other);
+            else
+            {
+                rigidBody.isKinematic = true;
+            }
+            firstHit = false;
         }
     }
 }

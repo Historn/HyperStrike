@@ -5,11 +5,8 @@ public class ImpactExplosiveProjectile : ExplosiveProjectile
 {
     private void OnCollisionEnter(Collision other)
     {
-        if (!enabled && !IsServer) return;
+        if (!enabled || !IsServer) return;
 
-        if (other != null)
-        {
-            Explode(other);
-        }
+        Explode(other);
     }
 }

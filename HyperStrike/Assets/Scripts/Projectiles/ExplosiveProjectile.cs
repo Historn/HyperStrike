@@ -29,6 +29,8 @@ public class ExplosiveProjectile : Projectile
     [SerializeField] protected GameObject explosionFX;
     [SerializeField] protected Rigidbody rigidBody;
 
+    protected Collision collision = null;
+
     public override void OnNetworkSpawn()
     {
         SendParticles sendParticles = new SendParticles
@@ -68,16 +70,39 @@ public class ExplosiveProjectile : Projectile
         else rigidBody.AddForce((transform.forward + direction.normalized) * speed, ForceMode.Impulse);
     }
 
-    protected virtual void Explode(Collision other)
+    protected virtual void Explode(Collision other = null)
     {
         SendParticles explosion = new SendParticles
         {
             particlesFXNetworkId = explosionFX.GetComponent<NetworkObject>().NetworkObjectId,
-            collisionPoint = other.contacts[0].point,
-            collisionNormal = other.contacts[0].normal
+            collisionPoint = Vector3.zero,
+            collisionNormal = Vector3.zero
         };
 
+        
+        if (other != null && other.contactCount > 0)
+        {
+            explosion.collisionPoint = other.GetContact(0).point;
+            explosion.collisionNormal = other.GetContact(0).normal;
+        }
+
         SpawnParticlesClientRPC(explosion, 3f, true);
+
+        if (other != null)
+        {
+            Rigidbody rb = other.gameObject.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                Vector3 dir = rb.position - transform.position;
+
+                rb.AddForce(dir.normalized * explosionForce, ForceMode.Impulse);
+                
+                if (other.gameObject.CompareTag("Player") && this.playerOwnerId != other.gameObject.GetComponent<NetworkObject>().NetworkObjectId)
+                {
+                    other.gameObject.GetComponent<Player>().ApplyDamage(damage);
+                }
+            }
+        }
 
         Collider[] colliders = Physics.OverlapSphere(transform.position, explosionRadius);
 
@@ -154,13 +179,6 @@ public class ExplosiveProjectile : Projectile
     IEnumerator DestroyRocket()
     {
         yield return new WaitForSeconds(timeToDestroy);
-        SendParticles sendParticles = new SendParticles
-        {
-            particlesFXNetworkId = explosionFX.GetComponent<NetworkObject>().NetworkObjectId,
-            collisionPoint = Vector3.zero,
-            collisionNormal = Vector3.zero
-        };
-        SpawnParticlesClientRPC(sendParticles, 3f);
-        gameObject.GetComponent<NetworkObject>().Despawn();
+        Explode(collision);
     }
 }

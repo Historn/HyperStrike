@@ -124,6 +124,14 @@ public class MatchManager : NetworkBehaviour
 #endif
     }
 
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.P) && State.Value != MatchState.CHARACTER_SELECTION)
+        {
+            SetMatchState(MatchState.CHARACTER_SELECTION);
+        }
+    }
+
     void MatchStateBehavior()
     {
         switch (State.Value)
@@ -386,11 +394,13 @@ public class MatchManager : NetworkBehaviour
         return currentMatchTime.Value;
     }
 
-    //void OnDestroy()
-    //{
-    //    if (NetworkManager.Singleton == null) return;
+    public override void OnNetworkDespawn()
+    {
+        base.OnNetworkDespawn();
 
-    //    NetworkManager.Singleton.SceneManager.OnLoadComplete -= OnSceneLoaded;
-    //    NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
-    //}
+        if (NetworkManager.Singleton == null) return;
+
+        NetworkManager.Singleton.SceneManager.OnLoadComplete -= OnSceneLoaded;
+        NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
+    }
 }

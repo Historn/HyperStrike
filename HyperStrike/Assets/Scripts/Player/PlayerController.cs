@@ -102,24 +102,13 @@ public class PlayerController : NetworkBehaviour
     #region "Attack Variables"
     [Header("Melee Variables")]
     private bool meleeReady;
-    
+
     [Header("Shooting Variables")]
     public Transform projectileSpawnOffset;
     private bool shootReady;
-
     #endregion
 
     HyperStrikeUtils hyperStrikeUtils;
-
-    private void OnEnable()
-    {
-        input?.Player.Enable();
-    }
-
-    private void OnDisable()
-    {
-        input?.Player.Disable();
-    }
 
     public override void OnNetworkSpawn()
     {
@@ -180,6 +169,18 @@ public class PlayerController : NetworkBehaviour
         hyperStrikeUtils = new HyperStrikeUtils();
     }
 
+    public override void OnNetworkDespawn()
+    {
+        base.OnNetworkDespawn();
+
+        input?.Player.Disable();
+
+        if (IsClient && IsOwner)
+        {
+            cameraTilt.OnValueChanged -= OnCameraTiltChanged;
+        }
+    }
+
     private void OnCameraTiltChanged(CameraTilt previousValue, CameraTilt newValue)
     {
         if (cinemachineCamera == null) return;
@@ -208,9 +209,13 @@ public class PlayerController : NetworkBehaviour
             GetComponentInChildren<Camera>().enabled = false;
             GetComponentInChildren<AudioListener>().enabled = false;
             GetComponentInChildren<CinemachineBrain>().enabled = false;
-            //GetComponentInChildren<PlayerController>().enabled = false;
-            //GetComponentInChildren<PlayerAbilityController>().enabled = false;
         }
+        else if (!IsOwner && !IsServer)
+        {
+            GetComponentInChildren<PlayerController>().enabled = false;
+            GetComponentInChildren<PlayerAbilityController>().enabled = false;
+        }
+
     }
 
     // Physics-based + Rigidbody Actions
@@ -292,6 +297,10 @@ public class PlayerController : NetworkBehaviour
     {
         isGrounded = hyperStrikeUtils.CheckGrounded(transform, characterHeight);
         animator?.Animator.SetBool(GroundHash, isGrounded);
+
+        //if (isGrounded) rb.linearDamping = 5f;
+        //else rb.linearDamping = 0;
+
         isWallRunning = hyperStrikeUtils.CheckWalls(transform, ref wallHit, ref refCameraTilt);
 
         // Only send when changed
@@ -491,7 +500,7 @@ public class PlayerController : NetworkBehaviour
     {
         animator?.Animator.SetTrigger(DanceHash);
     }
-    
+
     [ServerRpc]
     void Emote2ServerRPC()
     {

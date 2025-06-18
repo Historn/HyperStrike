@@ -9,8 +9,6 @@ public class PlayerAbilityController : NetworkBehaviour
     [SerializeField, Header("Ability Slots")]
     private List<Ability> abilityInstances = new List<Ability>();
 
-    private NetworkVariable<int> currentSelectedAbility = new NetworkVariable<int>();
-
     private Player player;
 
     [SerializeField] private Transform castTransform;

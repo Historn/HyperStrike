@@ -2705,6 +2705,13 @@ MonoBehaviour:
   - IsCrossFadeExit: 0
     Layer: 0
     OriginatingState: 1962642196
+    DestinationState: -635584739
+    TransitionDuration: 0.8
+    TriggerNameHash: 1137391654
+    TransitionIndex: 0
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: 1962642196
     DestinationState: 88080842
     TransitionDuration: 0.25
     TriggerNameHash: -1078995872
@@ -2716,6 +2723,34 @@ MonoBehaviour:
     TransitionDuration: 0.25
     TriggerNameHash: 237393061
     TransitionIndex: 3
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: 1962642196
+    DestinationState: 392758892
+    TransitionDuration: 0.25
+    TriggerNameHash: -645213589
+    TransitionIndex: 4
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: 1962642196
+    DestinationState: 1240556266
+    TransitionDuration: 0.25
+    TriggerNameHash: -127705783
+    TransitionIndex: 5
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: 88080842
+    DestinationState: -635584739
+    TransitionDuration: 0.25
+    TriggerNameHash: 1137391654
+    TransitionIndex: 1
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: -1373958296
+    DestinationState: -635584739
+    TransitionDuration: 0.25
+    TriggerNameHash: 1137391654
+    TransitionIndex: 1
   - IsCrossFadeExit: 0
     Layer: 0
     OriginatingState: -1373958296
@@ -2730,6 +2765,20 @@ MonoBehaviour:
     TransitionDuration: 0.25
     TriggerNameHash: 237393061
     TransitionIndex: 3
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: -1373958296
+    DestinationState: 392758892
+    TransitionDuration: 0.25
+    TriggerNameHash: -645213589
+    TransitionIndex: 4
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: -1373958296
+    DestinationState: 1240556266
+    TransitionDuration: 0.25
+    TriggerNameHash: -127705783
+    TransitionIndex: 5
   m_Animator: {fileID: 6507632688674329374}
 --- !u!114 &3038221327139667878
 MonoBehaviour:

@@ -128,7 +128,6 @@ GameObject:
   - component: {fileID: 3617829514769685705}
   - component: {fileID: 4856232224675675026}
   - component: {fileID: 9035245812400127922}
-  - component: {fileID: 628254444470678748}
   - component: {fileID: 4273061715997264505}
   - component: {fileID: 4284417717198246814}
   - component: {fileID: 3289915323030772734}
@@ -277,9 +276,6 @@ MonoBehaviour:
   leaderboardPanel: {fileID: 0}
   scoreText: {fileID: 0}
   characterNameText: {fileID: 0}
-  timerText: {fileID: 0}
-  localScoreText: {fileID: 0}
-  visitantScoreText: {fileID: 0}
 --- !u!114 &4856232224675675026
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -318,28 +314,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  characterData: {fileID: 11400000, guid: 9d4e3ba57a1756c44ac3868b3c2b2ba0, type: 2}
   cinemachineCamera: {fileID: 5505959830489533935}
   mainCameraTransform: {fileID: 8002915620469594049}
   cameraWeaponTransform: {fileID: 2381903384639404792}
   isGrounded: 0
   isWallRunning: 0
   projectileSpawnOffset: {fileID: 3935416128287498826}
---- !u!114 &628254444470678748
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3057295474076285659}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: faeb8f8da6afce04e96fc63f8d8dd559, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  abilitySlots:
-  - ability: {fileID: 11400000, guid: c63efe8cb4f7fb8489cb63f4eca8c40f, type: 2}
-    activationKey: 101
 --- !u!114 &4273061715997264505
 MonoBehaviour:
   m_ObjectHideFlags: 0

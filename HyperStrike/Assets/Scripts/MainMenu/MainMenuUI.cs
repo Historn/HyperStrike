@@ -58,9 +58,10 @@ public class MainMenuUI : MonoBehaviour
 #if UNITY_EDITOR
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("127.0.0.1", 8100);
 #else
-        if(m_InputField.text != "") { NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(m_InputField.text, 8100); }
-        //NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("90.170.224.218", 8100); //Set Online Server IP
+        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("90.170.224.218", 8100); //Set Online Server IP
+        if (m_InputField.text != "") { NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(m_InputField.text, 8100); }
 #endif
+
         m_FindStatusText.color = Color.white;
         m_FindStatusText.text = "Joining Server";
 
@@ -74,7 +75,7 @@ public class MainMenuUI : MonoBehaviour
 
     void StartServer()
     {
-        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("0.0.0.0", 8100, "0.0.0.0");
+        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("0.0.0.0", 8100);
         NetworkManager.Singleton.StartServer();
         var status = NetworkManager.Singleton.SceneManager.LoadScene("LobbyRoom", LoadSceneMode.Single);
         if (status != SceneEventProgressStatus.Started)
