@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5139897359077900496}
   - component: {fileID: 2635671658603009036}
   m_Layer: 0
-  m_Name: ShotLine
+  m_Name: ShotLine_Crashwall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

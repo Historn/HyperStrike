@@ -46,7 +46,8 @@ public class LobbyManager : NetworkBehaviour
         if (!IsServer) return;
 
         Characters[] enumValues = (Characters[])System.Enum.GetValues(typeof(Characters));
-        var character = (byte)UnityEngine.Random.Range(0, (enumValues.Length - 2));
+        //var character = (byte)UnityEngine.Random.Range(0, (enumValues.Length - 2));
+        var character = (byte)Characters.NANOFLOW;
 
         if(character != (byte)Characters.NONE)
         {
