@@ -51,7 +51,7 @@ public class ExplosiveProjectile : Projectile
         {
             if (rigidBody != null)
             {
-                Move();
+                Use();
             }
             else if (rigidBody == null)
             {
@@ -61,7 +61,7 @@ public class ExplosiveProjectile : Projectile
         }
     }
 
-    public override void Move()
+    public override void Use()
     {
         if (isForwardDirection) rigidBody.AddForce(transform.forward * speed, ForceMode.Impulse);
         else rigidBody.AddForce((transform.forward + direction.normalized) * speed, ForceMode.Impulse);
@@ -130,7 +130,6 @@ public class ExplosiveProjectile : Projectile
             {
                 Quaternion spawnRotation = Quaternion.LookRotation(transform.up, transform.forward);
                 GameObject vfxInstance = Instantiate(explosionFX, transform.position, spawnRotation);
-                Debug.Log("Particle Active");
                 Destroy(vfxInstance, destructionTime);
             }
             else
@@ -141,11 +140,9 @@ public class ExplosiveProjectile : Projectile
                 
                 Quaternion spawnRotation = Quaternion.LookRotation(nearestAxis);
                 GameObject vfxInstance = Instantiate(explosionFX, transform.position, spawnRotation);
-                Debug.Log("Particle Active");
                 Destroy(vfxInstance, destructionTime);
             }
         }
-        else Debug.Log("PARTICLE NULL");
     }
 
     private Vector3 FindNearestAxis(Vector3 normal)
