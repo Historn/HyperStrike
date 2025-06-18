@@ -19,6 +19,10 @@ namespace HyperStrike
         public float shootCooldown;
         public float shootOffset; // Forward offset for the projectile spawn
 
+        [Header("Character Melee Attack")]
+        public float meleeForce;
+        public float meleeOffset;
+
         [Header("Character Abilities")]
         public Ability[] abilities = new Ability[3];
     }

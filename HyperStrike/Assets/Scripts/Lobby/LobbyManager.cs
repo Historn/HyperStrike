@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -24,6 +25,7 @@ public class LobbyManager : NetworkBehaviour
     private IEnumerator completedTimerCoroutine;
 
     [SerializeField] private GameObject ballPrefab;
+    [SerializeField] private List<GameObject> charactersPrefabs;
 
     public override void OnNetworkSpawn()
     {
@@ -42,6 +44,15 @@ public class LobbyManager : NetworkBehaviour
     void OnClientConnected(ulong clientId)
     {
         if (!IsServer) return;
+
+        Characters[] enumValues = (Characters[])System.Enum.GetValues(typeof(Characters));
+        var character = (byte)UnityEngine.Random.Range(0, (enumValues.Length - 2));
+
+        if(character != (byte)Characters.NONE)
+        {
+            GameObject player = Instantiate(charactersPrefabs[character], Vector3.zero, Quaternion.identity);
+            player.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
+        }
 
         if (NetworkManager.Singleton.ConnectedClientsIds.Count >= 6)
         {

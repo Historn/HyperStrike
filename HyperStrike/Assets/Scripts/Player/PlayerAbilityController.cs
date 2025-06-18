@@ -83,7 +83,7 @@ public class PlayerAbilityController : NetworkBehaviour
     public void TryCastAbility(int index)
     {
         // Client-side prediction
-        abilityInstances[index]?.OnStartCast(OwnerClientId);
+        //abilityInstances[index]?.OnStartCast(OwnerClientId);
         // Send to server
         CastAbility(index, OwnerClientId);
     }

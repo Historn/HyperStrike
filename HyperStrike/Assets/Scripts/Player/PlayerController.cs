@@ -427,18 +427,23 @@ public class PlayerController : NetworkBehaviour
         {
             meleeReady = false;
 
-            if (Physics.Raycast(cameraWeaponTransform.position, cameraWeaponTransform.forward, out RaycastHit hit, player.Character.shootOffset))
+            if (Physics.Raycast(cameraWeaponTransform.position, cameraWeaponTransform.forward, out RaycastHit hit, player.Character.meleeOffset))
             {
-                Debug.Log("Hit Object");
+                Rigidbody rb = hit.rigidbody;
+
+                if (rb != null)
+                {
+                    rb.AddForce(transform.forward * player.Character.meleeForce, ForceMode.Impulse);
+                }
+
                 if (hit.transform.TryGetComponent<Player>(out Player p))
                 {
-                    Debug.Log("Hit Player");
                     p.ApplyDamage(20);
                 }
             }
 
             Invoke(nameof(ResetMeleeAttack), 1f);    //Delay for attack to reset
-            Debug.Log("Melee Attack");
+            //Debug.Log("Melee Attack");
             animator?.Animator.SetTrigger(MeleeHash);
         }
     }
@@ -455,7 +460,7 @@ public class PlayerController : NetworkBehaviour
         {
             shootReady = false;
 
-            GameObject projectileGO = Instantiate(player.Character.projectilePrefab, projectileSpawnOffset.position + cameraWeaponTransform.forward * player.Character.shootOffset, rb.rotation);
+            GameObject projectileGO = Instantiate(player.Character.projectilePrefab, projectileSpawnOffset.position + cameraWeaponTransform.forward * player.Character.shootOffset, cameraWeaponTransform.rotation);
             projectileGO.GetComponent<Projectile>().playerOwnerId = this.NetworkObjectId;
             projectileGO.GetComponent<NetworkObject>().Spawn(true);
             Invoke(nameof(ResetShoot), player.Character.shootCooldown);    //Delay for attack to reset

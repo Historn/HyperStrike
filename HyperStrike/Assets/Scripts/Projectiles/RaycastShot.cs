@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class RaycastShot : Projectile
 {
+    [SerializeField] private float force;
     [SerializeField] private float timeToDestroy;
     [SerializeField] private LineRenderer lineRenderer;
 
@@ -12,7 +13,7 @@ public class RaycastShot : Projectile
         lineRenderer = GetComponent<LineRenderer>();
         lineRenderer.SetPosition(0, transform.position);
         if (!IsServer) return;
-        
+
         StartCoroutine(DestroyProjectile());
     }
 
@@ -28,12 +29,17 @@ public class RaycastShot : Projectile
         RaycastHit hit;
         if (Physics.Raycast(transform.position, transform.forward, out hit, 100f))
         {
-            GameObject go = hit.transform.gameObject;
-            if (go)
+            Rigidbody rb = hit.rigidbody;
+            if (rb)
             {
-                if (go.CompareTag("Player") && this.playerOwnerId != go.GetComponent<NetworkObject>().NetworkObjectId)
+                if (rb.gameObject.CompareTag("Ball"))
                 {
-                    go.GetComponent<Player>().ApplyDamage(damage);
+                    rb.AddForce(transform.forward * force, ForceMode.Impulse);
+                }
+
+                if (rb.gameObject.CompareTag("Player") && this.playerOwnerId != rb.gameObject.GetComponent<NetworkObject>().NetworkObjectId)
+                {
+                    rb.gameObject.GetComponent<Player>().ApplyDamage(damage);
                 }
             }
         }

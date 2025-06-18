@@ -3,7 +3,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
-using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -142,7 +141,7 @@ public class MatchManager : NetworkBehaviour
                     /*DESPAWN EACH TEAM PLAYER PREFABS TO SPAWN POSITIONS*/
                     foreach (var clientId in NetworkManager.Singleton.ConnectedClients.Keys)
                     {
-                        NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.Despawn();
+                        NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject?.Despawn();
                     }
 
                     // ASSIGN PLAYERS TO A TEAM HARDCODED NOW
@@ -339,8 +338,11 @@ public class MatchManager : NetworkBehaviour
         for (int i = 0; i < NetworkManager.Singleton.ConnectedClientsIds.Count; i++)
         {
             var player = NetworkManager.Singleton.SpawnManager.PlayerObjects[i];
-            player.GetComponent<Rigidbody>().isKinematic = true;
-            player.gameObject.transform.SetPositionAndRotation(spawnPositions[i].position, spawnPositions[i].rotation);
+            Rigidbody rb = player.GetComponent<Rigidbody>();
+            
+            rb.isKinematic = true;
+            rb.position = spawnPositions[i].position;
+            rb.rotation = Quaternion.LookRotation(spawnPositions[i].forward);
         }
 
         GameObject ball = Instantiate(ballPrefab, new Vector3(0, 5, 0), Quaternion.identity);

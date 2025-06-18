@@ -22,7 +22,9 @@ MonoBehaviour:
   maxSlidingSpeed: 30
   projectilePrefab: {fileID: 8027826101285448113, guid: 896c731fd59471f41990bdc7983ade21, type: 3}
   shootCooldown: 0.1
-  shootOffset: 1
+  shootOffset: 0
+  meleeForce: 25
+  meleeOffset: 1.5
   abilities:
   - {fileID: 0}
   - {fileID: 0}
