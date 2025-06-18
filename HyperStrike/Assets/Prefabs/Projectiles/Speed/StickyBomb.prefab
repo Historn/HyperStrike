@@ -262,5 +262,5 @@ MonoBehaviour:
   isForwardDirection: 1
   direction: {x: 0, y: 1, z: 0}
   spawnFX: {fileID: 1546897667432260974, guid: fe8a487245448f640925f8455a9ff42b, type: 3}
-  explosionFX: {fileID: 1546897667432260974, guid: fe8a487245448f640925f8455a9ff42b, type: 3}
+  explosionFX: {fileID: 5872978858568323582, guid: 354d2cab1ac1bb8408a748d61325ee9d, type: 3}
   rigidBody: {fileID: 0}

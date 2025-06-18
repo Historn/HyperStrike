@@ -59,9 +59,9 @@ Material:
     - _DisolveSlider02: 0.58
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _Smoothstep: 0.232
+    - _Smoothstep: 0.108
     m_Colors:
     - _DarkColor: {r: 0.122641504, g: 0.122641504, b: 0.122641504, a: 0}
-    - _FireColor: {r: 2.6596532, g: 0.5606153, b: 0, a: 1}
+    - _FireColor: {r: 10.432951, g: 2.1991107, b: 0, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
