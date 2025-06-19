@@ -242,18 +242,18 @@ public class PlayerController : NetworkBehaviour
     {
         if (!IsOwner || cinemachineCamera == null) return;
 
-        switch (cameraTilt.Value)
-        {
-            case CameraTilt.NONE:
-                cinemachineCamera.Lens.Dutch = 0;
-                break;
-            case CameraTilt.RIGHT:
-                cinemachineCamera.Lens.Dutch = 10;
-                break;
-            case CameraTilt.LEFT:
-                cinemachineCamera.Lens.Dutch = -10;
-                break;
-        }
+        //switch (cameraTilt.Value)
+        //{
+        //    case CameraTilt.NONE:
+        //        cinemachineCamera.Lens.Dutch = 0;
+        //        break;
+        //    case CameraTilt.RIGHT:
+        //        cinemachineCamera.Lens.Dutch = 10;
+        //        break;
+        //    case CameraTilt.LEFT:
+        //        cinemachineCamera.Lens.Dutch = -10;
+        //        break;
+        //}
     }
 
     void HideMeshRenderer()
@@ -336,6 +336,12 @@ public class PlayerController : NetworkBehaviour
     #region "Movement Mechanics Methods"
     void RotatePlayerWithCamera(Vector2 lookValue)
     {
+        if (cinemachineCamera.Target.TrackingTarget != null) 
+        {
+            rb.rotation = Quaternion.Euler(0, cinemachineCamera.Target.TrackingTarget.eulerAngles.y, 0);
+            return;
+        }
+
         // Get mouse input
         float mouseX = lookValue.x * sensitivity * Time.fixedDeltaTime;
         float mouseY = lookValue.y * sensitivity * Time.fixedDeltaTime;

@@ -15,9 +15,9 @@ MonoBehaviour:
   abilityName: Mobile Shield
   icon: {fileID: 0}
   chargeReloadTime: 0
-  fullCooldown: 25
+  fullCooldown: 30
   castTime: 0
-  maxCastTime: 15
+  maxCastTime: 10
   maxCharges: 1
   currentCharges: 0
   isReloading: 0

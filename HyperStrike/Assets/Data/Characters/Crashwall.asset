@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Crashwall
   m_EditorClassIdentifier: 
   characterName: Crashwall
-  health: 100
+  health: 0
   maxHealth: 100
   speed: 30
   sprintSpeed: 50
@@ -27,5 +27,5 @@ MonoBehaviour:
   meleeOffset: 1.5
   abilities:
   - {fileID: 11400000, guid: a56e2037d5f57df4789eda808cd835d7, type: 2}
-  - {fileID: 0}
+  - {fileID: 11400000, guid: ee52dbddd5a13e540b7bf61616b51591, type: 2}
   - {fileID: 0}
