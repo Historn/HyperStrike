@@ -7,17 +7,15 @@ public class MovementAbility : Ability
 {
     [Header("Movement Settings")]
     public float dashDistance;
-    public float dashDuration;
     public float dashSpeed;
     public bool canDamageEnemies;
-    public int damageAmount;
+    public int damage;
     public Vector3 dashDirection;
     public bool isForwardDirection;
     public LayerMask collisionLayers;
     public bool smoothTransition;
 
     protected bool isDashing = false;
-    private float dashTimer = 0f;
     private Vector3 dashEndPosition;
 
     public override void ServerCast(ulong clientId, Vector3 initPos, Vector3 dir)
@@ -56,7 +54,7 @@ public class MovementAbility : Ability
     private IEnumerator PerformDash()
     {
         isDashing = true;
-        dashTimer = 0f;
+        castTime = 0f;
         Rigidbody rb = owner.GetComponent<Rigidbody>();
         Vector3 startPosition = owner.transform.position;
 
@@ -64,10 +62,10 @@ public class MovementAbility : Ability
         Vector3 originalVelocity = rb.linearVelocity;
         rb.linearVelocity = Vector3.zero;
 
-        while (dashTimer < dashDuration)
+        while (castTime < maxCastTime)
         {
-            dashTimer += Time.deltaTime;
-            float progress = Mathf.Clamp01(dashTimer / dashDuration);
+            castTime += Time.deltaTime;
+            float progress = Mathf.Clamp01(castTime / maxCastTime);
 
             float smoothedProgress = Mathf.Sin(progress * Mathf.PI * 0.5f);
 

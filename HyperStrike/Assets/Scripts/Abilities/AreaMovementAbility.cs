@@ -5,6 +5,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "New Movement Area Ability", menuName = "HyperStrike/Movement Area Ability")]
 public class AreaMovementAbility : MovementAbility
 {
+    [Header("Activators")]
     public bool useForce;
     public bool useDamage;
     public bool useHeal;
@@ -12,13 +13,12 @@ public class AreaMovementAbility : MovementAbility
     public bool affectAllies;
     public bool affectEnemies;
 
+    [Header("Values")]
     public float radius;
     public float force;
     public bool setManualForceDir;
     public Vector3 forceDir;
     public int heal;
-
-    
 
     Collider[] colliders;
 
@@ -45,9 +45,8 @@ public class AreaMovementAbility : MovementAbility
         foreach (Collider collider in colliders)
         {
             Rigidbody rb = collider.GetComponent<Rigidbody>();
-            if (rb == null) continue;
 
-            if (useForce)
+            if (useForce && rb != null)
             {
                 Vector3 d = rb.position - owner.transform.position;
 
@@ -58,7 +57,7 @@ public class AreaMovementAbility : MovementAbility
 
             if (!collider.CompareTag("Player")) continue;
 
-            if (useDamage) collider.GetComponent<Player>().ApplyDamage(damageAmount);
+            if (useDamage) collider.GetComponent<Player>().ApplyDamage(damage);
 
             if (useHeal) collider.GetComponent<Player>().ApplyHeal(heal);
         }

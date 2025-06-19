@@ -1,9 +1,5 @@
-using System;
-using System.Collections;
-using Unity.Netcode;
 using UnityEngine;
 
-//[CreateAssetMenu(fileName = "New Ability", menuName = "HyperStrike/Ability Data")]
 public abstract class Ability : ScriptableObject
 {
     [Header("Basic Info")]
@@ -11,7 +7,8 @@ public abstract class Ability : ScriptableObject
     public Sprite icon;
     public float chargeReloadTime;
     public float fullCooldown;
-    public float castTime;
+    [SerializeField] protected float castTime;
+    public float maxCastTime;
     public int maxCharges;
 
     [Header("Networking")]
@@ -30,17 +27,18 @@ public abstract class Ability : ScriptableObject
         isOnCooldown = false;
         isReloading = false;
         currentCharges = maxCharges;
+        castTime = 0f;
     }
 
     // Called when player presses the ability button (client-side prediction)
     public virtual void OnStartCast(ulong clientId) { }
 
     // Server-side validation and execution
-    public virtual void ServerCast(ulong clientId, Vector3 initPos, Vector3 dir) 
+    public virtual void ServerCast(ulong clientId, Vector3 initPos, Vector3 dir)
     {
         // Charges
         currentCharges--;
-        if (currentCharges < 1) 
+        if (currentCharges < 1)
         {
             Debug.Log("Is on cooldown");
             isOnCooldown = true;

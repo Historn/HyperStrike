@@ -18,7 +18,7 @@ GameObject:
   - component: {fileID: 5584011796735262125}
   - component: {fileID: 243614659054135150}
   - component: {fileID: 6815619412466325727}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: SpeedBallProjectile
   m_TagString: Untagged
   m_Icon: {fileID: 0}

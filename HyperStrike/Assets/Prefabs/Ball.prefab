@@ -19,7 +19,7 @@ GameObject:
   - component: {fileID: 3456272679948203483}
   - component: {fileID: 4879467947066210398}
   - component: {fileID: 6833736466136356205}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Ball
   m_TagString: Ball
   m_Icon: {fileID: 0}
@@ -154,7 +154,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 4269792012
+  GlobalObjectIdHash: 1647554747
   InScenePlacedSourceGlobalObjectIdHash: 1647554747
   DeferredDespawnTick: 0
   Ownership: 1
@@ -180,7 +180,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  isGrounded: 0
   IsGoal: 0
   lastPlayerHitPosition: {x: 0, y: 0, z: 0}
 --- !u!114 &5782075087628816509

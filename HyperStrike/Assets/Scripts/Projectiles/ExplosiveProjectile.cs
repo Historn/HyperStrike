@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI;
 
 [Serializable]
 public struct SendParticles : INetworkSerializable
@@ -84,22 +85,6 @@ public class ExplosiveProjectile : Projectile
 
         SpawnParticlesClientRPC(explosion, 3f, true);
 
-        if (other != null)
-        {
-            Rigidbody rb = other.gameObject.GetComponent<Rigidbody>();
-            if (rb != null)
-            {
-                Vector3 dir = rb.position - transform.position;
-
-                rb.AddForce(dir.normalized * explosionForce, ForceMode.Impulse);
-                
-                if (other.gameObject.CompareTag("Player") && this.playerOwnerId != other.gameObject.GetComponent<NetworkObject>().NetworkObjectId)
-                {
-                    other.gameObject.GetComponent<Player>().ApplyDamage(damage);
-                }
-            }
-        }
-
         Collider[] colliders = Physics.OverlapSphere(transform.position, explosionRadius);
 
         foreach (Collider collider in colliders)
@@ -107,14 +92,18 @@ public class ExplosiveProjectile : Projectile
             Rigidbody rb = collider.GetComponent<Rigidbody>();
             if (rb != null)
             {
+                if (collider.CompareTag("Player") && this.playerOwnerId != collider.GetComponent<NetworkObject>().NetworkObjectId)
+                {
+                    Player player = collider.GetComponent<Player>();
+                    if (player.isProtected) continue;
+                    player.ApplyDamage(damage);
+                }
+
+                if (collider.CompareTag("Shield")) continue;
+
                 Vector3 dir = rb.position - transform.position;
 
                 rb.AddForce(dir.normalized * explosionForce, ForceMode.Impulse);
-
-                if (collider.CompareTag("Player") && this.playerOwnerId != collider.GetComponent<NetworkObject>().NetworkObjectId)
-                {
-                    collider.GetComponent<Player>().ApplyDamage(damage);
-                }
             }
         }
 

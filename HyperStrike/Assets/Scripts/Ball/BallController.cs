@@ -5,7 +5,6 @@ public class BallController : NetworkBehaviour
 {
     private Rigidbody rb;
 
-    [SerializeField] bool isGrounded;
     public bool IsGoal;
 
     HyperStrikeUtils hyperStrikeUtils;
@@ -13,8 +12,9 @@ public class BallController : NetworkBehaviour
     private ulong lastPlayerHitId = 0;
     public Vector3 lastPlayerHitPosition;
 
-    private void Awake()
+    public override void OnNetworkSpawn()
     {
+        base.OnNetworkSpawn();
         hyperStrikeUtils = new HyperStrikeUtils();
     }
 

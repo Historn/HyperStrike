@@ -13,6 +13,8 @@ public class Player : NetworkBehaviour
     public NetworkVariable<int> Score = new NetworkVariable<int>(0);
     public NetworkVariable<int> Goals = new NetworkVariable<int>(0);
 
+    public bool isProtected { get; private set; }
+
     float maxDeadTime = 5f;
     public NetworkVariable<float> deadTime = new NetworkVariable<float>(5.0f);
 
@@ -53,6 +55,11 @@ public class Player : NetworkBehaviour
         {
             Character.health = Character.maxHealth;
         }
+    }
+    
+    public void ApplyProtection(bool protect)
+    {
+        isProtected = protect;
     }
 
     private IEnumerator DeadTimer()
