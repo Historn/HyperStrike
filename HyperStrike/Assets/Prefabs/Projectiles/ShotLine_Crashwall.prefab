@@ -183,5 +183,6 @@ MonoBehaviour:
   damage: 20
   playerOwnerId: 0
   force: 25
+  range: 10
   timeToDestroy: 0.1
   lineRenderer: {fileID: 0}

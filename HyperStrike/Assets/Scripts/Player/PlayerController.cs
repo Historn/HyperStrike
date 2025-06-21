@@ -449,7 +449,6 @@ public class PlayerController : NetworkBehaviour
             }
 
             Invoke(nameof(ResetMeleeAttack), 1f);    //Delay for attack to reset
-            //Debug.Log("Melee Attack");
             animator?.Animator.SetTrigger(MeleeHash);
         }
     }

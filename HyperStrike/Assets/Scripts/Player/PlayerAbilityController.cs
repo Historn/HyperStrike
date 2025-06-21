@@ -11,7 +11,7 @@ public class PlayerAbilityController : NetworkBehaviour
 
     private Player player;
 
-    [SerializeField] private Transform castTransform;
+    [SerializeField] private Transform CastTransform;
 
     public override void OnNetworkSpawn()
     {
@@ -40,7 +40,7 @@ public class PlayerAbilityController : NetworkBehaviour
         if (ability.isOnCooldown || ability.currentCharges <= 0) return;
 
         //Debug.Log(abilities[abilityIndex].abilityName);
-        ability.ServerCast(clientId, castTransform.position, castTransform.forward);
+        ability.ServerCast(clientId, CastTransform.position, CastTransform.forward);
 
         // Start cooldown timer
         if (ability.isOnCooldown)
@@ -87,4 +87,6 @@ public class PlayerAbilityController : NetworkBehaviour
         // Send to server
         CastAbility(index, OwnerClientId);
     }
+
+    public Transform GetCastTransform() { return CastTransform; }
 }

@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5de018f935c8aa241882280433785761, type: 3}
-  m_Name: Speed_StickyBomb
+  m_Name: Crashwall_Overdrive
   m_EditorClassIdentifier: 
-  abilityName: Sticky Bomb
+  abilityName: Overdrive
   icon: {fileID: 0}
   chargeReloadTime: 0
-  fullCooldown: 15
+  fullCooldown: 5
   castTime: 0
   maxCastTime: 1
   maxCharges: 1
@@ -23,4 +23,5 @@ MonoBehaviour:
   isReloading: 0
   requiresTarget: 0
   isOnCooldown: 0
-  projectilePrefab: {fileID: 4480140288178342511, guid: e1d52ce7f9fa1a646adf6a6b1e5cc9f6, type: 3}
+  projectilePrefab: {fileID: 4480140288178342511, guid: ca9aef1a2d387d140b2a4c03c6ba0f49, type: 3}
+  projectilesQuantity: 5

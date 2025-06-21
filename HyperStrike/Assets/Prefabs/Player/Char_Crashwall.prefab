@@ -1740,7 +1740,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   abilityInstances: []
-  castTransform: {fileID: 3855824972258302075}
+  CastTransform: {fileID: 3855824972258302075}
 --- !u!114 &1230830037057109791
 MonoBehaviour:
   m_ObjectHideFlags: 0

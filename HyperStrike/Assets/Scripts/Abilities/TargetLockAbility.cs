@@ -40,7 +40,6 @@ public class TargetLockAbility : Ability
                 var targetNetObj = newTarget.GetComponent<NetworkObject>();
                 if (targetNetObj != null)
                 {
-                    Debug.Log("New Target to be set");
                     currentTarget = newTarget;
                     LookAtTargetClientRPC(targetNetObj);
                 }

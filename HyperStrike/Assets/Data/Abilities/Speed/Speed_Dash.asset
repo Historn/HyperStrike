@@ -17,16 +17,16 @@ MonoBehaviour:
   chargeReloadTime: 5
   fullCooldown: 20
   castTime: 0
+  maxCastTime: 0.05
   maxCharges: 3
   currentCharges: 0
   isReloading: 0
   requiresTarget: 0
   isOnCooldown: 0
   dashDistance: 10
-  dashDuration: 0.2
   dashSpeed: 60
   canDamageEnemies: 0
-  damageAmount: 0
+  damage: 0
   dashDirection: {x: 0, y: 0, z: 1}
   isForwardDirection: 1
   collisionLayers:
