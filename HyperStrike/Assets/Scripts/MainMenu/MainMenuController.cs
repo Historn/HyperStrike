@@ -11,6 +11,15 @@ public class MainMenuController : MonoBehaviour
     [SerializeField] private Slider volumeSlider = null;
     [SerializeField] private float defaultVolume = 0.5f;
 
+    [Header("Gameplay Settings")]
+    [SerializeField] private TMP_Text sensitivityTextValue = null;
+    [SerializeField] private Slider sensitivitySlider = null;
+    [SerializeField] private int defaultSensitivity = 5;
+    public int mainSensitivity = 5;
+
+    [Header("Toggle Settings")]
+    [SerializeField] private Toggle invertYToggle = null;
+
     [Header("Confirmation")]
     [SerializeField] private GameObject confirmationPrompt = null;
 
@@ -33,6 +42,31 @@ public class MainMenuController : MonoBehaviour
         StartCoroutine(ConfirmationBox());
     }
 
+    public void SetSensitivity(float sensitivity)
+    {
+        mainSensitivity = Mathf.RoundToInt(sensitivity);
+        sensitivityTextValue.text = sensitivity.ToString("0");
+    }
+
+    public void GameplayApply() 
+    {
+        if(invertYToggle.isOn)
+        {
+            PlayerPrefs.SetInt("masterInvertY", 1);
+            // invert y with Arnau's method
+        }
+        else
+        {
+            PlayerPrefs.SetInt("masterInvertY", 0);
+            // not invert y with Arnau's method
+        }
+
+        PlayerPrefs.SetFloat("masterSen", mainSensitivity);
+        // set sensitivity with Arnau's method
+
+        StartCoroutine(ConfirmationBox());
+    }
+
     public void ResetButton(string MenuType)
     {
         if(MenuType == "Audio")
@@ -41,6 +75,15 @@ public class MainMenuController : MonoBehaviour
             volumeSlider.value = defaultVolume;
             volumeTextValue.text = defaultVolume.ToString("0.0");
             VolumeApply();
+        }
+
+        if (MenuType == "Gameplay")
+        {
+           sensitivityTextValue.text = defaultSensitivity.ToString("0");
+            sensitivitySlider.value = defaultSensitivity;
+            mainSensitivity = defaultSensitivity;
+            invertYToggle.isOn = false;
+            GameplayApply();
         }
     }
 
