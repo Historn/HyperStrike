@@ -444,7 +444,7 @@ public class PlayerController : NetworkBehaviour
 
                 if (hit.transform.TryGetComponent<Player>(out Player p))
                 {
-                    p.ApplyDamage(20);
+                    p.ApplyEffect(EffectType.DAMAGE, 20);
                 }
             }
 
@@ -465,13 +465,25 @@ public class PlayerController : NetworkBehaviour
         {
             shootReady = false;
 
-            GameObject projectileGO = Instantiate(player.Character.projectilePrefab, projectileSpawnOffset.position + cameraWeaponTransform.forward * player.Character.shootOffset, cameraWeaponTransform.rotation);
-            projectileGO.GetComponent<Projectile>().playerOwnerId = this.NetworkObjectId;
-            projectileGO.GetComponent<NetworkObject>().Spawn(true);
+            var projectileNO = NetworkObjectPool.Singleton.GetNetworkObject(player.Character.projectilePrefab, projectileSpawnOffset.position + cameraWeaponTransform.forward * player.Character.shootOffset, cameraWeaponTransform.rotation);
+
+            if (!projectileNO.IsSpawned)
+            {
+                projectileNO.Spawn();
+            }
+            else
+            {
+                Debug.LogWarning("Tried to spawn an already-spawned object");
+                NetworkObjectPool.Singleton.ReturnNetworkObject(projectileNO, player.Character.projectilePrefab);
+            }
+
+            var projectile = projectileNO.GetComponent<Projectile>();
+            projectile.projectilePrefabUsed = player.Character.projectilePrefab;
+            projectile.Activate(projectileSpawnOffset.position + cameraWeaponTransform.forward * player.Character.shootOffset, cameraWeaponTransform.rotation, OwnerClientId);
+
             Invoke(nameof(ResetShoot), player.Character.shootCooldown);    //Delay for attack to reset
             animator?.Animator.SetTrigger(ShootHash);
         }
-        //else animator?.Animator.ResetTrigger(ShootHash);
     }
 
     void ResetShoot()

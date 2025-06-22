@@ -5,21 +5,25 @@ public class StickExplosiveProjectile : ExplosiveProjectile
 {
     bool firstHit = true;
 
-    private void OnCollisionEnter(Collision other)
+    protected override void HandleImpact(Collision collision)
     {
-        if (!enabled || !IsServer || other == null) return;
+        Stick(collision);
+        SpawnParticlesClientRPC(collision.GetContact(0).point, collision.GetContact(0).normal);
+        Deactivate();
+    }
 
-        collision = other;
-        NetworkObject netObj = other.gameObject.GetComponent<NetworkObject>();
-        SphereCollider sphereCollider = GetComponent<SphereCollider>();
-
+    void Stick (Collision collision)
+    {
         if (firstHit)
         {
+            NetworkObject netObj = collision.gameObject.GetComponent<NetworkObject>();
+            SphereCollider sphereCollider = GetComponent<SphereCollider>();
+
             if (netObj && netObj.OwnerClientId != this.playerOwnerId)
             {
                 sphereCollider.isTrigger = true;
                 rigidBody.isKinematic = true;
-                transform.SetParent(other.transform);
+                transform.SetParent(collision.transform);
             }
             else
             {

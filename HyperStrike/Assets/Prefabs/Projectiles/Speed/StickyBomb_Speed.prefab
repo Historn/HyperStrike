@@ -19,7 +19,7 @@ GameObject:
   - component: {fileID: 243614659054135150}
   - component: {fileID: -7935321353710795183}
   m_Layer: 8
-  m_Name: StickyBomb
+  m_Name: StickyBomb_Speed
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

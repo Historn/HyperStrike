@@ -4,28 +4,28 @@ using UnityEngine;
 
 public class RaycastShot : Projectile
 {
-    [SerializeField] private float force;
-    [SerializeField] private float timeToDestroy;
-    [SerializeField] private LineRenderer lineRenderer;
+    [SerializeField] protected float force;
+    [SerializeField] protected LineRenderer lineRenderer;
+
+    [SerializeField] protected EffectType effectType;
+    [SerializeField] protected AffectedBaseStats affectedBaseStats;
+    [SerializeField] protected float quantity;
 
     public override void OnNetworkSpawn()
     {
+        base.OnNetworkSpawn();
         lineRenderer = GetComponent<LineRenderer>();
+    }
+
+    public override void Activate(Vector3 position, Quaternion rotation, ulong ownerId)
+    {
+        base.Activate(position, rotation, ownerId);
         lineRenderer.SetPosition(0, transform.position);
-        if (!IsServer) return;
-
-        StartCoroutine(DestroyProjectile());
+        CastTheRay();
     }
 
-    protected override void OnNetworkPostSpawn()
+    public void CastTheRay()
     {
-        Use();
-    }
-
-    public override void Use()
-    {
-        if (!IsServer) return;
-
         RaycastHit hit;
         if (Physics.Raycast(transform.position, transform.forward, out hit, 100f))
         {
@@ -39,7 +39,7 @@ public class RaycastShot : Projectile
 
                 if (rb.gameObject.CompareTag("Player") && this.playerOwnerId != rb.gameObject.GetComponent<NetworkObject>().NetworkObjectId)
                 {
-                    rb.gameObject.GetComponent<Player>().ApplyDamage(damage);
+                    rb.gameObject.GetComponent<Player>()?.ApplyEffect(effectType, quantity, affectedBaseStats);
                 }
             }
         }
@@ -52,6 +52,13 @@ public class RaycastShot : Projectile
         ShowLineClientRPC(hit.point);
     }
 
+    public override void Deactivate()
+    {
+        isActive = false;
+        gameObject.SetActive(false);
+        //OnProjectileDeactivated?.Invoke(this);
+    }
+
     [ClientRpc]
     private void ShowLineClientRPC(Vector3 finalPos)
     {
@@ -61,9 +68,8 @@ public class RaycastShot : Projectile
         }
     }
 
-    IEnumerator DestroyProjectile()
+    protected override void HandleImpact(Collision collision)
     {
-        yield return new WaitForSeconds(timeToDestroy);
-        gameObject.GetComponent<NetworkObject>().Despawn();
+        return;
     }
 }

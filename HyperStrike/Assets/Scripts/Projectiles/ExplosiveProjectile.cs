@@ -1,162 +1,65 @@
-using System;
 using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
-using static UnityEngine.Rendering.DebugUI;
-
-[Serializable]
-public struct SendParticles : INetworkSerializable
-{
-    public Vector3 collisionPoint;
-    public Vector3 collisionNormal;
-
-    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-    {
-        serializer.SerializeValue(ref collisionPoint);
-        serializer.SerializeValue(ref collisionNormal);
-    }
-}
 
 public class ExplosiveProjectile : Projectile
 {
     public float explosionForce = 25f;
     public float explosionRadius = 20f;
-    [SerializeField] private int timeToDestroy;
+    public LayerMask targetLayers;
     [SerializeField] protected bool isForwardDirection = true;
     [SerializeField] protected Vector3 direction;
-    [SerializeField] protected GameObject spawnFX;
-    [SerializeField] protected GameObject explosionFX;
-    [SerializeField] protected Rigidbody rigidBody;
 
-    protected Collision collision = null;
-
-    public override void OnNetworkSpawn()
+    public override void Activate(Vector3 position, Quaternion rotation, ulong ownerId)
     {
-        SendParticles sendParticles = new SendParticles
-        {
-            collisionPoint = Vector3.zero,
-            collisionNormal = Vector3.zero
-        };
-
-        //SpawnParticlesClientRPC(sendParticles, 0.3f);
-
-        // Spawns from the player that shot
-        rigidBody = GetComponent<Rigidbody>();
-
-        if (IsServer) StartCoroutine(DestroyRocket());
+        base.Activate(position, rotation, ownerId);
+        rigidBody.AddForce(transform.forward * speed, ForceMode.Impulse);
     }
 
-    protected override void OnNetworkPostSpawn()
+    protected override void HandleImpact(Collision collision)
     {
-        if (IsServer)
-        {
-            if (rigidBody != null)
-            {
-                Use();
-            }
-            else if (rigidBody == null)
-            {
-                Debug.Log("Rigidbody Not Found!");
-                gameObject.GetComponent<NetworkObject>().Despawn();
-            }
-        }
+        Explode(collision);
+        SpawnParticlesClientRPC(collision.GetContact(0).point, collision.GetContact(0).normal);
+        Deactivate();
     }
 
-    public override void Use()
+    protected virtual void Explode(Collision collision)
     {
-        if (isForwardDirection) rigidBody.AddForce(transform.forward * speed, ForceMode.Impulse);
-        else rigidBody.AddForce((transform.forward + direction.normalized) * speed, ForceMode.Impulse);
-    }
+        Collider[] colliders = Physics.OverlapSphere(transform.position, explosionRadius, targetLayers);
 
-    protected virtual void Explode(Collision other = null)
-    {
-        SendParticles explosion = new SendParticles
+        foreach (var collider in colliders)
         {
-            collisionPoint = Vector3.zero,
-            collisionNormal = Vector3.zero
-        };
-
-        
-        if (other != null && other.contactCount > 0)
-        {
-            explosion.collisionPoint = other.GetContact(0).point;
-            explosion.collisionNormal = other.GetContact(0).normal;
-        }
-
-        SpawnParticlesClientRPC(explosion, 3f, true);
-
-        Collider[] colliders = Physics.OverlapSphere(transform.position, explosionRadius);
-
-        foreach (Collider collider in colliders)
-        {
-            Rigidbody rb = collider.GetComponent<Rigidbody>();
-            if (rb != null)
+            if (collider.TryGetComponent<Rigidbody>(out var rb))
             {
-                if (collider.CompareTag("Player") && this.playerOwnerId != collider.GetComponent<NetworkObject>().NetworkObjectId)
+                if (collider.CompareTag("Player"))
                 {
                     Player player = collider.GetComponent<Player>();
-                    if (player.isProtected) continue;
-                    player.ApplyDamage(damage);
+                    if (!player.IsProtected || player.OwnerClientId != playerOwnerId)
+                        player.ApplyEffect(EffectType.DAMAGE, effectQuantity);
                 }
 
-                if (collider.CompareTag("Shield")) continue;
-
                 Vector3 dir = rb.position - transform.position;
-
                 rb.AddForce(dir.normalized * explosionForce, ForceMode.Impulse);
             }
         }
-
-        gameObject.GetComponent<NetworkObject>().Despawn();
     }
 
     [ClientRpc]
-    protected virtual void SpawnParticlesClientRPC(SendParticles sendParticles, float destructionTime = -1f, bool useImpactNormal = false)
+    protected virtual void SpawnParticlesClientRPC(Vector3 position, Vector3 normal)
     {
-        if (explosionFX != null)
+        if (projectileFX != null)
         {
-            if (!useImpactNormal)
-            {
-                Quaternion spawnRotation = Quaternion.LookRotation(transform.up, transform.forward);
-                GameObject vfxInstance = Instantiate(explosionFX, transform.position, spawnRotation);
-                Destroy(vfxInstance, destructionTime);
-            }
-            else
-            {
-                // Find the nearest axis to the impact normal
-                Vector3 impactNormal = sendParticles.collisionNormal;
-                Vector3 nearestAxis = FindNearestAxis(impactNormal);
-                
-                Quaternion spawnRotation = Quaternion.LookRotation(nearestAxis);
-                GameObject vfxInstance = Instantiate(explosionFX, transform.position, spawnRotation);
-                Destroy(vfxInstance, destructionTime);
-            }
+            var rotation = Quaternion.LookRotation(normal);
+            var vfx = Instantiate(projectileFX, position, rotation);
+            Destroy(vfx, 3f);
         }
     }
 
-    private Vector3 FindNearestAxis(Vector3 normal)
+    protected override IEnumerator LifetimeCountdown()
     {
-        // Compare the normal with the primary axes and choose the closest one
-        Vector3[] axes = { Vector3.right, Vector3.up, Vector3.forward, -Vector3.right, -Vector3.up, -Vector3.forward };
-        Vector3 nearest = axes[0];
-        float maxDot = Vector3.Dot(normal, axes[0]);
-
-        foreach (Vector3 axis in axes)
-        {
-            float dot = Vector3.Dot(normal, axis);
-            if (dot > maxDot)
-            {
-                maxDot = dot;
-                nearest = axis;
-            }
-        }
-
-        return nearest;
-    }
-
-    IEnumerator DestroyRocket()
-    {
-        yield return new WaitForSeconds(timeToDestroy);
-        Explode(collision);
+        yield return new WaitForSeconds(lifetime);
+        Explode(collision: null);
+        SpawnParticlesClientRPC(transform.position, transform.up);
+        if (isActive) Deactivate();
     }
 }
