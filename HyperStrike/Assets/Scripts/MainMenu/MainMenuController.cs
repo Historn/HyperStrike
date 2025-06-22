@@ -22,11 +22,6 @@ public class MainMenuController : MonoBehaviour
     [SerializeField] private Toggle invertYToggle = null;
 
     [Header("Graphics Settings")]
-    [SerializeField] private TMP_Text brightnessTextValue = null;
-    [SerializeField] private Slider brightnessSlider = null;
-    [SerializeField] private float defaultBrightness = 1.0f;
-
-    [Space(10)]
     [SerializeField] private TMP_Dropdown qualityDropdown;
     [SerializeField] private Toggle fullscreenToggle;
 
@@ -111,12 +106,6 @@ public class MainMenuController : MonoBehaviour
         StartCoroutine(ConfirmationBox());
     }
 
-    public void SetBrightness(float brightness)
-    {
-        _brightnessLevel = brightness;
-        brightnessTextValue.text = brightness.ToString("0.0");
-    }
-
     public void SetFullscreen(bool isFullscreen)
     {
         _isFullscreen = isFullscreen;
@@ -145,10 +134,6 @@ public class MainMenuController : MonoBehaviour
     {
         if (MenuType == "Graphics")
         {
-            // Reset brightness value
-            brightnessSlider.value = defaultBrightness;
-            brightnessTextValue.text = defaultBrightness.ToString("0.0");
-
             qualityDropdown.value = 3;
             QualitySettings.SetQualityLevel(3);
 
