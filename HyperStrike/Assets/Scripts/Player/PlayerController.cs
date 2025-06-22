@@ -238,24 +238,6 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
-    private void LateUpdate()
-    {
-        if (!IsOwner || cinemachineCamera == null) return;
-
-        //switch (cameraTilt.Value)
-        //{
-        //    case CameraTilt.NONE:
-        //        cinemachineCamera.Lens.Dutch = 0;
-        //        break;
-        //    case CameraTilt.RIGHT:
-        //        cinemachineCamera.Lens.Dutch = 10;
-        //        break;
-        //    case CameraTilt.LEFT:
-        //        cinemachineCamera.Lens.Dutch = -10;
-        //        break;
-        //}
-    }
-
     void HideMeshRenderer()
     {
         var meshes = GetComponentsInChildren<SkinnedMeshRenderer>();
@@ -304,8 +286,15 @@ public class PlayerController : NetworkBehaviour
         isWallRunning = hyperStrikeUtils.CheckWalls(transform, ref wallHit, ref refCameraTilt);
 
         // Only send when changed
-        if (input.look != Vector2.zero)
+        if (input.look != Vector2.zero && cinemachineCamera.Target.TrackingTarget == null)
+        {
             RotatePlayerWithCamera(input.look);
+        }
+
+        if (cinemachineCamera.Target.TrackingTarget != null)
+        {
+            FollowTarget(input.look);
+        }
 
         if (input.move != Vector2.zero)
         {
@@ -336,12 +325,6 @@ public class PlayerController : NetworkBehaviour
     #region "Movement Mechanics Methods"
     void RotatePlayerWithCamera(Vector2 lookValue)
     {
-        if (cinemachineCamera.Target.TrackingTarget != null) 
-        {
-            rb.rotation = Quaternion.Euler(0, cinemachineCamera.Target.TrackingTarget.eulerAngles.y, 0);
-            return;
-        }
-
         // Get mouse input
         float mouseX = lookValue.x * sensitivity * Time.fixedDeltaTime;
         float mouseY = lookValue.y * sensitivity * Time.fixedDeltaTime;
@@ -358,6 +341,31 @@ public class PlayerController : NetworkBehaviour
 
         // Apply horizontal rotation to the player
         rb.rotation = Quaternion.Euler(0, yRotation, 0);
+    }
+
+    void FollowTarget(Vector2 lookValue)
+    {
+        // Get direction to target
+        Vector3 targetDirection = (cinemachineCamera.Target.TrackingTarget.position - transform.position).normalized;
+
+        
+
+        // Allow some camera movement while locked (reduced sensitivity)
+        float mouseXx = lookValue.x * (sensitivity * 0.2f) * Time.fixedDeltaTime;
+        float mouseYy = lookValue.y * (sensitivity * 0.2f) * Time.fixedDeltaTime;
+
+        // Apply limited camera rotation
+        xRotation -= mouseYy;
+        xRotation = Mathf.Clamp(xRotation, -10f, 10f); // Reduced vertical range
+        yRotation += mouseXx;
+        yRotation = Mathf.Clamp(xRotation, -10f, 10f); // Reduced horzontal range
+
+        cameraWeaponTransform.localRotation = Quaternion.Euler(xRotation, 0, 0);
+        mainCameraTransform.localRotation = Quaternion.Euler(xRotation, 0, 0);
+
+        // Only rotate player on Y axis to face target
+        Quaternion targetRotation = Quaternion.LookRotation(new Vector3(targetDirection.x, 0, targetDirection.z));
+        rb.rotation = Quaternion.Slerp(rb.rotation, targetRotation, Time.fixedDeltaTime * 100f);
     }
 
     void WalkAndRun(Vector2 moveValue, bool isSprinting)

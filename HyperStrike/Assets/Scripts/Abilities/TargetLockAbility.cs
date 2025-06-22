@@ -33,14 +33,13 @@ public class TargetLockAbility : Ability
         while (castTime < maxCastTime)
         {
             castTime += Time.deltaTime;
-            Transform newTarget = FindClosestTarget();
+            currentTarget = FindClosestTarget();
 
-            if (fixCameraToTarget && newTarget != null)
+            if (fixCameraToTarget && currentTarget != null)
             {
-                var targetNetObj = newTarget.GetComponent<NetworkObject>();
+                var targetNetObj = currentTarget.GetComponent<NetworkObject>();
                 if (targetNetObj != null)
                 {
-                    currentTarget = newTarget;
                     LookAtTargetClientRPC(targetNetObj);
                 }
             }
@@ -81,9 +80,13 @@ public class TargetLockAbility : Ability
     {
         if (!targetRef.TryGet(out NetworkObject targetObj)) return;
 
+
+        currentTarget = targetObj.transform;
+
         var cinemachineCamera = owner.GetComponentInChildren<CinemachineCamera>();
         if (cinemachineCamera == null) return;
-        Debug.Log("CAMERA FOUND" + targetObj.transform.position);
+        Debug.Log($"CAMERA FOUND: {targetObj.transform.position}, {targetObj.name}");
+        
         cinemachineCamera.Target.TrackingTarget = targetObj.transform;
     }
 
@@ -94,6 +97,7 @@ public class TargetLockAbility : Ability
         if (cinemachineCamera == null) return;
 
         cinemachineCamera.Target.TrackingTarget = null;
+        currentTarget = null;
     }
 
     public override void PlayEffects(Vector3 position)
