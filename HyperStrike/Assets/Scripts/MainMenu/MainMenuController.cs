@@ -25,10 +25,8 @@ public class MainMenuController : MonoBehaviour
     [SerializeField] private TMP_Dropdown qualityDropdown;
     [SerializeField] private Toggle fullscreenToggle;
 
-
     private int _qualityLevel;
     private bool _isFullscreen;
-    private float _brightnessLevel;
 
     [Header("Resolution Dropdowns")]
     public TMP_Dropdown resolutionDropdown;
@@ -118,9 +116,6 @@ public class MainMenuController : MonoBehaviour
 
     public void GraphicsApply()
     {
-        PlayerPrefs.SetFloat("masterBrigthness", _brightnessLevel);
-        // set brightness with Arnau's method
-
         PlayerPrefs.SetInt("masterQuality", _qualityLevel);
         QualitySettings.SetQualityLevel(_qualityLevel);
 
@@ -134,8 +129,8 @@ public class MainMenuController : MonoBehaviour
     {
         if (MenuType == "Graphics")
         {
-            qualityDropdown.value = 3;
-            QualitySettings.SetQualityLevel(3);
+            qualityDropdown.value = 0;
+            QualitySettings.SetQualityLevel(0);
 
             fullscreenToggle.isOn = false;
             Screen.fullScreen = false;

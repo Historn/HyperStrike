@@ -79,11 +79,15 @@ public class LoadPrefs : MonoBehaviour
                 sensitivitySlider.value = localSensitivity;
                 mainMenuController.mainSensitivity = Mathf.RoundToInt(localSensitivity);
             }
+            else
+            {
+                mainMenuController.ResetButton("Gameplay");
+            }
 
             // MOUSE INVERT Y
             if (PlayerPrefs.HasKey("masterInvertY"))
             {
-                if(PlayerPrefs.GetInt("masterInvertY") == 1)
+                if (PlayerPrefs.GetInt("masterInvertY") == 1)
                 {
                     invertYToggle.isOn = true;
                 }
