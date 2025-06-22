@@ -35,7 +35,7 @@ public class AreaAbility : Ability
     public override void ServerCast(ulong clientId, Vector3 initPos, Vector3 dir)
     {
         base.ServerCast(clientId, initPos, dir);
-        owner.StartCoroutine(StartArea());
+        owner.StartCoroutine(AreaCast());
         PlayEffects(initPos);
     }
 
@@ -73,19 +73,19 @@ public class AreaAbility : Ability
 
             if (useDamage)
             {
-                player.ApplyDamage(damage);
+                player.ApplyEffect(EffectType.DAMAGE, damage);
                 currentlyAffectedPlayers.Add(player);
             }
 
             if (useHeal)
             {
-                player.ApplyHeal(heal);
+                player.ApplyEffect(EffectType.HEAL, heal);
                 if (!currentlyAffectedPlayers.Contains(player)) currentlyAffectedPlayers.Add(player);
             }
 
             if (useProtection)
             {
-                player.ApplyProtection(true);
+                player.ApplyEffect(EffectType.PROTECT);
                 if (!currentlyAffectedPlayers.Contains(player)) currentlyAffectedPlayers.Add(player);
             }
 
@@ -94,7 +94,7 @@ public class AreaAbility : Ability
             {
                 if (!currentlyAffectedPlayers.Contains(p))
                 {
-                    p.ApplyProtection(false);
+                    p.ApplyEffect(EffectType.UNPROTECT);
                 }
             }
 
@@ -102,7 +102,7 @@ public class AreaAbility : Ability
         }
     }
 
-    private IEnumerator StartArea()
+    private IEnumerator AreaCast()
     {
         castTime = 0;
 
@@ -121,7 +121,7 @@ public class AreaAbility : Ability
 
         foreach (Collider collider in colliders)
         {
-            if (useProtection) collider.GetComponent<Player>()?.ApplyProtection(false);
+            if (useProtection) collider.GetComponent<Player>()?.ApplyEffect(EffectType.UNPROTECT);
         }
     }
 

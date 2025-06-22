@@ -1,7 +1,27 @@
 using HyperStrike;
+using System;
 using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
+
+public enum EffectType : byte
+{
+    NONE,
+    DAMAGE,
+    HEAL,
+    PROTECT,
+    UNPROTECT,
+    BOOST
+}
+
+[Flags]
+public enum AffectedBaseStats : byte
+{
+    NONE,
+    MAX_HP,
+    SPEED,
+    DAMAGE
+}
 
 // CLASS FOR VARIABLES AND FUNCTIONS - NOT ACTIONS/INPUTS
 public class Player : NetworkBehaviour
@@ -13,7 +33,9 @@ public class Player : NetworkBehaviour
     public NetworkVariable<int> Score = new NetworkVariable<int>(0);
     public NetworkVariable<int> Goals = new NetworkVariable<int>(0);
 
-    public bool isProtected { get; private set; }
+    public bool IsProtected { get; private set; }
+    public float BoostPercentage { get; private set; }
+    public AffectedBaseStats AffectedStats { get; private set; }
 
     float maxDeadTime = 5f;
     public NetworkVariable<float> deadTime = new NetworkVariable<float>(5.0f);
@@ -32,21 +54,55 @@ public class Player : NetworkBehaviour
         }
     }
 
-    public void ApplyDamage(int damage)
+    public void ApplyEffect(EffectType effectType, float quantity = 0f, AffectedBaseStats affectedBaseStats = AffectedBaseStats.NONE)
     {
-        if (!MatchManager.Instance) return;
-        
+        switch (effectType)
+        {
+            case EffectType.NONE:
+                break;
+            case EffectType.DAMAGE:
+                {
+                    ApplyDamage((int)quantity);
+                }
+                break;
+            case EffectType.HEAL:
+                {
+                    ApplyHeal((int)quantity);
+                }
+                break;
+            case EffectType.PROTECT:
+                {
+                    ApplyProtection(true);
+                }
+                break;
+            case EffectType.UNPROTECT:
+                {
+                    ApplyProtection(false);
+                }
+                break;
+            case EffectType.BOOST:
+                {
+                    //ApplyBoost(quantity, affectedBaseStats);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void ApplyDamage(int damage)
+    {
         Character.health -= damage;
         if (Character.health <= 0)
         {
-            playerEventSubscriber.OnDeath.Invoke();
+            if (MatchManager.Instance) playerEventSubscriber.OnDeath.Invoke();
             gameObject.GetComponent<Rigidbody>().isKinematic = true;
             StartCoroutine(DeadTimer());
         }
-        playerEventSubscriber.OnReceiveDamage.Invoke();
+        if (MatchManager.Instance) playerEventSubscriber.OnReceiveDamage.Invoke();
     }
 
-    public void ApplyHeal(int heal)
+    private void ApplyHeal(int heal)
     {
         if (!MatchManager.Instance) return;
 
@@ -56,10 +112,34 @@ public class Player : NetworkBehaviour
             Character.health = Character.maxHealth;
         }
     }
-    
-    public void ApplyProtection(bool protect)
+
+    private void ApplyProtection(bool protect)
     {
-        isProtected = protect;
+        IsProtected = protect;
+    }
+
+    private void ApplyBoost(float percentage, AffectedBaseStats affectedBaseStats)
+    {
+
+        if (BoostPercentage < 0 || AffectedStats != AffectedBaseStats.NONE) { return; }
+
+        if (affectedBaseStats.HasFlag(AffectedBaseStats.MAX_HP))
+        {
+            Character.maxHealth += (int)(Character.maxHealth * percentage);
+        }
+        
+        if (affectedBaseStats.HasFlag(AffectedBaseStats.SPEED))
+        {
+            Character.maxSpeed += (int)(Character.maxSpeed * percentage);
+        }
+        
+        //if (affectedBaseStats.HasFlag(AffectedBaseStats.DAMAGE))
+        //{
+        //    Character.maxSpeed += (int)(Character.maxSpeed * percentage);
+        //}
+
+        AffectedStats = affectedBaseStats;
+        BoostPercentage = percentage;
     }
 
     private IEnumerator DeadTimer()

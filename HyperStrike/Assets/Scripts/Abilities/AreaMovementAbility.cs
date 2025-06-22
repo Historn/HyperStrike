@@ -57,9 +57,9 @@ public class AreaMovementAbility : MovementAbility
 
             if (!collider.CompareTag("Player")) continue;
 
-            if (useDamage) collider.GetComponent<Player>().ApplyDamage(damage);
+            if (useDamage) collider.GetComponent<Player>().ApplyEffect(EffectType.DAMAGE, damage);
 
-            if (useHeal) collider.GetComponent<Player>().ApplyHeal(heal);
+            if (useHeal) collider.GetComponent<Player>().ApplyEffect(EffectType.HEAL, heal);
         }
     }
 
