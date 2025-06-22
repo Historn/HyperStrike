@@ -38,8 +38,7 @@ public abstract class Projectile : NetworkBehaviour
         isActive = false;
         rigidBody.linearVelocity = Vector3.zero;
         rigidBody.angularVelocity = Vector3.zero;
-        GetComponent<NetworkObject>().Despawn(false);
-        //OnProjectileDeactivated?.Invoke(this);
+        GetComponent<NetworkObject>().Despawn();
     }
 
     protected virtual void OnCollisionEnter(Collision collision)

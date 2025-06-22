@@ -471,11 +471,11 @@ public class PlayerController : NetworkBehaviour
             {
                 projectileNO.Spawn();
             }
-            else
-            {
-                Debug.LogWarning("Tried to spawn an already-spawned object");
-                NetworkObjectPool.Singleton.ReturnNetworkObject(projectileNO, player.Character.projectilePrefab);
-            }
+            //else
+            //{
+            //    Debug.LogWarning("Tried to spawn an already-spawned object");
+            //    NetworkObjectPool.Singleton.ReturnNetworkObject(projectileNO, player.Character.projectilePrefab);
+            //}
 
             var projectile = projectileNO.GetComponent<Projectile>();
             projectile.projectilePrefabUsed = player.Character.projectilePrefab;
