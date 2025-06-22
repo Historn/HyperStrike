@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class ExplosiveProjectile : Projectile
 {
+    public bool explodeOnContact = true;
     public float explosionForce = 25f;
     public float explosionRadius = 20f;
     public LayerMask targetLayers;
@@ -18,6 +19,8 @@ public class ExplosiveProjectile : Projectile
 
     protected override void HandleImpact(Collision collision)
     {
+        if (!explodeOnContact) return;
+
         Explode(collision);
         SpawnParticlesClientRPC(collision.GetContact(0).point, collision.GetContact(0).normal);
         Deactivate();
@@ -34,10 +37,13 @@ public class ExplosiveProjectile : Projectile
                 if (collider.CompareTag("Player"))
                 {
                     Player player = collider.GetComponent<Player>();
-                    if (!player.IsProtected || player.OwnerClientId != playerOwnerId)
+
+                    if (player.IsProtected) return;
+
+                    if (player.OwnerClientId != playerOwnerId)
                         player.ApplyEffect(EffectType.DAMAGE, effectQuantity);
                 }
-
+                if (collider.CompareTag("Shield")) continue;
                 Vector3 dir = rb.position - transform.position;
                 rb.AddForce(dir.normalized * explosionForce, ForceMode.Impulse);
             }

@@ -166,7 +166,6 @@ class PooledPrefabInstanceHandler : INetworkPrefabInstanceHandler
 
     NetworkObject INetworkPrefabInstanceHandler.Instantiate(ulong ownerClientId, Vector3 position, Quaternion rotation)
     {
-        Debug.Log("Instance from OBJECT POOL");
         return m_Pool.GetNetworkObject(m_Prefab, position, rotation);
     }
 

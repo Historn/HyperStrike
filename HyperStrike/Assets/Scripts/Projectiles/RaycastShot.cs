@@ -10,7 +10,6 @@ public class RaycastShot : Projectile
 
     [SerializeField] protected EffectType effectType;
     [SerializeField] protected AffectedBaseStats affectedBaseStats;
-    [SerializeField] protected float quantity;
 
     public override void OnNetworkSpawn()
     {
@@ -39,7 +38,7 @@ public class RaycastShot : Projectile
 
                 if (rb.gameObject.CompareTag("Player") && this.playerOwnerId != rb.gameObject.GetComponent<NetworkObject>().NetworkObjectId)
                 {
-                    rb.gameObject.GetComponent<Player>()?.ApplyEffect(effectType, quantity, affectedBaseStats);
+                    rb.gameObject.GetComponent<Player>()?.ApplyEffect(effectType, effectQuantity, affectedBaseStats);
                 }
             }
         }

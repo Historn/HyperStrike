@@ -267,9 +267,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   speed: 1
-  damage: 20
+  effectQuantity: 35
   playerOwnerId: 0
+  lifetime: 0.1
+  projectileFX: {fileID: 0}
+  rigidBody: {fileID: 0}
+  projectilePrefabUsed: {fileID: 8027826101285448113}
   force: 25
-  range: 12
-  timeToDestroy: 0.1
   lineRenderer: {fileID: 0}
+  effectType: 1
+  affectedBaseStats: 0
+  quantity: 0
