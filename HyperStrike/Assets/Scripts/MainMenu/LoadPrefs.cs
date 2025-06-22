@@ -1,8 +1,9 @@
-using UnityEngine;
-using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using UnityEngine;
+using UnityEngine.Audio;
+using UnityEngine.UI;
 
 public class LoadPrefs : MonoBehaviour
 {
@@ -10,9 +11,18 @@ public class LoadPrefs : MonoBehaviour
     [SerializeField] private bool canUse = false;
     [SerializeField] private MainMenuController mainMenuController;
 
-    [Header("Volume Setting")]
-    [SerializeField] private TMP_Text volumeTextValue = null;
-    [SerializeField] private Slider volumeSlider = null;
+    [Header("Audio Setting")]
+    [SerializeField] private AudioMixer mixer;
+    
+    [Space(10)]
+
+    [SerializeField] private TMP_Text musicTextValue = null;
+    [SerializeField] private Slider musicSlider = null;
+    
+    [Space(10)]
+
+    [SerializeField] private TMP_Text sfxTextValue = null;
+    [SerializeField] private Slider sfxSlider = null;
 
     [Header("Quality Level Setting")]
     [SerializeField] private TMP_Dropdown qualityDropdown;
@@ -27,18 +37,32 @@ public class LoadPrefs : MonoBehaviour
     [Header("Invert Y Setting")]
     [SerializeField] private Toggle invertYToggle = null;
 
-    private void Awake()
+    private void Start()
     {
         if (canUse)
         {
-            // AUDIO
-            if (PlayerPrefs.HasKey("masterVolume"))
+            // AUDIO MUSIC
+            if (PlayerPrefs.HasKey("masterMusic"))
             {
-                float localVolume = PlayerPrefs.GetFloat("masterVolume");
+                float localMusic = PlayerPrefs.GetFloat("masterMusic");
 
-                volumeTextValue.text = localVolume.ToString("0.0");
-                volumeSlider.value = localVolume;
-                AudioListener.volume = localVolume;
+                musicTextValue.text = localMusic.ToString("0.0");
+                musicSlider.value = localMusic;
+                mixer.SetFloat("Music_Volume", Mathf.Log10(localMusic) * 20);
+            }
+            else
+            {
+                mainMenuController.ResetButton("Audio");
+            }
+            
+            // AUDIO SFX
+            if (PlayerPrefs.HasKey("masterSFX"))
+            {
+                float localSFX = PlayerPrefs.GetFloat("masterSFX");
+
+                sfxTextValue.text = localSFX.ToString("0.0");
+                sfxSlider.value = localSFX;
+                mixer.SetFloat("SFX_Volume", Mathf.Log10(localSFX) * 20);
             }
             else
             {

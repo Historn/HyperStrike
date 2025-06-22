@@ -1,16 +1,28 @@
-using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
+using UnityEngine;
+using UnityEngine.Audio;
+using UnityEngine.Rendering;
+using UnityEngine.UI;
 
 
 public class MainMenuController : MonoBehaviour
 {
-    [Header("Volume Settings")]
-    [SerializeField] private TMP_Text volumeTextValue = null;
-    [SerializeField] private Slider volumeSlider = null;
-    [SerializeField] private float defaultVolume = 0.5f;
+    [Header("Audio Settings")]
+    [SerializeField] private AudioMixer mixer;
+    
+    [Space(10)]
+
+    [SerializeField] private TMP_Text musicTextValue = null;
+    [SerializeField] private Slider musicSlider = null;
+    [SerializeField] private float defaultMusic = 0.5f;
+
+    [Space(10)]
+
+    [SerializeField] private TMP_Text sfxTextValue = null;
+    [SerializeField] private Slider sfxSlider = null;
+    [SerializeField] private float defaultSFX = 0.5f;
 
     [Header("Gameplay Settings")]
     [SerializeField] private TMP_Text sensitivityTextValue = null;
@@ -65,16 +77,26 @@ public class MainMenuController : MonoBehaviour
         Screen.SetResolution(resolution.width, resolution.height, Screen.fullScreen);
     }
   
-    public void SetVolume(float volume)
+    public void SetMusic(float music)
     {
-        AudioListener.volume = volume;
+        //AudioListener.volume = music;
 
-        volumeTextValue.text = volume.ToString("0.0");
+        mixer.SetFloat("Music_Volume", Mathf.Log10(music) * 20);
+        musicTextValue.text = music.ToString("0.0");
+    }
+    public void SetSFX(float sfx)
+    {
+        //AudioListener.volume = sfx;
+
+        mixer.SetFloat("SFX_Volume", Mathf.Log10(sfx) * 20);
+        sfxTextValue.text = sfx.ToString("0.0");
     }
 
-    public void VolumeApply()
+    public void AudioApply()
     {
-        PlayerPrefs.SetFloat("masterVolume", AudioListener.volume);
+        PlayerPrefs.SetFloat("masterMusic", musicSlider.value);
+
+        PlayerPrefs.SetFloat("masterSFX", sfxSlider.value);
 
         StartCoroutine(ConfirmationBox());
     }
@@ -143,10 +165,15 @@ public class MainMenuController : MonoBehaviour
 
         if (MenuType == "Audio")
         {
-            AudioListener.volume = defaultVolume;
-            volumeSlider.value = defaultVolume;
-            volumeTextValue.text = defaultVolume.ToString("0.0");
-            VolumeApply();
+            mixer.SetFloat("Music_Volume", Mathf.Log10(defaultMusic) * 20);
+            musicSlider.value = defaultMusic;
+            musicTextValue.text = defaultMusic.ToString("0.0");
+
+            mixer.SetFloat("SFX_Volume", Mathf.Log10(defaultSFX) * 20);
+            sfxSlider.value = defaultSFX;
+            sfxTextValue.text = defaultSFX.ToString("0.0");
+
+            AudioApply();
         }
 
         if (MenuType == "Gameplay")
