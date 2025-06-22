@@ -3,6 +3,7 @@ using Unity.Cinemachine;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 // PLAYER STATE????
 
@@ -68,6 +69,7 @@ public class PlayerController : NetworkBehaviour
     [SerializeField] private Transform mainCameraTransform;
     [SerializeField] private Transform cameraWeaponTransform; // The transform of the Cinemachine camera's LookAt target
     float sensitivity = 5.0f;
+    int invertY = 0;
     float xRotation;
     float yRotation;
     NetworkVariable<CameraTilt> cameraTilt = new NetworkVariable<CameraTilt>(CameraTilt.NONE);
@@ -128,6 +130,16 @@ public class PlayerController : NetworkBehaviour
         {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
+
+            if (PlayerPrefs.HasKey("masterSen"))
+            {
+                sensitivity = PlayerPrefs.GetFloat("masterSen");
+            }
+
+            if (PlayerPrefs.HasKey("masterInvertY"))
+            {
+                invertY = PlayerPrefs.GetInt("masterInvertY");
+            }
 
             input = new PlayerInput();
             input?.Player.Enable();
@@ -229,7 +241,7 @@ public class PlayerController : NetworkBehaviour
             {
                 move = input.Player.Move.ReadValue<Vector2>(),
                 moveInProgress = input.Player.Move.IsInProgress(),
-                look = input.Player.Look.ReadValue<Vector2>(),
+                look = new Vector2(input.Player.Look.ReadValue<Vector2>().x, invertY != 0 ? input.Player.Look.ReadValue<Vector2>().y : -input.Player.Look.ReadValue<Vector2>().y),
                 sprint = input.Player.Sprint.IsPressed(),
                 jump = input.Player.Jump.IsPressed(),
                 slide = input.Player.Slide.IsPressed(),
@@ -330,7 +342,7 @@ public class PlayerController : NetworkBehaviour
         float mouseY = lookValue.y * sensitivity * Time.fixedDeltaTime;
 
         // Adjust xRotation for vertical rotation and clamp it
-        xRotation -= mouseY;
+        xRotation -= -mouseY;
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);
 
         yRotation += mouseX;
@@ -348,7 +360,7 @@ public class PlayerController : NetworkBehaviour
         // Get direction to target
         Vector3 targetDirection = (cinemachineCamera.Target.TrackingTarget.position - transform.position).normalized;
 
-        
+
 
         // Allow some camera movement while locked (reduced sensitivity)
         float mouseXx = lookValue.x * (sensitivity * 0.2f) * Time.fixedDeltaTime;

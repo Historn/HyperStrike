@@ -9019,6 +9019,7 @@ GameObject:
   m_Component:
   - component: {fileID: 918982807}
   - component: {fileID: 918982806}
+  - component: {fileID: 918982808}
   m_Layer: 0
   m_Name: LoadPlayerPrefs
   m_TagString: Untagged
@@ -9065,6 +9066,15 @@ Transform:
   m_Children: []
   m_Father: {fileID: 382761365}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1652712579 &918982808
+MultiplayerRolesData:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 918982805}
+  m_GameObjectRolesMask: 1
+  m_ComponentsRolesMasks: []
 --- !u!1 &937308272
 GameObject:
   m_ObjectHideFlags: 0
