@@ -14,10 +14,6 @@ public class LoadPrefs : MonoBehaviour
     [SerializeField] private TMP_Text volumeTextValue = null;
     [SerializeField] private Slider volumeSlider = null;
 
-    [Header("Brightness Setting")]
-    [SerializeField] private TMP_Text brightnessValue = null;
-    [SerializeField] private Slider brightnessSlider = null;
-
     [Header("Quality Level Setting")]
     [SerializeField] private TMP_Dropdown qualityDropdown;
 
@@ -72,17 +68,6 @@ public class LoadPrefs : MonoBehaviour
                     Screen.fullScreen = false;
                     fullscreenToggle.isOn = false; 
                 }
-            }
-
-            // BRIGHTNESS
-            if (PlayerPrefs.HasKey("masterBrigthness"))
-            {
-                float localBrightness = PlayerPrefs.GetFloat("masterBrigthness");
-
-                brightnessValue.text = localBrightness.ToString("0.0");
-                brightnessSlider.value = localBrightness;
-
-                // Change the brightness of the game with Arnau's logic
             }
 
             // SENSITIVITY
