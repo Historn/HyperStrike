@@ -15,9 +15,9 @@ MonoBehaviour:
   abilityName: LockOn
   icon: {fileID: 0}
   chargeReloadTime: 0
-  fullCooldown: 5
+  fullCooldown: 40
   castTime: 0
-  maxCastTime: 5
+  maxCastTime: 10
   maxCharges: 1
   currentCharges: 0
   isReloading: 0

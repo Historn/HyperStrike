@@ -15,18 +15,18 @@ MonoBehaviour:
   abilityName: Ground Quake
   icon: {fileID: 0}
   chargeReloadTime: 0
-  fullCooldown: 5
+  fullCooldown: 60
   castTime: 0
+  maxCastTime: 0
   maxCharges: 1
   currentCharges: 0
   isReloading: 0
   requiresTarget: 0
   isOnCooldown: 0
   dashDistance: 100
-  dashDuration: 0.6
   dashSpeed: 100
   canDamageEnemies: 1
-  damageAmount: 30
+  damage: 50
   dashDirection: {x: 0, y: -1, z: 0}
   isForwardDirection: 0
   collisionLayers:
@@ -39,9 +39,8 @@ MonoBehaviour:
   affectSelf: 0
   affectAllies: 0
   affectEnemies: 1
-  radius: 15
-  force: 20
+  radius: 30
+  force: 35
   setManualForceDir: 1
   forceDir: {x: 0, y: 1, z: 0}
-  damage: 30
   heal: 0

@@ -88,7 +88,7 @@ public class Player : NetworkBehaviour
                 break;
             case EffectType.BOOST:
                 {
-                    //ApplyBoost(quantity, affectedBaseStats);
+                    ApplyBoost(quantity, affectedBaseStats);
                 }
                 break;
             default:
@@ -131,18 +131,20 @@ public class Player : NetworkBehaviour
 
         if (affectedBaseStats.HasFlag(AffectedBaseStats.MAX_HP))
         {
-            Character.maxHealth += (int)(Character.maxHealth * percentage);
+            Character.health = Character.maxHealth;
+            Character.health += (int)(Character.maxHealth * percentage);
         }
         
         if (affectedBaseStats.HasFlag(AffectedBaseStats.SPEED))
         {
-            Character.maxSpeed += (int)(Character.maxSpeed * percentage);
+            Character.speed = Character.maxSpeed;
+            Character.speed += (int)(Character.maxSpeed * percentage);
         }
-        
-        //if (affectedBaseStats.HasFlag(AffectedBaseStats.DAMAGE))
-        //{
-        //    Character.maxSpeed += (int)(Character.maxSpeed * percentage);
-        //}
+
+        if (affectedBaseStats.HasFlag(AffectedBaseStats.DAMAGE))
+        {
+            //Character.maxSpeed += (int)(Character.maxSpeed * percentage);
+        }
 
         AffectedStats = affectedBaseStats;
         BoostPercentage = percentage;

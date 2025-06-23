@@ -56,6 +56,31 @@ public class AreaAbility : Ability
 
         foreach (Collider collider in colliders)
         {
+            if (collider.TryGetComponent<Player>(out Player player) && owner.TryGetComponent<Player>(out Player ownerPlayer))
+            {
+                if (!selfAffect && player.OwnerClientId == ownerPlayer.OwnerClientId) return;
+                if (!affectAllies && player.Team.Value == ownerPlayer.Team.Value) return;
+                if (!affectEnemies && player.Team.Value != ownerPlayer.Team.Value) return;
+
+                if (useDamage)
+                {
+                    player.ApplyEffect(EffectType.DAMAGE, damage);
+                    currentlyAffectedPlayers.Add(player);
+                }
+
+                if (useHeal)
+                {
+                    player.ApplyEffect(EffectType.HEAL, heal);
+                    if (!currentlyAffectedPlayers.Contains(player)) currentlyAffectedPlayers.Add(player);
+                }
+
+                if (useProtection)
+                {
+                    player.ApplyEffect(EffectType.PROTECT);
+                    if (!currentlyAffectedPlayers.Contains(player)) currentlyAffectedPlayers.Add(player);
+                }
+            }
+
             Rigidbody rb = collider.GetComponent<Rigidbody>();
 
             if (useForce && rb != null)
@@ -65,28 +90,6 @@ public class AreaAbility : Ability
                 if (setManualForceDir) d = forceDir;
 
                 rb.AddForce(d.normalized * force, ForceMode.Impulse);
-            }
-
-            if (!collider.CompareTag("Player")) continue;
-
-            Player player = collider.GetComponent<Player>();
-
-            if (useDamage)
-            {
-                player.ApplyEffect(EffectType.DAMAGE, damage);
-                currentlyAffectedPlayers.Add(player);
-            }
-
-            if (useHeal)
-            {
-                player.ApplyEffect(EffectType.HEAL, heal);
-                if (!currentlyAffectedPlayers.Contains(player)) currentlyAffectedPlayers.Add(player);
-            }
-
-            if (useProtection)
-            {
-                player.ApplyEffect(EffectType.PROTECT);
-                if (!currentlyAffectedPlayers.Contains(player)) currentlyAffectedPlayers.Add(player);
             }
 
             // Revoke protection for players who left the area

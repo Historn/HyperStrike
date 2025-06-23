@@ -255,8 +255,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  speed: 20
-  effectQuantity: 15
+  speed: 15
+  effectQuantity: 20
   playerOwnerId: 0
   lifetime: 5
   projectileFX: {fileID: 5872978858568323582, guid: 354d2cab1ac1bb8408a748d61325ee9d, type: 3}
@@ -264,7 +264,7 @@ MonoBehaviour:
   projectilePrefabUsed: {fileID: 0}
   explodeOnContact: 0
   explosionForce: 25
-  explosionRadius: 20
+  explosionRadius: 30
   targetLayers:
     serializedVersion: 2
     m_Bits: 640

@@ -91,7 +91,7 @@ MonoBehaviour:
     m_InternalValue: 30
   currentWaitTime:
     m_InternalValue: 5
-  maxTime: 15
+  maxTime: 300
   currentMatchTime:
     m_InternalValue: 300
   localGoals:

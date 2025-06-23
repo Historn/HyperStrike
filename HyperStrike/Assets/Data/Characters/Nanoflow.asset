@@ -26,6 +26,6 @@ MonoBehaviour:
   meleeForce: 25
   meleeOffset: 1.5
   abilities:
+  - {fileID: 11400000, guid: 376fa5e9f326eeb4a8d586261c782982, type: 2}
   - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 11400000, guid: 8d3b307195173ac48a3cc59f754eee9d, type: 2}

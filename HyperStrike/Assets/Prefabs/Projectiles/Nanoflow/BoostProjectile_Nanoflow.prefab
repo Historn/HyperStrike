@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 8413597924851185452}
   - component: {fileID: 5584011796735262125}
   - component: {fileID: 243614659054135150}
-  - component: {fileID: 6815619412466325727}
+  - component: {fileID: 9046226234890770248}
   m_Layer: 8
   m_Name: BoostProjectile_Nanoflow
   m_TagString: Untagged
@@ -35,8 +35,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1, z: 0}
-  m_LocalScale: {x: 3.1146498, y: 3.1146498, z: 3.1146498}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -71,7 +71,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 4a5491a5e9360ff4f9d5c5df74261b92, type: 2}
+  - {fileID: 2100000, guid: 354f0814404c6444bb6e6e2469994658, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -126,7 +126,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1181680972
+  GlobalObjectIdHash: 1910483935
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -169,7 +169,7 @@ Rigidbody:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 4294967295
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
@@ -240,7 +240,7 @@ MonoBehaviour:
   UseRigidBodyForMotion: 1
   AutoUpdateKinematicState: 1
   AutoSetKinematicOnDespawn: 1
---- !u!114 &6815619412466325727
+--- !u!114 &9046226234890770248
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -249,18 +249,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 4480140288178342511}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7879ec959ab4daa46aff1e8877030b16, type: 3}
+  m_Script: {fileID: 11500000, guid: 6f2869224ba095245aa88be52cac15b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  speed: 30
-  damage: 20
+  speed: 100
+  effectQuantity: 0.25
   playerOwnerId: 0
-  explosionForce: 30
-  explosionRadius: 20
-  timeToDestroy: 5
-  isForwardDirection: 1
-  direction: {x: 0, y: 0, z: 0}
-  spawnFX: {fileID: 1546897667432260974, guid: fe8a487245448f640925f8455a9ff42b, type: 3}
-  explosionFX: {fileID: 5872978858568323582, guid: 354d2cab1ac1bb8408a748d61325ee9d, type: 3}
+  lifetime: 5
+  projectileFX: {fileID: 5872978858568323582, guid: 354d2cab1ac1bb8408a748d61325ee9d, type: 3}
   rigidBody: {fileID: 0}
+  projectilePrefabUsed: {fileID: 0}
+  effectType: 5
+  affectedBaseStats: 255

@@ -15,9 +15,9 @@ MonoBehaviour:
   abilityName: Overdrive
   icon: {fileID: 0}
   chargeReloadTime: 0
-  fullCooldown: 5
+  fullCooldown: 60
   castTime: 0
-  maxCastTime: 1
+  maxCastTime: 0.5
   maxCharges: 1
   currentCharges: 0
   isReloading: 0

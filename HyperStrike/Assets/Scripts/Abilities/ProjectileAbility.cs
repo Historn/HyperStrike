@@ -34,7 +34,7 @@ public class ProjectileAbility : Ability
             projectile.projectilePrefabUsed = projectilePrefab;
             projectile.Activate(owner.GetCastTransform().position + owner.GetCastTransform().forward, owner.GetCastTransform().rotation, owner.OwnerClientId);
 
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(maxCastTime);
         }
     }
 
