@@ -39,9 +39,11 @@ public class Player : NetworkBehaviour
     public NetworkVariable<string> Name = new NetworkVariable<string>("DefaultCharacter");
     public NetworkVariable<int> Health = new NetworkVariable<int>(100);
     public NetworkVariable<int> MaxHealth = new NetworkVariable<int>(100);
-    public NetworkVariable<float> Speed = new NetworkVariable<float>(6f);
-    public NetworkVariable<float> SprintSpeed = new NetworkVariable<float>(15f);
-    public NetworkVariable<float> WallRunSpeed = new NetworkVariable<float>(30f);
+    public NetworkVariable<float> Speed = new NetworkVariable<float>(30f); // No va cambiando
+    public NetworkVariable<float> SprintSpeed = new NetworkVariable<float>(60f);// No va cambiando
+    public NetworkVariable<float> WallRunSpeed = new NetworkVariable<float>(100f);// No va cambiando
+    public NetworkVariable<float> MaxSpeed = new NetworkVariable<float>(15f);
+    public NetworkVariable<float> MaxSlidingSpeed = new NetworkVariable<float>(15f);
 
 
     public NetworkVariable<Team> Team = new NetworkVariable<Team>(0);
