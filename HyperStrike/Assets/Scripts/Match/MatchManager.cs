@@ -32,6 +32,7 @@ public class MatchManager : NetworkBehaviour
 
     public event Action OnDisplayCharacterSelection;
     public event Action OnUpdateMatchScore;
+    public event Action<Team> OnMatchEnded;
 
     public NetworkVariable<MatchState> State { get; private set; } = new NetworkVariable<MatchState>(MatchState.NONE);
     public NetworkVariable<bool> allowMovement = new NetworkVariable<bool>(false);
@@ -50,8 +51,10 @@ public class MatchManager : NetworkBehaviour
     #region "Character Selection"
     [Header("Character Selection")]
     public List<GameObject> charactersPrefabs;
-    [SerializeField] private List<Transform> spawnPositions;
-    public NetworkList<byte> CharacterSelected;
+    [SerializeField] private List<Transform> localSpawnPositions;
+    [SerializeField] private List<Transform> visitantSpawnPositions;
+    public NetworkList<byte> LocalCharacterSelected;
+    public NetworkList<byte> VisitantCharacterSelected;
     public NetworkVariable<float> characterSelectionTime = new NetworkVariable<float>(90.0f);
     #endregion
 
@@ -67,8 +70,10 @@ public class MatchManager : NetworkBehaviour
     public NetworkVariable<float> currentMatchTime = new NetworkVariable<float>(300.0f);
     public NetworkVariable<int> localGoals = new NetworkVariable<int>(0);
     public NetworkVariable<int> visitantGoals = new NetworkVariable<int>(0);
+    public NetworkVariable<Team> winnerTeam = new NetworkVariable<Team>(0);
     #endregion
 
+    [Header("Ball")]
     [SerializeField] private GameObject ballPrefab;
     private GameObject currentBall;
 
@@ -92,7 +97,8 @@ public class MatchManager : NetworkBehaviour
             Destroy(gameObject);
         }
 
-        CharacterSelected = new NetworkList<byte>();
+        LocalCharacterSelected = new NetworkList<byte>();
+        VisitantCharacterSelected = new NetworkList<byte>();
         LocalPlayersID = new NetworkList<ulong>();
         VisitantPlayersID = new NetworkList<ulong>();
 
@@ -144,6 +150,12 @@ public class MatchManager : NetworkBehaviour
                         NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject?.Despawn();
                     }
 
+                    GameObject ball = Instantiate(ballPrefab, new Vector3(0, 5, 0), Quaternion.identity);
+                    ball.transform.localScale = new Vector3(3, 3, 3);
+                    ball.GetComponent<NetworkObject>().Spawn(true);
+                    ball.GetComponent<Rigidbody>().isKinematic = true;
+                    currentBall = ball;
+
                     // ASSIGN PLAYERS TO A TEAM HARDCODED NOW
                     for (int i = 0; i < NetworkManager.Singleton.ConnectedClientsList.Count; i++)
                     {
@@ -156,7 +168,8 @@ public class MatchManager : NetworkBehaviour
                             VisitantPlayersID.Add(NetworkManager.Singleton.ConnectedClientsList[i].ClientId);
                         }
 
-                        if (CharacterSelected.Count < 6) CharacterSelected.Add((byte)Characters.NONE);
+                        if (LocalCharacterSelected.Count < 3) LocalCharacterSelected.Add((byte)Characters.NONE);
+                        if (VisitantCharacterSelected.Count < 3) VisitantCharacterSelected.Add((byte)Characters.NONE);
                     }
 
                     // DISPLAY CHARACTER SELECTION WHEN ALL PLAYERS ARE CONNECTED AND SYNCED
@@ -173,20 +186,47 @@ public class MatchManager : NetworkBehaviour
                     if (characterSelectTimerCoroutine != null)
                         StopCoroutine(characterSelectTimerCoroutine);
 
-                    /*SPAWN EACH TEAM PLAYER PREFABS TO SPAWN POSITIONS*/
-                    for (int i = 0; i < CharacterSelected.Count; i++)
+                    for (int i = 0; i < LocalCharacterSelected.Count; i++)
                     {
-                        var character = CharacterSelected[i];
+                        var character = LocalCharacterSelected[i];
 
                         Characters[] enumValues = (Characters[])System.Enum.GetValues(typeof(Characters));
 
-                        if (character == (byte)Characters.NONE && i < NetworkManager.Singleton.ConnectedClientsList.Count)
+                        if (character == (byte)Characters.NONE && i < LocalPlayersID.Count)
+                            character = (byte)UnityEngine.Random.Range(0, (enumValues.Length - 1));
+
+                        if (character != (byte)Characters.NONE && charactersPrefabs[character] != null)
+                        {
+                            ulong id = LocalPlayersID[i];
+
+                            GameObject playerGO = Instantiate(charactersPrefabs[character], localSpawnPositions[i].position, localSpawnPositions[i].rotation);
+                            if (playerGO.TryGetComponent<Player>(out Player player))
+                            {
+                                player.Team.Value = Team.LOCAL;
+                            }
+                            playerGO.GetComponent<NetworkObject>().SpawnAsPlayerObject(id, true);
+                        }
+                    }
+
+                    for (int i = 0; i < VisitantCharacterSelected.Count; i++)
+                    {
+                        var character = VisitantCharacterSelected[i];
+
+                        Characters[] enumValues = (Characters[])System.Enum.GetValues(typeof(Characters));
+
+                        if (character == (byte)Characters.NONE && i < VisitantPlayersID.Count)
                             character = (byte)UnityEngine.Random.Range(0, (enumValues.Length - 2));
 
-                        if (character != (byte)Characters.NONE && charactersPrefabs[character] != null && spawnPositions[i] != null)
+                        if (character != (byte)Characters.NONE && charactersPrefabs[character] != null)
                         {
-                            GameObject player = Instantiate(charactersPrefabs[character], spawnPositions[i].position, spawnPositions[i].rotation);
-                            player.GetComponent<NetworkObject>().SpawnAsPlayerObject(NetworkManager.Singleton.ConnectedClientsList[i].ClientId, true);
+                            ulong id = VisitantPlayersID[i];
+
+                            GameObject playerGO = Instantiate(charactersPrefabs[character], visitantSpawnPositions[i].position, visitantSpawnPositions[i].rotation);
+                            if (playerGO.TryGetComponent<Player>(out Player player))
+                            {
+                                player.Team.Value = Team.VISITANT;
+                            }
+                            playerGO.GetComponent<NetworkObject>().SpawnAsPlayerObject(id, true);
                         }
                     }
 
@@ -233,18 +273,21 @@ public class MatchManager : NetworkBehaviour
 
                     matchTimerCoroutine = MatchTimer();
 
-                    // Starts timer
                     if (matchTimerCoroutine != null)
                         StartCoroutine(matchTimerCoroutine);
-
-                    // HANDLE PLAY BEHAVIOR --> GOALS
                 }
                 break;
             case MatchState.GOAL:
                 {
-                    Debug.Log($"Local: {localGoals.Value} - {visitantGoals.Value} :Visitant");
                     OnUpdateMatchScore?.Invoke();
-                    SetMatchState(MatchState.WAIT);
+                    if (localGoals.Value != visitantGoals.Value && currentMatchTime.Value < 0.0f)
+                    {
+                        SetMatchState(MatchState.FINALIZED);
+                    }
+                    else
+                    {
+                        SetMatchState(MatchState.WAIT);
+                    }
                 }
                 break;
             case MatchState.FINALIZED:
@@ -257,12 +300,22 @@ public class MatchManager : NetworkBehaviour
 
                     allowMovement.Value = false;
 
-                    closeMatchGameTime.Value = 3f;
+                    ResetPositions();
+
+                    if (visitantGoals.Value > localGoals.Value) 
+                    {
+                        winnerTeam.Value = Team.VISITANT;
+                        Debug.Log("Visitant Win");
+                    }
+                    
+
+                    closeMatchGameTime.Value = 5f;
                     closeMatchGameTimerCoroutine = CloseMatchGameTimer();
 
                     if (closeMatchGameTimerCoroutine != null)
                         StartCoroutine(closeMatchGameTimerCoroutine);
 
+                    OnMatchEnded?.Invoke(winnerTeam.Value);
                     Debug.Log("Match Ended!");
                     Debug.Log($"Final Score: Local {localGoals.Value} - {visitantGoals.Value} Visitant");
                     // STOP THE PLAYERS AND BALL
@@ -302,11 +355,19 @@ public class MatchManager : NetworkBehaviour
     [Rpc(SendTo.Server)]
     public void SelectCharacterRpc(Characters character, ulong clientID)
     {
-        for (int i = 0; i < NetworkManager.Singleton.ConnectedClientsList.Count; i++)
+        for (int i = 0; i < LocalPlayersID.Count; i++)
         {
-            if (NetworkManager.Singleton.ConnectedClientsList[i].ClientId.Equals(clientID))
+            if (LocalPlayersID[i].Equals(clientID))
             {
-                CharacterSelected[i] = (byte)character;
+                LocalCharacterSelected[i] = (byte)character;
+            }
+        }
+
+        for (int i = 0; i < VisitantPlayersID.Count; i++)
+        {
+            if (VisitantPlayersID[i].Equals(clientID))
+            {
+                VisitantCharacterSelected[i] = (byte)character;
             }
         }
     }
@@ -337,19 +398,29 @@ public class MatchManager : NetworkBehaviour
 
         for (int i = 0; i < NetworkManager.Singleton.ConnectedClientsIds.Count; i++)
         {
-            var player = NetworkManager.Singleton.SpawnManager.PlayerObjects[i];
-            Rigidbody rb = player.GetComponent<Rigidbody>();
-            
-            rb.isKinematic = true;
-            rb.position = spawnPositions[i].position;
-            rb.rotation = Quaternion.LookRotation(spawnPositions[i].forward);
+            var playerNO = NetworkManager.Singleton.SpawnManager.PlayerObjects[i];
+
+            if (playerNO.TryGetComponent<Player>(out Player p) && playerNO.TryGetComponent<Rigidbody>(out Rigidbody rb))
+            {
+                if (p.Team.Value == Team.LOCAL)
+                {
+                    int index = LocalPlayersID.IndexOf(NetworkManager.Singleton.ConnectedClientsIds[i]);
+                    rb.isKinematic = true;
+                    rb.position = localSpawnPositions[i].position;
+                    rb.rotation = Quaternion.LookRotation(localSpawnPositions[i].forward);
+                }
+                else
+                {
+                    int index = VisitantPlayersID.IndexOf(NetworkManager.Singleton.ConnectedClientsIds[i]);
+                    rb.isKinematic = true;
+                    rb.position = visitantSpawnPositions[i].position;
+                    rb.rotation = Quaternion.LookRotation(visitantSpawnPositions[i].forward);
+                }
+            }
         }
 
-        GameObject ball = Instantiate(ballPrefab, new Vector3(0, 5, 0), Quaternion.identity);
-        ball.transform.localScale = new Vector3(3, 3, 3);
-        ball.GetComponent<NetworkObject>().Spawn(true);
-        ball.GetComponent<Rigidbody>().isKinematic = true;
-        currentBall = ball;
+        currentBall.GetComponent<Rigidbody>().isKinematic = true;
+        currentBall.transform.SetPositionAndRotation(new Vector3(0, 5, 0), Quaternion.identity);
     }
 
     private IEnumerator MatchTimer()

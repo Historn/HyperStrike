@@ -23,13 +23,19 @@ public enum AffectedBaseStats : byte
     DAMAGE
 }
 
+public enum Team : byte
+{
+    LOCAL,
+    VISITANT
+}
+
 // CLASS FOR VARIABLES AND FUNCTIONS - NOT ACTIONS/INPUTS
 public class Player : NetworkBehaviour
 {
     public string PlayerName = "PlayerName";
     public ulong PlayerId = 0;
 
-    public NetworkVariable<byte> Team = new NetworkVariable<byte>(0);
+    public NetworkVariable<Team> Team = new NetworkVariable<Team>(0);
     public NetworkVariable<int> Score = new NetworkVariable<int>(0);
     public NetworkVariable<int> Goals = new NetworkVariable<int>(0);
 

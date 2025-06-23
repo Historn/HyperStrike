@@ -79,10 +79,11 @@ MonoBehaviour:
   - {fileID: 5560394306431470110, guid: 67517a22e1ce0dc459c7ddd49f33728f, type: 3}
   - {fileID: 4220784000810643060, guid: 865caeaf8c17fec4fadf61810ea01809, type: 3}
   - {fileID: 4092117151816693018, guid: d5b614d8cc56a9d429cdb647c35fa1ba, type: 3}
-  spawnPositions:
+  localSpawnPositions:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  visitantSpawnPositions:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
@@ -90,11 +91,13 @@ MonoBehaviour:
     m_InternalValue: 30
   currentWaitTime:
     m_InternalValue: 5
-  maxTime: 300
+  maxTime: 15
   currentMatchTime:
     m_InternalValue: 300
   localGoals:
     m_InternalValue: 0
   visitantGoals:
+    m_InternalValue: 0
+  winnerTeam:
     m_InternalValue: 0
   ballPrefab: {fileID: 8379585553693324858, guid: e4da653cc54f17e428caa2723bfd66f5, type: 3}

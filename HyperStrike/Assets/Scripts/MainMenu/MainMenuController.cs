@@ -225,4 +225,9 @@ public class MainMenuController : MonoBehaviour
             isPaused = true;
         }
     }
+
+    private void OnDestroy()
+    {
+        if (input != null && input.Player.enabled) input?.Player.Disable();
+    }
 }

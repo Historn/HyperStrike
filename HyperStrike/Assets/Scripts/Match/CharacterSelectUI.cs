@@ -20,7 +20,8 @@ public class CharacterSelectUI : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         if (!IsClient) return;
-        MatchManager.Instance.CharacterSelected.OnListChanged += OnClientSelectCharacter;
+        MatchManager.Instance.LocalCharacterSelected.OnListChanged += OnClientSelectCharacterLocal;
+        MatchManager.Instance.VisitantCharacterSelected.OnListChanged += OnClientSelectCharacterVisitant;
         MatchManager.Instance.characterSelectionTime.OnValueChanged += UpdateCharSelectTimerAsText;
         MatchManager.Instance.characterSelectionTime.OnValueChanged += (previous, current) => { if (MatchManager.Instance.GetCurrentCharSelectTime() < 0.0f) gameObject.SetActive(false); };
     }
@@ -66,41 +67,84 @@ public class CharacterSelectUI : NetworkBehaviour
         characterSelectTimerText.text = timeText;
     }
 
-    private void OnClientSelectCharacter(NetworkListEvent<byte> changeEvent)
+    private void OnClientSelectCharacterLocal(NetworkListEvent<byte> changeEvent)
     {
-        if (changeEvent.Type != NetworkListEvent<byte>.EventType.Value) return;
+        if (!MatchManager.Instance.LocalPlayersID.Contains(NetworkManager.Singleton.LocalClient.ClientId)) return;
 
-        //switch (changeEvent.Index)
-        //{
-        //    case 0:
-        //    case 3:
-        //        characterSelectButtons[0].interactable = false;
-        //        break;
-        //    case 1:
-        //    case 4:
-        //        characterSelectButtons[1].interactable = false;
-        //        break;
-        //    case 2:
-        //    case 5:
-        //        characterSelectButtons[2].interactable = false;
-        //        break;
-        //    default:
-        //        break;
-        //}
+        switch (changeEvent.PreviousValue)
+        {
+            case 0:
+                characterSelectButtons[0].interactable = true;
+                break;
+            case 1:
+                characterSelectButtons[1].interactable = true;
+                break;
+            case 2:
+                characterSelectButtons[2].interactable = true;
+                break;
+            default:
+                break;
+        }
 
-        //for (int i = 0; i < MatchManager.Instance.CharacterSelected.Count; i++)
-        //{
-        //    var byteCharacter = MatchManager.Instance.CharacterSelected[i];
-        //    if ((Characters)byteCharacter == Characters.NONE)
-        //    {
-        //        //characterSelectButtons[currentSelectedButton].interactable = true;
-        //    }
-        //}
+        switch (changeEvent.Value)
+        {
+            case 0:
+                characterSelectButtons[0].interactable = false;
+                break;
+            case 1:
+                characterSelectButtons[1].interactable = false;
+                break;
+            case 2:
+                characterSelectButtons[2].interactable = false;
+                break;
+            default:
+                break;
+        }
+
+        
+    }
+    
+    private void OnClientSelectCharacterVisitant(NetworkListEvent<byte> changeEvent)
+    {
+        if (!MatchManager.Instance.VisitantPlayersID.Contains(NetworkManager.Singleton.LocalClient.ClientId)) return;
+
+        switch (changeEvent.PreviousValue)
+        {
+            case 0:
+                characterSelectButtons[0].interactable = true;
+                break;
+            case 1:
+                characterSelectButtons[1].interactable = true;
+                break;
+            case 2:
+                characterSelectButtons[2].interactable = true;
+                break;
+            default:
+                break;
+        }
+
+        switch (changeEvent.Value)
+        {
+            case 0:
+                characterSelectButtons[0].interactable = false;
+                break;
+            case 1:
+                characterSelectButtons[1].interactable = false;
+                break;
+            case 2:
+                characterSelectButtons[2].interactable = false;
+                break;
+            default:
+                break;
+        }
+
+        
     }
 
     private void OnDisable()
     {
         if (!IsOwner) return;
-        MatchManager.Instance.CharacterSelected.OnListChanged -= OnClientSelectCharacter;
+        MatchManager.Instance.LocalCharacterSelected.OnListChanged -= OnClientSelectCharacterLocal;
+        MatchManager.Instance.VisitantCharacterSelected.OnListChanged -= OnClientSelectCharacterVisitant;
     }
 }
