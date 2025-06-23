@@ -35,6 +35,15 @@ public class Player : NetworkBehaviour
     public string PlayerName = "PlayerName";
     public ulong PlayerId = 0;
 
+    [Header("Player Character Net Variables")]
+    public NetworkVariable<string> Name = new NetworkVariable<string>("DefaultCharacter");
+    public NetworkVariable<int> Health = new NetworkVariable<int>(100);
+    public NetworkVariable<int> MaxHealth = new NetworkVariable<int>(100);
+    public NetworkVariable<float> Speed = new NetworkVariable<float>(6f);
+    public NetworkVariable<float> SprintSpeed = new NetworkVariable<float>(15f);
+    public NetworkVariable<float> WallRunSpeed = new NetworkVariable<float>(30f);
+
+
     public NetworkVariable<Team> Team = new NetworkVariable<Team>(0);
     public NetworkVariable<int> Score = new NetworkVariable<int>(0);
     public NetworkVariable<int> Goals = new NetworkVariable<int>(0);
@@ -46,7 +55,7 @@ public class Player : NetworkBehaviour
     float maxDeadTime = 5f;
     public NetworkVariable<float> deadTime = new NetworkVariable<float>(5.0f);
 
-    public Character Character;
+    [SerializeField] private Character Character;
 
     private PlayerEventSubscriber playerEventSubscriber;
 
@@ -58,6 +67,11 @@ public class Player : NetworkBehaviour
             playerEventSubscriber = GetComponent<PlayerEventSubscriber>();
             Character.health = Character.maxHealth;
         }
+    }
+
+    void InitializeValues()
+    {
+
     }
 
     public void ApplyEffect(EffectType effectType, float quantity = 0f, AffectedBaseStats affectedBaseStats = AffectedBaseStats.NONE)
@@ -134,7 +148,7 @@ public class Player : NetworkBehaviour
             Character.health = Character.maxHealth;
             Character.health += (int)(Character.maxHealth * percentage);
         }
-        
+
         if (affectedBaseStats.HasFlag(AffectedBaseStats.SPEED))
         {
             Character.speed = Character.maxSpeed;

@@ -464,7 +464,7 @@ public class PlayerController : NetworkBehaviour
 
                 if (hit.transform.TryGetComponent<Player>(out Player p))
                 {
-                    p.ApplyEffect(EffectType.DAMAGE, 20);
+                    p.ApplyEffect(EffectType.DAMAGE, player.Character.meleeDamage);
                 }
             }
 
@@ -495,7 +495,7 @@ public class PlayerController : NetworkBehaviour
             var projectile = projectileNO.GetComponent<Projectile>();
             projectile.projectilePrefabUsed = player.Character.projectilePrefab;
             projectile.Activate(projectileSpawnOffset.position + cameraWeaponTransform.forward * player.Character.shootOffset, cameraWeaponTransform.rotation, OwnerClientId);
-
+            //Set shoot Damage
             Invoke(nameof(ResetShoot), player.Character.shootCooldown);    //Delay for attack to reset
             animator?.Animator.SetTrigger(ShootHash);
         }

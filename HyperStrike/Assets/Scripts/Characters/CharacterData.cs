@@ -13,13 +13,17 @@ namespace HyperStrike
         public float wallRunSpeed;
         public float maxSpeed;
         public float maxSlidingSpeed;
+        
+        
 
         [Header("Character Shoot Attack")]
         public GameObject projectilePrefab;
+        public int shootDamage;
         public float shootCooldown;
         public float shootOffset; // Forward offset for the projectile spawn
 
         [Header("Character Melee Attack")]
+        public int meleeDamage;
         public float meleeForce;
         public float meleeOffset;
 
