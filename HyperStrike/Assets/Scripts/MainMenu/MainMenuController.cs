@@ -47,8 +47,22 @@ public class MainMenuController : MonoBehaviour
 
     [Header("Confirmation Icon")]
     [SerializeField] private GameObject confirmationPrompt = null;
+
+    
+    PlayerInput input;
+
+    [Header("Pause")]
+    [SerializeField] private GameObject pauseMenuContainer;
+    [SerializeField] private bool canPause;
+    private bool isPaused = false;
+
     private void Start()
     {
+        input = new PlayerInput();
+        if (!input.Player.enabled) input?.Player.Enable();
+        if (canPause) input.Player.OpenClosePause.started += ctx => OpenClosePause();
+        isPaused = false;
+
         resolutions = Screen.resolutions;
         resolutionDropdown.ClearOptions();
 
@@ -196,5 +210,19 @@ public class MainMenuController : MonoBehaviour
         confirmationPrompt.SetActive(true);
         yield return new WaitForSeconds(2);
         confirmationPrompt.SetActive(false);
+    }
+
+    public void OpenClosePause()
+    {
+        if (isPaused && pauseMenuContainer.activeSelf)
+        {
+            pauseMenuContainer.SetActive(false);
+            isPaused = false;
+        }
+        else if (!isPaused && !pauseMenuContainer.activeSelf)
+        {
+            pauseMenuContainer.SetActive(true);
+            isPaused = true;
+        }
     }
 }

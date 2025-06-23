@@ -142,7 +142,7 @@ public class PlayerController : NetworkBehaviour
             }
 
             input = new PlayerInput();
-            input?.Player.Enable();
+            if (!input.Player.enabled) input?.Player.Enable();
             InitInputs();
 
             HideMeshRenderer();

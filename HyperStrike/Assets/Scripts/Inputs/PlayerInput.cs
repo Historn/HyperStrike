@@ -198,6 +198,15 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""OpenClosePause"",
+                    ""type"": ""Button"",
+                    ""id"": ""6870559f-4f1c-420f-94a7-2d3ed80a8150"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -638,6 +647,28 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": "";Gamepad"",
                     ""action"": ""Emote2"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""01ec9172-c42b-48bd-8977-84169ae7d116"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""OpenClosePause"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b3d12793-cc97-4cce-ba64-9d7f1a1f0b55"",
+                    ""path"": ""<Gamepad>/start"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Gamepad"",
+                    ""action"": ""OpenClosePause"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1237,6 +1268,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         m_Player_Ultimate = m_Player.FindAction("Ultimate", throwIfNotFound: true);
         m_Player_Emote1 = m_Player.FindAction("Emote1", throwIfNotFound: true);
         m_Player_Emote2 = m_Player.FindAction("Emote2", throwIfNotFound: true);
+        m_Player_OpenClosePause = m_Player.FindAction("OpenClosePause", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1342,6 +1374,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Ultimate;
     private readonly InputAction m_Player_Emote1;
     private readonly InputAction m_Player_Emote2;
+    private readonly InputAction m_Player_OpenClosePause;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1401,6 +1434,10 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/Emote2".
         /// </summary>
         public InputAction @Emote2 => m_Wrapper.m_Player_Emote2;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/OpenClosePause".
+        /// </summary>
+        public InputAction @OpenClosePause => m_Wrapper.m_Player_OpenClosePause;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1463,6 +1500,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @Emote2.started += instance.OnEmote2;
             @Emote2.performed += instance.OnEmote2;
             @Emote2.canceled += instance.OnEmote2;
+            @OpenClosePause.started += instance.OnOpenClosePause;
+            @OpenClosePause.performed += instance.OnOpenClosePause;
+            @OpenClosePause.canceled += instance.OnOpenClosePause;
         }
 
         /// <summary>
@@ -1510,6 +1550,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @Emote2.started -= instance.OnEmote2;
             @Emote2.performed -= instance.OnEmote2;
             @Emote2.canceled -= instance.OnEmote2;
+            @OpenClosePause.started -= instance.OnOpenClosePause;
+            @OpenClosePause.performed -= instance.OnOpenClosePause;
+            @OpenClosePause.canceled -= instance.OnOpenClosePause;
         }
 
         /// <summary>
@@ -1894,6 +1937,13 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnEmote2(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "OpenClosePause" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnOpenClosePause(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.
