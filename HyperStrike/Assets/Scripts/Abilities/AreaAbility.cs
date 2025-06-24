@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Area Ability", menuName = "HyperStrike/Area Ability")]
 public class AreaAbility : Ability
 {
     [Header("Activators")]

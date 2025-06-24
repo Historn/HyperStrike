@@ -7,7 +7,7 @@ using UnityEngine;
 public class PlayerAbilityController : NetworkBehaviour
 {
     [SerializeField, Header("Ability Slots")]
-    private List<Ability> abilityInstances = new List<Ability>();
+    private List<Ability> abilities = new List<Ability>();
 
     private Player player;
 
@@ -19,25 +19,23 @@ public class PlayerAbilityController : NetworkBehaviour
         player = GetComponent<Player>(); ;
 
         // Initialize all abilities
-        foreach (var ability in abilityInstances)
+        foreach (var ability in abilities)
         {
             if (ability != null)
             {
-                var instance = Instantiate(ability);
-                instance.Initialize(this);
-                abilityInstances.Add(instance);
+                ability.Initialize(this);
             }
         }
     }
 
     public void CastAbility(int abilityIndex, ulong clientId)
     {
-        if (abilityIndex < 0 || abilityIndex >= abilityInstances.Count) return;
+        if (abilityIndex < 0 || abilityIndex >= abilities.Count) return;
 
-        var ability = abilityInstances[abilityIndex];
+        var ability = abilities[abilityIndex];
 
         if (ability == null) return;
-        if (ability.isOnCooldown || ability.currentCharges <= 0) return;
+        if (ability.isOnCooldown || ability.currentCharges.Value <= 0) return;
 
         //Debug.Log(abilities[abilityIndex].abilityName);
         ability.ServerCast(clientId, CastTransform.position, CastTransform.forward);
@@ -56,23 +54,36 @@ public class PlayerAbilityController : NetworkBehaviour
 
     private IEnumerator StartCooldown(int index)
     {
-        var ability = abilityInstances[index];
+        var ability = abilities[index];
 
-        yield return new WaitForSeconds(ability.fullCooldown);
-        ability.currentCharges = ability.maxCharges;
+        while (ability.currentCooldownTime.Value < ability.fullCooldown) 
+        {
+            ability.currentCooldownTime.Value++;
+            yield return new WaitForSeconds(1f);
+        }
+        ability.currentCharges.Value = ability.maxCharges;
         ability.isOnCooldown = false;
     }
     private IEnumerator StartReloading(int index)
     {
-        var ability = abilityInstances[index];
+        var ability = abilities[index];
 
-        yield return new WaitForSeconds(ability.chargeReloadTime);
-
-        ability.currentCharges++;
-
-        if (ability.currentCharges < ability.maxCharges)
+        while (ability.currentReloadTime.Value < ability.chargeReloadTime)
         {
-            yield return new WaitForSeconds(ability.chargeReloadTime);
+            ability.currentReloadTime.Value++;
+            yield return new WaitForSeconds(1f);
+        }
+
+        ability.currentCharges.Value++;
+        ability.currentReloadTime.Value = 0;
+
+        if (ability.currentCharges.Value < ability.maxCharges)
+        {
+            while (ability.currentReloadTime.Value < ability.chargeReloadTime)
+            {
+                ability.currentReloadTime.Value++;
+                yield return new WaitForSeconds(1f);
+            }
         }
         else
         {

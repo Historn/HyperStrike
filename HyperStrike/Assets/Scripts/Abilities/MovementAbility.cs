@@ -2,7 +2,6 @@ using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Movement Ability", menuName = "HyperStrike/Movement Ability")]
 public class MovementAbility : Ability
 {
     [Header("Movement Settings")]

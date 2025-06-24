@@ -1,9 +1,7 @@
 using System.Collections;
-using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Projectile Ability", menuName = "HyperStrike/Projectile Ability")]
 public class ProjectileAbility : Ability
 {
     [Header("Projectiles Settings")]

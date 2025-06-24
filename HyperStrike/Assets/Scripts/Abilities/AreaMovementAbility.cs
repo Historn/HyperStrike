@@ -2,7 +2,6 @@ using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Movement Area Ability", menuName = "HyperStrike/Movement Area Ability")]
 public class AreaMovementAbility : MovementAbility
 {
     [Header("Activators")]
