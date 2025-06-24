@@ -5,16 +5,19 @@ namespace HyperStrike
     [CreateAssetMenu(fileName = "New Character", menuName = "HyperStrike/Character")]
     public class Character : ScriptableObject
     {
+        [Header("Character Name")]
         public string characterName;
+
+        [Header("Character Health")]
         public int health;
         public int maxHealth;
+
+        [Header("Character Speeds")]
         public float speed;
         public float sprintSpeed;
         public float wallRunSpeed;
         public float maxSpeed;
         public float maxSlidingSpeed;
-        
-        
 
         [Header("Character Shoot Attack")]
         public GameObject projectilePrefab;
@@ -26,8 +29,5 @@ namespace HyperStrike
         public int meleeDamage;
         public float meleeForce;
         public float meleeOffset;
-
-        [Header("Character Abilities")]
-        public Ability[] abilities = new Ability[3];
     }
 }

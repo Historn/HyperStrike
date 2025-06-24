@@ -262,3 +262,4 @@ MonoBehaviour:
   projectilePrefabUsed: {fileID: 0}
   effectType: 5
   affectedBaseStats: 255
+  effectTime: 10

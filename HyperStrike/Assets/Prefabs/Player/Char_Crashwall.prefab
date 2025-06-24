@@ -1683,6 +1683,25 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   PlayerName: PlayerName
   PlayerId: 0
+  Name: 
+  Health:
+    m_InternalValue: 100
+  MaxHealth:
+    m_InternalValue: 100
+  Speed: 30
+  SprintSpeed: 60
+  WallRunSpeed: 100
+  MaxSpeed: 15
+  MaxSlidingSpeed: 15
+  ShootDamage:
+    m_InternalValue: 15
+  ShootCooldown: 0
+  ShootOffset: 0
+  MeleeDamage:
+    m_InternalValue: 15
+  MeleeForce: 0
+  MeleeOffset: 0
+  ProjectilePrefab: {fileID: 0}
   Team:
     m_InternalValue: 0
   Score:
@@ -1733,7 +1752,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4220784000810643060}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c9849c35918686f408b7c8be8735a698, type: 3}
   m_Name: 
@@ -1835,6 +1854,9 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   OnReceiveDamage:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHeal:
     m_PersistentCalls:
       m_Calls: []
 --- !u!81 &7181881467820568513

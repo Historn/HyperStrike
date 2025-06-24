@@ -1360,6 +1360,25 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   PlayerName: PlayerName
   PlayerId: 0
+  Name: 
+  Health:
+    m_InternalValue: 100
+  MaxHealth:
+    m_InternalValue: 100
+  Speed: 30
+  SprintSpeed: 60
+  WallRunSpeed: 100
+  MaxSpeed: 15
+  MaxSlidingSpeed: 15
+  ShootDamage:
+    m_InternalValue: 15
+  ShootCooldown: 0
+  ShootOffset: 0
+  MeleeDamage:
+    m_InternalValue: 15
+  MeleeForce: 0
+  MeleeOffset: 0
+  ProjectilePrefab: {fileID: 0}
   Team:
     m_InternalValue: 0
   Score:
@@ -1410,7 +1429,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4092117151816693018}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c9849c35918686f408b7c8be8735a698, type: 3}
   m_Name: 
@@ -1519,6 +1538,9 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   OnReceiveDamage:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHeal:
     m_PersistentCalls:
       m_Calls: []
 --- !u!81 &7679960963000521798
@@ -2754,8 +2776,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6572253354404910553}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.375, z: 0.135}
+  m_LocalRotation: {x: 0, y: -0.87901556, z: 0, w: 0.47679305}
+  m_LocalPosition: {x: 6.3, y: 1.22, z: -2.84}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2824,9 +2846,9 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.01
-  far clip plane: 500
-  field of view: 65
+  near clip plane: 0.1
+  far clip plane: 5000
+  field of view: 60
   orthographic: 0
   orthographic size: 10
   m_Depth: 0

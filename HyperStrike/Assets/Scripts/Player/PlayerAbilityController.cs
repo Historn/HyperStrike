@@ -19,7 +19,7 @@ public class PlayerAbilityController : NetworkBehaviour
         player = GetComponent<Player>(); ;
 
         // Initialize all abilities
-        foreach (var ability in player.Character.abilities)
+        foreach (var ability in abilityInstances)
         {
             if (ability != null)
             {

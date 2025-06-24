@@ -35,16 +35,34 @@ public class Player : NetworkBehaviour
     public string PlayerName = "PlayerName";
     public ulong PlayerId = 0;
 
-    [Header("Player Character Net Variables")]
-    public NetworkVariable<string> Name = new NetworkVariable<string>("DefaultCharacter");
-    public NetworkVariable<int> Health = new NetworkVariable<int>(100);
-    public NetworkVariable<int> MaxHealth = new NetworkVariable<int>(100);
-    public NetworkVariable<float> Speed = new NetworkVariable<float>(30f); // No va cambiando
-    public NetworkVariable<float> SprintSpeed = new NetworkVariable<float>(60f);// No va cambiando
-    public NetworkVariable<float> WallRunSpeed = new NetworkVariable<float>(100f);// No va cambiando
-    public NetworkVariable<float> MaxSpeed = new NetworkVariable<float>(15f);
-    public NetworkVariable<float> MaxSlidingSpeed = new NetworkVariable<float>(15f);
+    // Network variables tienen que ser las que se vean en UI
+    [Header("Name")]
+    public string Name = "DefaultCharacterName";
 
+    [Header("Health")]
+    public NetworkVariable<int> Health = new NetworkVariable<int>(100);
+    public NetworkVariable<int> MaxHealth = new NetworkVariable<int>(100); // A
+
+    [Header("Speeds")]
+    public float Speed = 30f;
+    public float SprintSpeed = 60f;
+    public float WallRunSpeed = 100f;
+    public float MaxSpeed = 15f;
+    public float MaxSlidingSpeed = 15f;
+
+    
+    public NetworkVariable<int> ShootDamage = new NetworkVariable<int>(15);
+    [Header("Shoot Attack")]
+    public float ShootCooldown;
+    public float ShootOffset;
+
+    
+    public NetworkVariable<int> MeleeDamage = new NetworkVariable<int>(15);
+    [Header("Melee Attack")]
+    public float MeleeForce;
+    public float MeleeOffset;
+
+    public GameObject ProjectilePrefab;
 
     public NetworkVariable<Team> Team = new NetworkVariable<Team>(0);
     public NetworkVariable<int> Score = new NetworkVariable<int>(0);
@@ -67,16 +85,34 @@ public class Player : NetworkBehaviour
         if (IsServer)
         {
             playerEventSubscriber = GetComponent<PlayerEventSubscriber>();
-            Character.health = Character.maxHealth;
+            ResetInitCharacterValues();
+            ProjectilePrefab = Character.projectilePrefab;
         }
     }
 
-    void InitializeValues()
+    void ResetInitCharacterValues()
     {
+        Name = Character.name;
 
+        Health.Value = Character.health;
+        MaxHealth.Value = Character.maxHealth;
+
+        Speed = Character.speed;
+        SprintSpeed = Character.sprintSpeed;
+        WallRunSpeed = Character.wallRunSpeed;
+        MaxSpeed = Character.maxSpeed;
+        MaxSlidingSpeed = Character.maxSlidingSpeed;
+
+        ShootDamage.Value = Character.shootDamage;
+        ShootCooldown = Character.shootCooldown;
+        ShootOffset = Character.shootOffset;
+
+        MeleeDamage.Value = Character.meleeDamage;
+        MeleeForce = Character.meleeForce;
+        MeleeOffset = Character.meleeOffset;
     }
 
-    public void ApplyEffect(EffectType effectType, float quantity = 0f, AffectedBaseStats affectedBaseStats = AffectedBaseStats.NONE)
+    public void ApplyEffect(EffectType effectType, float quantity = 0f, float time = 0.0f, AffectedBaseStats affectedBaseStats = AffectedBaseStats.NONE)
     {
         switch (effectType)
         {
@@ -104,7 +140,7 @@ public class Player : NetworkBehaviour
                 break;
             case EffectType.BOOST:
                 {
-                    ApplyBoost(quantity, affectedBaseStats);
+                    ApplyBoost(quantity, time, affectedBaseStats);
                 }
                 break;
             default:
@@ -114,8 +150,8 @@ public class Player : NetworkBehaviour
 
     private void ApplyDamage(int damage)
     {
-        Character.health -= damage;
-        if (Character.health <= 0)
+        Health.Value -= damage;
+        if (Health.Value <= 0)
         {
             if (MatchManager.Instance) playerEventSubscriber.OnDeath.Invoke();
             gameObject.GetComponent<Rigidbody>().isKinematic = true;
@@ -128,10 +164,10 @@ public class Player : NetworkBehaviour
     {
         if (!MatchManager.Instance) return;
 
-        Character.health += heal;
-        if (Character.health >= Character.maxHealth)
+        Health.Value += heal;
+        if (Health.Value >= MaxHealth.Value)
         {
-            Character.health = Character.maxHealth;
+            Health.Value = MaxHealth.Value;
         }
     }
 
@@ -140,30 +176,39 @@ public class Player : NetworkBehaviour
         IsProtected = protect;
     }
 
-    private void ApplyBoost(float percentage, AffectedBaseStats affectedBaseStats)
+    private void ApplyBoost(float percentage, float time, AffectedBaseStats affectedBaseStats)
     {
-
         if (BoostPercentage < 0 || AffectedStats != AffectedBaseStats.NONE) { return; }
+
+        StopCoroutine(BoostTimer(time));
 
         if (affectedBaseStats.HasFlag(AffectedBaseStats.MAX_HP))
         {
-            Character.health = Character.maxHealth;
-            Character.health += (int)(Character.maxHealth * percentage);
+            MaxHealth.Value += (int)(MaxHealth.Value * percentage);
+            Health.Value = MaxHealth.Value;
         }
 
         if (affectedBaseStats.HasFlag(AffectedBaseStats.SPEED))
         {
-            Character.speed = Character.maxSpeed;
-            Character.speed += (int)(Character.maxSpeed * percentage);
+            MaxSpeed += (int)(MaxSpeed * percentage);
+            Speed += (int)(Speed * percentage);
         }
 
         if (affectedBaseStats.HasFlag(AffectedBaseStats.DAMAGE))
         {
-            //Character.maxSpeed += (int)(Character.maxSpeed * percentage);
+            ShootDamage.Value += (int)(ShootDamage.Value * percentage);
+            MeleeDamage.Value += (int)(MeleeDamage.Value * percentage);
         }
 
         AffectedStats = affectedBaseStats;
         BoostPercentage = percentage;
+        StartCoroutine(BoostTimer(time));
+    }
+
+    private IEnumerator BoostTimer(float time)
+    {
+        yield return new WaitForSeconds(time);
+        ResetInitCharacterValues();
     }
 
     private IEnumerator DeadTimer()
@@ -175,7 +220,7 @@ public class Player : NetworkBehaviour
         }
 
         gameObject.GetComponent<Rigidbody>().isKinematic = false;
-        Character.health = Character.maxHealth;
+        Health.Value = Character.maxHealth;
         deadTime.Value = maxDeadTime;
     }
 }

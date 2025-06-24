@@ -1,7 +1,5 @@
-using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class RaycastShot : Projectile
 {
@@ -10,6 +8,7 @@ public class RaycastShot : Projectile
 
     [SerializeField] protected EffectType effectType;
     [SerializeField] protected AffectedBaseStats affectedBaseStats;
+    [SerializeField] protected float effectTime;
 
     public override void OnNetworkSpawn()
     {
@@ -26,7 +25,7 @@ public class RaycastShot : Projectile
     public void CastTheRay(Vector3 initPos)
     {
         RaycastHit hit;
-        if (Physics.Raycast(initPos, transform.forward, out hit, 100f))
+        if (Physics.Raycast(initPos, transform.forward, out hit, 100f)) // Add layers affected to make it more simple
         {
             Rigidbody rb = hit.rigidbody;
             if (rb)
@@ -38,7 +37,7 @@ public class RaycastShot : Projectile
 
                 if (rb.gameObject.CompareTag("Player") && this.playerOwnerId != rb.gameObject.GetComponent<NetworkObject>().NetworkObjectId)
                 {
-                    rb.gameObject.GetComponent<Player>()?.ApplyEffect(effectType, effectQuantity, affectedBaseStats);
+                    rb.gameObject.GetComponent<Player>()?.ApplyEffect(effectType, effectQuantity, effectTime, affectedBaseStats);
                 }
             }
         }

@@ -124,7 +124,7 @@ public class PlayerController : NetworkBehaviour
         // Init Physics variables
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
-        rb.maxLinearVelocity = player.Character.maxSpeed;
+        rb.maxLinearVelocity = player.MaxSpeed;
 
         if (IsClient && IsOwner)
         {
@@ -164,7 +164,6 @@ public class PlayerController : NetworkBehaviour
 
         if (IsServer)
         {
-            player.Score.Value = 0;
             cameraTilt.Value = CameraTilt.NONE;
             refCameraTilt = CameraTilt.NONE;
         }
@@ -384,7 +383,7 @@ public class PlayerController : NetworkBehaviour
     {
         if (isWallRunning && !isGrounded) return;
 
-        float speed = isSprinting && isGrounded ? player.Character.sprintSpeed : player.Character.speed;
+        float speed = isSprinting && isGrounded ? player.SprintSpeed : player.Speed;
 
         Vector3 dir = transform.forward * moveValue.y + transform.right * moveValue.x;
         rb.AddForce(dir.normalized * speed, ForceMode.Force);
@@ -396,13 +395,13 @@ public class PlayerController : NetworkBehaviour
     {
         if (isSliding)
         {
-            rb.maxLinearVelocity = player.Character.maxSlidingSpeed;
+            rb.maxLinearVelocity = player.MaxSlidingSpeed;
             rb.linearDamping = 0.1f;
             animator?.Animator.SetTrigger(SlidingHash);
         }
         else
         {
-            rb.maxLinearVelocity = player.Character.maxSpeed;
+            rb.maxLinearVelocity = player.MaxSpeed;
             rb.linearDamping = 0.2f;
             animator?.Animator.ResetTrigger(SlidingHash);
         }
@@ -435,7 +434,7 @@ public class PlayerController : NetworkBehaviour
             // Stick to wall
             rb.AddForce(-wallHit.normal * stickWallForce, ForceMode.Force);
 
-            rb.AddForce((transform.forward * player.Character.wallRunSpeed) + (transform.up * stickWallForce), ForceMode.Force); // Reduce gravity to stay more time in the wall but not infinite
+            rb.AddForce((transform.forward * player.WallRunSpeed) + (transform.up * stickWallForce), ForceMode.Force); // Reduce gravity to stay more time in the wall but not infinite
             Jump(isJumping, wallHit.normal, 5f);
         }
         else
@@ -449,22 +448,22 @@ public class PlayerController : NetworkBehaviour
     [ServerRpc]
     void MeleeAttackServerRPC()
     {
-        if (meleeReady && player.Character != null)
+        if (meleeReady)
         {
             meleeReady = false;
 
-            if (Physics.Raycast(cameraWeaponTransform.position, cameraWeaponTransform.forward, out RaycastHit hit, player.Character.meleeOffset))
+            if (Physics.Raycast(cameraWeaponTransform.position, cameraWeaponTransform.forward, out RaycastHit hit, player.MeleeOffset))
             {
                 Rigidbody rb = hit.rigidbody;
 
                 if (rb != null)
                 {
-                    rb.AddForce(transform.forward * player.Character.meleeForce, ForceMode.Impulse);
+                    rb.AddForce(transform.forward * player.MeleeForce, ForceMode.Impulse);
                 }
 
                 if (hit.transform.TryGetComponent<Player>(out Player p))
                 {
-                    p.ApplyEffect(EffectType.DAMAGE, player.Character.meleeDamage);
+                    p.ApplyEffect(EffectType.DAMAGE, player.MeleeDamage.Value);
                 }
             }
 
@@ -481,11 +480,11 @@ public class PlayerController : NetworkBehaviour
     [ServerRpc]
     void ShootServerRPC()
     {
-        if (shootReady && player.Character != null && (projectileSpawnOffset != null && player.Character.projectilePrefab != null))
+        if (shootReady && (projectileSpawnOffset != null && player.ProjectilePrefab != null))
         {
             shootReady = false;
 
-            var projectileNO = NetworkObjectPool.Singleton.GetNetworkObject(player.Character.projectilePrefab, projectileSpawnOffset.position + cameraWeaponTransform.forward * player.Character.shootOffset, cameraWeaponTransform.rotation);
+            var projectileNO = NetworkObjectPool.Singleton.GetNetworkObject(player.ProjectilePrefab, projectileSpawnOffset.position + cameraWeaponTransform.forward * player.ShootOffset, cameraWeaponTransform.rotation);
 
             if (!projectileNO.IsSpawned)
             {
@@ -493,10 +492,11 @@ public class PlayerController : NetworkBehaviour
             }
 
             var projectile = projectileNO.GetComponent<Projectile>();
-            projectile.projectilePrefabUsed = player.Character.projectilePrefab;
-            projectile.Activate(projectileSpawnOffset.position + cameraWeaponTransform.forward * player.Character.shootOffset, cameraWeaponTransform.rotation, OwnerClientId);
-            //Set shoot Damage
-            Invoke(nameof(ResetShoot), player.Character.shootCooldown);    //Delay for attack to reset
+            projectile.projectilePrefabUsed = player.ProjectilePrefab;
+            projectile.effectQuantity = player.ShootDamage.Value;
+            projectile.Activate(projectileSpawnOffset.position + cameraWeaponTransform.forward * player.ShootOffset, cameraWeaponTransform.rotation, OwnerClientId);
+
+            Invoke(nameof(ResetShoot), player.ShootCooldown);    //Delay for attack to reset
             animator?.Animator.SetTrigger(ShootHash);
         }
     }

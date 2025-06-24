@@ -13,16 +13,18 @@ MonoBehaviour:
   m_Name: Nanoflow
   m_EditorClassIdentifier: 
   characterName: Nanoflow
-  health: 100
-  maxHealth: 100
+  health: 200
+  maxHealth: 200
   speed: 30
   sprintSpeed: 50
   wallRunSpeed: 100
   maxSpeed: 15
   maxSlidingSpeed: 30
   projectilePrefab: {fileID: 8027826101285448113, guid: ef4db8020a5cf0b4fb05f48e98f679cb, type: 3}
+  shootDamage: 10
   shootCooldown: 0.5
   shootOffset: 0
+  meleeDamage: 15
   meleeForce: 25
   meleeOffset: 1.5
   abilities:
