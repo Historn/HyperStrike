@@ -12,7 +12,7 @@ public abstract class Projectile : NetworkBehaviour
     [SerializeField] protected Rigidbody rigidBody;
     protected bool isActive;
 
-    public GameObject projectilePrefabUsed;
+    [HideInInspector] public GameObject projectilePrefabUsed;
 
     public override void OnNetworkSpawn()
     {

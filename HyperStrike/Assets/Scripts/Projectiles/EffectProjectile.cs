@@ -5,6 +5,7 @@ public class EffectProjectile : Projectile
 {
     [SerializeField] protected EffectType effectType;
     [SerializeField] protected AffectedBaseStats affectedBaseStats;
+    [SerializeField] protected float effectTime;
     
 
     public override void Activate(Vector3 position, Quaternion rotation, ulong ownerId)
@@ -26,7 +27,7 @@ public class EffectProjectile : Projectile
         {
             if (player.OwnerClientId != playerOwnerId)
             {
-                player.ApplyEffect(effectType, effectQuantity, affectedBaseStats);
+                player.ApplyEffect(effectType, effectQuantity, effectTime, affectedBaseStats);
             }
         }
     }

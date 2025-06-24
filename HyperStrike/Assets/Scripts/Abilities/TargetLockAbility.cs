@@ -3,7 +3,6 @@ using Unity.Cinemachine;
 using Unity.Netcode;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Targeted Ability", menuName = "HyperStrike/Targeted Ability")]
 public class TargetLockAbility : Ability
 {
     [Header("Settings")]

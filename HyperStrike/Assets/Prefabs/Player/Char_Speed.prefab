@@ -1477,8 +1477,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3520141469846233796}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.057282403, y: -0.47996694, z: -0.031426683, w: 0.8748502}
-  m_LocalPosition: {x: 6.395, y: 0.97, z: 0.133}
+  m_LocalRotation: {x: 0, y: -0.87901556, z: 0, w: 0.47679305}
+  m_LocalPosition: {x: 6.3, y: 1.22, z: -2.84}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2422,6 +2422,9 @@ GameObject:
   - component: {fileID: 6459366816758444367}
   - component: {fileID: 8862662987425679454}
   - component: {fileID: 5850214212879513311}
+  - component: {fileID: 4951063768619024614}
+  - component: {fileID: 8055175971901904565}
+  - component: {fileID: 3751195441790900428}
   - component: {fileID: 4326943606440057839}
   - component: {fileID: 1820654785331639308}
   - component: {fileID: 6142821008091826370}
@@ -2567,6 +2570,25 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   PlayerName: PlayerName
   PlayerId: 0
+  Name: 
+  Health:
+    m_InternalValue: 100
+  MaxHealth:
+    m_InternalValue: 100
+  Speed: 30
+  SprintSpeed: 60
+  WallRunSpeed: 100
+  MaxSpeed: 15
+  MaxSlidingSpeed: 15
+  ShootDamage:
+    m_InternalValue: 15
+  ShootCooldown: 0
+  ShootOffset: 0
+  MeleeDamage:
+    m_InternalValue: 15
+  MeleeForce: 0
+  MeleeOffset: 0
+  ProjectilePrefab: {fileID: 0}
   Team:
     m_InternalValue: 0
   Score:
@@ -2623,8 +2645,131 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  abilityInstances: []
+  abilities:
+  - {fileID: 4951063768619024614}
+  - {fileID: 8055175971901904565}
+  - {fileID: 3751195441790900428}
   CastTransform: {fileID: 5722620188708603574}
+--- !u!114 &4951063768619024614
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5560394306431470110}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b40c5a0ffb473346be08937d187a6a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  abilityName: TP Dash
+  icon: {fileID: 0}
+  chargeReloadTime: 5
+  fullCooldown: 25
+  castTime: 0
+  maxCastTime: 0.1
+  maxCharges: 3
+  isReloading: 0
+  requiresTarget: 0
+  isOnCooldown: 0
+  currentCharges:
+    m_InternalValue: 1
+  currentCooldownTime:
+    m_InternalValue: 0
+  currentReloadTime:
+    m_InternalValue: 0
+  dashDistance: 10
+  dashSpeed: 100
+  canDamageEnemies: 0
+  damage: 0
+  dashDirection: {x: 0, y: 0, z: 0}
+  isForwardDirection: 1
+  collisionLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  smoothTransition: 1
+--- !u!114 &8055175971901904565
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5560394306431470110}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5de018f935c8aa241882280433785761, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  abilityName: Sticky Bomb
+  icon: {fileID: 0}
+  chargeReloadTime: 0
+  fullCooldown: 15
+  castTime: 0
+  maxCastTime: 1
+  maxCharges: 1
+  isReloading: 0
+  requiresTarget: 0
+  isOnCooldown: 0
+  currentCharges:
+    m_InternalValue: 1
+  currentCooldownTime:
+    m_InternalValue: 0
+  currentReloadTime:
+    m_InternalValue: 0
+  projectilePrefab: {fileID: 4480140288178342511, guid: e1d52ce7f9fa1a646adf6a6b1e5cc9f6, type: 3}
+  projectilesQuantity: 1
+--- !u!114 &3751195441790900428
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5560394306431470110}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59d75496e4532a843b5fdf7726357ef3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  abilityName: Ground Quake
+  icon: {fileID: 0}
+  chargeReloadTime: 0
+  fullCooldown: 60
+  castTime: 0
+  maxCastTime: 0
+  maxCharges: 1
+  isReloading: 0
+  requiresTarget: 0
+  isOnCooldown: 0
+  currentCharges:
+    m_InternalValue: 1
+  currentCooldownTime:
+    m_InternalValue: 0
+  currentReloadTime:
+    m_InternalValue: 0
+  dashDistance: 100
+  dashSpeed: 100
+  canDamageEnemies: 1
+  damage: 50
+  dashDirection: {x: 0, y: -1, z: 0}
+  isForwardDirection: 0
+  collisionLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  smoothTransition: 0
+  useForce: 1
+  useDamage: 1
+  useHeal: 0
+  affectSelf: 0
+  affectAllies: 0
+  affectEnemies: 1
+  radius: 30
+  force: 35
+  setManualForceDir: 1
+  forceDir: {x: 0, y: 1, z: 0}
+  heal: 0
 --- !u!114 &4326943606440057839
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2796,6 +2941,9 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   OnReceiveDamage:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHeal:
     m_PersistentCalls:
       m_Calls: []
 --- !u!81 &623013758756019153
