@@ -26,7 +26,10 @@ public class MainMenuUI : MonoBehaviour
     TextMeshProUGUI m_FindStatusText;
 
     [SerializeField]
-    TMPro.TMP_InputField m_InputField;
+    TMP_InputField m_InputField;
+
+    string m_ServerIP;
+    ushort m_ServerPort;
 
     void Awake()
     {
@@ -53,12 +56,21 @@ public class MainMenuUI : MonoBehaviour
         if (MultiplayerRolesManager.ActiveMultiplayerRoleMask == MultiplayerRoleFlags.Server) StartServer();
     }
 
+    public void SetOnlineServerParams(string ip, ushort port)
+    {
+        m_ServerIP = ip;
+        m_ServerPort = port;
+    }
+
     void FindMatch()
     {
 #if UNITY_EDITOR
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("127.0.0.1", 8100);
+#elif ONLINE_SERVER
+
+        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(m_ServerIP, m_ServerPort); //Set Online Server IP
 #else
-        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("90.170.224.218", 8100); //Set Online Server IP
+        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("90.170.224.218", 8100); //Set Port Forwarded Server IP
         if (m_InputField.text != "") { NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(m_InputField.text, 8100); }
 #endif
 
