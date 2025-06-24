@@ -1,4 +1,3 @@
-using HyperStrike;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -80,7 +79,11 @@ public class MatchManager : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         // SYNCHRONIZATION EVENT PROCESS
-        if (IsServer) NetworkManager.Singleton.SceneManager.OnLoadComplete += OnSceneLoaded;
+        if (IsServer)
+        {
+            NetworkManager.Singleton.SceneManager.OnLoadComplete += OnSceneLoaded;
+            //NetworkManager.Singleton.ConnectionApprovalCallback += OnClientConnectedDuringMatch;
+        }
         else if (IsClient) NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
 
     }
@@ -302,12 +305,7 @@ public class MatchManager : NetworkBehaviour
 
                     ResetPositions();
 
-                    if (visitantGoals.Value > localGoals.Value) 
-                    {
-                        winnerTeam.Value = Team.VISITANT;
-                        Debug.Log("Visitant Win");
-                    }
-                    
+                    if (visitantGoals.Value > localGoals.Value) winnerTeam.Value = Team.VISITANT;
 
                     closeMatchGameTime.Value = 5f;
                     closeMatchGameTimerCoroutine = CloseMatchGameTimer();

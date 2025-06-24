@@ -29,7 +29,7 @@ public class LobbyManager : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+        if (IsServer) NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
 
         NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
 
@@ -43,8 +43,6 @@ public class LobbyManager : NetworkBehaviour
 
     void OnClientConnected(ulong clientId)
     {
-        if (!IsServer) return;
-
         Characters[] enumValues = (Characters[])System.Enum.GetValues(typeof(Characters));
         var character = (byte)UnityEngine.Random.Range(0, (enumValues.Length - 1));
         //var character = (byte)Characters.CRASHWALL;

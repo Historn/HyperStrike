@@ -63,6 +63,7 @@ public class PlayerAbilityController : NetworkBehaviour
         }
         ability.currentCharges.Value = ability.maxCharges;
         ability.isOnCooldown = false;
+        ability.currentCooldownTime.Value = 0;
     }
     private IEnumerator StartReloading(int index)
     {

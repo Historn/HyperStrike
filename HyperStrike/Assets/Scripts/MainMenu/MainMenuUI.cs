@@ -76,6 +76,7 @@ public class MainMenuUI : MonoBehaviour
     void StartServer()
     {
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("0.0.0.0", 8100);
+        NetworkManager.Singleton.ConnectionApprovalCallback += ConnectionApproval;
         NetworkManager.Singleton.StartServer();
         var status = NetworkManager.Singleton.SceneManager.LoadScene("LobbyRoom", LoadSceneMode.Single);
         if (status != SceneEventProgressStatus.Started)
@@ -83,7 +84,18 @@ public class MainMenuUI : MonoBehaviour
             Debug.LogWarning($"Failed to load Lobby" +
                   $"with a {nameof(SceneEventProgressStatus)}: {status}");
         }
-        //DeactivateButtons();
+    }
+
+    private void ConnectionApproval(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
+    {
+        if (SceneManager.GetActiveScene().name == "ArenaRoom")
+        {
+            response.Approved = false;
+        }
+        else
+        {
+            response.Approved = true;
+        }
     }
 
     void DeactivateButtons()
@@ -95,7 +107,7 @@ public class MainMenuUI : MonoBehaviour
 
     private IEnumerator WaitFullSync()
     {
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(2);
 
         var success = NetworkManager.Singleton.StartClient();
         NetworkManager.Singleton.OnClientDisconnectCallback += OnDisconnect;

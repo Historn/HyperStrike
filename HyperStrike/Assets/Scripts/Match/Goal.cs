@@ -39,8 +39,6 @@ public class Goal : NetworkBehaviour
             TriggerGoalVFX(other.transform.position);
             TriggerGoalSFX();
 
-            Destroy(other.gameObject);
-
             MatchManager.Instance.SetMatchState(MatchState.GOAL);
         }
     }
