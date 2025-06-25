@@ -178,12 +178,9 @@ public class PlayerController : NetworkBehaviour
 
     public override void OnNetworkDespawn()
     {
-        base.OnNetworkDespawn();
-
-        input?.Player.Disable();
-
         if (IsClient && IsOwner)
         {
+            input?.Player.Disable();
             cameraTilt.OnValueChanged -= OnCameraTiltChanged;
         }
     }
@@ -285,7 +282,7 @@ public class PlayerController : NetworkBehaviour
     void SendInputServerRPC(InputData input)
     {
         isGrounded = hyperStrikeUtils.CheckGrounded(transform, characterHeight);
-        animator?.Animator.SetBool(GroundHash, isGrounded);
+        animator?.Animator?.SetBool(GroundHash, isGrounded);
 
         //if (isGrounded) rb.linearDamping = 5f;
         //else rb.linearDamping = 0;
@@ -293,12 +290,12 @@ public class PlayerController : NetworkBehaviour
         isWallRunning = hyperStrikeUtils.CheckWalls(transform, ref wallHit, ref refCameraTilt);
 
         // Only send when changed
-        if (input.look != Vector2.zero && cinemachineCamera.Target.TrackingTarget == null)
+        if (input.look != Vector2.zero && cinemachineCamera?.Target.TrackingTarget == null)
         {
             RotatePlayerWithCamera(input.look);
         }
 
-        if (cinemachineCamera.Target.TrackingTarget != null)
+        if (cinemachineCamera?.Target.TrackingTarget != null)
         {
             FollowTarget(input.look);
         }
@@ -311,7 +308,7 @@ public class PlayerController : NetworkBehaviour
         }
         else
         {
-            animator?.Animator.ResetTrigger(WalkingHash);
+            animator?.Animator?.ResetTrigger(WalkingHash);
             //animator?.Animator.ResetTrigger(WallrunHash);
         }
 
@@ -326,7 +323,7 @@ public class PlayerController : NetworkBehaviour
             Jump(input.jump, Vector3.zero);
         }
 
-        animator?.Animator.SetFloat(VelocityHash, rb.linearVelocity.magnitude);
+        animator?.Animator?.SetFloat(VelocityHash, rb.linearVelocity.magnitude);
     }
 
     #region "Movement Mechanics Methods"
@@ -355,8 +352,6 @@ public class PlayerController : NetworkBehaviour
         // Get direction to target
         Vector3 targetDirection = (cinemachineCamera.Target.TrackingTarget.position - transform.position).normalized;
 
-
-
         // Allow some camera movement while locked (reduced sensitivity)
         float mouseXx = lookValue.x * (sensitivity * 0.2f) * Time.fixedDeltaTime;
         float mouseYy = lookValue.y * (sensitivity * 0.2f) * Time.fixedDeltaTime;
@@ -384,7 +379,7 @@ public class PlayerController : NetworkBehaviour
         Vector3 dir = transform.forward * moveValue.y + transform.right * moveValue.x;
         rb.AddForce(dir.normalized * speed, ForceMode.Force);
 
-        animator?.Animator.SetTrigger(WalkingHash);
+        animator?.Animator?.SetTrigger(WalkingHash);
     }
 
     void Slide(bool isSliding)
@@ -393,13 +388,13 @@ public class PlayerController : NetworkBehaviour
         {
             rb.maxLinearVelocity = player.MaxSlidingSpeed;
             rb.linearDamping = 0.1f;
-            animator?.Animator.SetTrigger(SlidingHash);
+            animator?.Animator?.SetTrigger(SlidingHash);
         }
         else
         {
             rb.maxLinearVelocity = player.MaxSpeed;
             rb.linearDamping = 0.2f;
-            animator?.Animator.ResetTrigger(SlidingHash);
+            animator?.Animator?.ResetTrigger(SlidingHash);
         }
     }
 
@@ -411,10 +406,10 @@ public class PlayerController : NetworkBehaviour
             //Reset Y Velocity
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
             rb.AddForce((transform.up + jumpDir.normalized) * (jumpForce + forceAdd), ForceMode.Impulse);
-            animator?.Animator.SetTrigger(JumpingHash);
+            animator?.Animator?.SetTrigger(JumpingHash);
             Invoke(nameof(ResetJump), jumpCooldown);    //Delay for jump to reset
         }
-        else animator?.Animator.ResetTrigger(JumpingHash);
+        else animator?.Animator?.ResetTrigger(JumpingHash);
     }
 
     void ResetJump()
@@ -464,7 +459,8 @@ public class PlayerController : NetworkBehaviour
             }
 
             Invoke(nameof(ResetMeleeAttack), 1f);    //Delay for attack to reset
-            animator?.Animator.SetTrigger(MeleeHash);
+            animator?.Animator?.ResetTrigger(MeleeHash);
+            animator?.Animator?.SetTrigger(MeleeHash);
         }
     }
 
@@ -476,7 +472,7 @@ public class PlayerController : NetworkBehaviour
     [ServerRpc]
     void ShootServerRPC()
     {
-        if (shootReady && (projectileSpawnOffset != null && player.ProjectilePrefab != null))
+        if (shootReady && (projectileSpawnOffset != null && player.ProjectilePrefab != null) && NetworkObjectPool.Singleton != null)
         {
             shootReady = false;
 
@@ -493,7 +489,8 @@ public class PlayerController : NetworkBehaviour
             projectile.Activate(projectileSpawnOffset.position + cameraWeaponTransform.forward * player.ShootOffset, cameraWeaponTransform.rotation, OwnerClientId, player);
 
             Invoke(nameof(ResetShoot), player.ShootCooldown);    //Delay for attack to reset
-            animator?.Animator.SetTrigger(ShootHash);
+            animator?.Animator?.ResetTrigger(ShootHash);
+            animator?.Animator?.SetTrigger(ShootHash);
         }
     }
 
@@ -505,7 +502,6 @@ public class PlayerController : NetworkBehaviour
     [ServerRpc]
     void ActivateAbility1ServerRPC()
     {
-        //Debug.Log("Trying to activate ABILITY 1");
         abilityController.TryCastAbility(0);
         return;
     }
@@ -513,7 +509,6 @@ public class PlayerController : NetworkBehaviour
     [ServerRpc]
     void ActivateAbility2ServerRPC()
     {
-        //Debug.Log("Trying to activate ABILITY 2");
         abilityController.TryCastAbility(1);
         return;
     }
@@ -521,7 +516,6 @@ public class PlayerController : NetworkBehaviour
     [ServerRpc]
     void ActivateUltimateServerRPC()
     {
-        //Debug.Log("Trying to activate ULTIMATE");
         abilityController.TryCastAbility(2);
         return;
     }
@@ -531,13 +525,15 @@ public class PlayerController : NetworkBehaviour
     [ServerRpc]
     void Emote1ServerRPC()
     {
-        animator?.Animator.SetTrigger(DanceHash);
+        animator?.Animator?.ResetTrigger(DanceHash);
+        animator?.Animator?.SetTrigger(DanceHash);
     }
 
     [ServerRpc]
     void Emote2ServerRPC()
     {
-        animator?.Animator.SetTrigger(BackflipHash);
+        animator?.Animator?.ResetTrigger(BackflipHash);
+        animator?.Animator?.SetTrigger(BackflipHash);
     }
     #endregion
 }

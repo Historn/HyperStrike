@@ -83,6 +83,8 @@ public class MatchManager : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         // SYNCHRONIZATION EVENT PROCESS
+        if (NetworkManager.Singleton == null) return;
+
         if (IsServer)
         {
             NetworkManager.Singleton.ConnectionApprovalCallback += ConnectionApproval;
@@ -132,6 +134,12 @@ public class MatchManager : NetworkBehaviour
 
     private void OnClientDisconnected(ulong obj)
     {
+        StartCoroutine(LoadMenuDelayed());
+    }
+
+    private IEnumerator LoadMenuDelayed()
+    {
+        yield return new WaitForSeconds(1.0f);
         SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
     }
 
@@ -231,7 +239,10 @@ public class MatchManager : NetworkBehaviour
             case MatchState.RESET:
                 {
                     if (characterSelectTimerCoroutine != null)
+                    {
                         StopCoroutine(characterSelectTimerCoroutine);
+                        characterSelectTimerCoroutine = null;
+                    }
 
                     for (int i = 0; i < LocalCharacterSelected.Count; i++)
                     {
@@ -305,15 +316,20 @@ public class MatchManager : NetworkBehaviour
                 break;
             case MatchState.PLAY:
                 {
-                    for (int i = 0; i < NetworkManager.Singleton.ConnectedClientsIds.Count; i++)
+                    foreach (var player in NetworkManager.Singleton.SpawnManager.PlayerObjects)
                     {
-                        var player = NetworkManager.Singleton.SpawnManager.PlayerObjects[i];
-                        player.GetComponent<Rigidbody>().isKinematic = false;
+                        if (player.TryGetComponent<Rigidbody>(out var rb))
+                        {
+                            rb.isKinematic = false;
+                        }
                     }
 
                     allowMovement.Value = true;
 
-                    currentBall.GetComponent<Rigidbody>().isKinematic = false;
+                    if (currentBall != null && currentBall.TryGetComponent<Rigidbody>(out var ballRb))
+                    {
+                        ballRb.isKinematic = false;
+                    }
 
                     if (initTimerCoroutine != null)
                         StopCoroutine(initTimerCoroutine);
@@ -383,7 +399,7 @@ public class MatchManager : NetworkBehaviour
     {
         SetMatchState(state);
     }
-    
+
     [Rpc(SendTo.Server)]
     public void LowerCharacterSelectionTimeRpc()
     {
@@ -433,7 +449,7 @@ public class MatchManager : NetworkBehaviour
 
         if (!LocalCharacterSelected.Contains((byte)Characters.NONE)) localsReady = true;
         else localsReady = false;
-        
+
         if (!VisitantCharacterSelected.Contains((byte)Characters.NONE)) visitantsReady = true;
         else visitantsReady = false;
 
@@ -498,8 +514,11 @@ public class MatchManager : NetworkBehaviour
             }
         }
 
-        currentBall.GetComponent<Rigidbody>().isKinematic = true;
-        currentBall.transform.SetPositionAndRotation(new Vector3(0, 5, 0), Quaternion.identity);
+        if (currentBall != null && currentBall.TryGetComponent<Rigidbody>(out var ballRb))
+        {
+            ballRb.isKinematic = true;
+            currentBall.transform.SetPositionAndRotation(new Vector3(0, 5, 0), Quaternion.identity);
+        }
     }
 
     private IEnumerator MatchTimer()

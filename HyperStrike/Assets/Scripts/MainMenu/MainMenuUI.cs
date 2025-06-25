@@ -69,7 +69,7 @@ public class MainMenuUI : MonoBehaviour
 
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(m_ServerIP, m_ServerPort); //Set Online Server IP
 #else
-        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("127.0.0.1", 8100); //Set Port Forwarded Server IP
+        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("127.0.0.1", 9000); //Set Port Forwarded Server IP
         if (m_InputField.text != "") { NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(m_InputField.text, 8100); }
 #endif
 
@@ -87,7 +87,7 @@ public class MainMenuUI : MonoBehaviour
     void StartServer()
     {
 #if DEDICATED_SERVER
-        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("0.0.0.0", 8100, "0.0.0.0");
+        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("0.0.0.0", 9000, "0.0.0.0");
 #else
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("0.0.0.0", 8100);
 #endif

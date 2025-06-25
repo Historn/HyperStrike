@@ -59,7 +59,6 @@ public class LobbyManager : NetworkBehaviour
     {
         Characters[] enumValues = (Characters[])System.Enum.GetValues(typeof(Characters));
         var character = (byte)UnityEngine.Random.Range(0, (enumValues.Length - 1));
-        //var character = (byte)Characters.CRASHWALL;
 
         if (character != (byte)Characters.NONE)
         {
@@ -75,9 +74,9 @@ public class LobbyManager : NetworkBehaviour
 
     void OnClientDisconnected(ulong clientId)
     {
-        if (IsClient)
+        if (IsClient && !IsServer)
         {
-            SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
+            StartCoroutine(DisconnectAndLoadMenu());
             return;
         }
 
@@ -85,6 +84,12 @@ public class LobbyManager : NetworkBehaviour
         {
             SetLobbyState(LobbyState.CONNECTING);
         }
+    }
+
+    private IEnumerator DisconnectAndLoadMenu()
+    {
+        yield return new WaitForSeconds(0.5f); // Let the server clean up
+        SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
     }
 
     void Awake()
@@ -109,11 +114,6 @@ public class LobbyManager : NetworkBehaviour
             SetLobbyStateRpc(LobbyState.WAIT);
         }
 #endif
-
-        //if (Input.GetKeyDown(KeyCode.P) && State.Value != LobbyState.WAIT)
-        //{
-        //    SetLobbyState(LobbyState.WAIT);
-        //}
     }
 
     void LobbyStateBehaviour()
@@ -124,7 +124,10 @@ public class LobbyManager : NetworkBehaviour
             case LobbyState.CONNECTING:
                 {
                     if (completedTimerCoroutine != null)
+                    {
                         StopCoroutine(completedTimerCoroutine);
+                        completedTimerCoroutine = null;
+                    }
 
                     currentWaitTime.Value = waitTime;
 
@@ -180,14 +183,14 @@ public class LobbyManager : NetworkBehaviour
 
     public override void OnNetworkDespawn()
     {
-        base.OnNetworkDespawn();
-
-        NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
-
-        if (!IsServer) return;
-
-        NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
-
-        NetworkManager.Singleton.ConnectionApprovalCallback -= ConnectionApproval;
+        if (NetworkManager.Singleton != null)
+        {
+            NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
+            if (IsServer)
+            {
+                NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
+                NetworkManager.Singleton.ConnectionApprovalCallback -= ConnectionApproval;
+            }
+        }
     }
 }
