@@ -8,11 +8,9 @@ public class StickExplosiveProjectile : ExplosiveProjectile
     protected override void HandleImpact(Collision collision)
     {
         Stick(collision);
-        SpawnParticlesClientRPC(collision.GetContact(0).point, collision.GetContact(0).normal);
-        Deactivate();
     }
 
-    void Stick (Collision collision)
+    void Stick(Collision collision)
     {
         if (firstHit)
         {
@@ -31,5 +29,11 @@ public class StickExplosiveProjectile : ExplosiveProjectile
             }
             firstHit = false;
         }
+    }
+
+    public override void Deactivate()
+    {
+        base.Deactivate();
+        firstHit = true;
     }
 }

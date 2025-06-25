@@ -79,6 +79,8 @@ public class Player : NetworkBehaviour
 
     private PlayerEventSubscriber playerEventSubscriber;
 
+    [SerializeField] private Transform CastTransform;
+
     public override void OnNetworkSpawn()
     {
         maxDeadTime = deadTime.Value;
@@ -223,4 +225,6 @@ public class Player : NetworkBehaviour
         Health.Value = Character.maxHealth;
         deadTime.Value = maxDeadTime;
     }
+
+    public Transform GetCastTransform() { return CastTransform; }
 }

@@ -15,11 +15,11 @@ MonoBehaviour:
   characterName: Crashwall
   health: 300
   maxHealth: 300
-  speed: 30
+  speed: 35
   sprintSpeed: 50
   wallRunSpeed: 100
-  maxSpeed: 15
-  maxSlidingSpeed: 30
+  maxSpeed: 10
+  maxSlidingSpeed: 25
   projectilePrefab: {fileID: 8027826101285448113, guid: 896c731fd59471f41990bdc7983ade21, type: 3}
   shootDamage: 25
   shootCooldown: 0.1
@@ -27,7 +27,3 @@ MonoBehaviour:
   meleeDamage: 35
   meleeForce: 25
   meleeOffset: 1.5
-  abilities:
-  - {fileID: 11400000, guid: a56e2037d5f57df4789eda808cd835d7, type: 2}
-  - {fileID: 11400000, guid: ee52dbddd5a13e540b7bf61616b51591, type: 2}
-  - {fileID: 11400000, guid: 3114fdf3901c3a44485b2b6c3574c827, type: 2}

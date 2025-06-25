@@ -13,20 +13,28 @@ public class ServerBrowseMultiplayer : MonoBehaviour
     }
 
     [Serializable]
+    public class ListServers
+    {
+        public Server[] serverList;
+    }
+
+    [Serializable]
+    public class MachineSpecs
+    {
+        public string contractEndDate;
+        public string contractStartDate;
+        public int cpuCores;
+        public string cpuDetail;
+        public string cpuName;
+        public string cpuShortname;
+        public int cpuSpeed;
+        public int memory;
+    }
+
+    [Serializable]
     public class Server
     {
-        [Serializable]
-        public struct MachineSpecs
-        {
-            public string contractEndDate;
-            public string contractStartDate;
-            public int cpuCores;
-            public string cpuDetail;
-            public string cpuName;
-            public string cpuShortname;
-            public int cpuSpeed;
-            public int memory;
-        }
+        
 
         public int buildConfigurationID;
         public string buildConfigurationName;
@@ -36,8 +44,8 @@ public class ServerBrowseMultiplayer : MonoBehaviour
         public bool deleted;
         public string fleetID;
         public string fleetName;
-        public string hardwareType; 
-        public int holdExpiresAt; 
+        public string hardwareType;
+        public int holdExpiresAt;
         public int id;
         public string ip;
         public int locationID;
@@ -56,6 +64,7 @@ public class ServerBrowseMultiplayer : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+#if ONLINE_SERVER              
         string keyId = "ee30d031-19be-4790-86b2-f18788d1c25f";
         string keySecret = "peWwpcPyFGVrxsXoXRXuEoHZ-q2laTtV";
         byte[] keyByteArray = Encoding.UTF8.GetBytes(keyId + ":" + keySecret);
@@ -69,7 +78,7 @@ public class ServerBrowseMultiplayer : MonoBehaviour
         WebRequests.Get(url,
             (UnityWebRequest unityWebRequest) =>
             {
-                unityWebRequest.SetRequestHeader("Authorization", "Basic" + keyBasee64);
+                unityWebRequest.SetRequestHeader("Authorization", "Basic " + keyBasee64);
             },
 
             (string error) =>
@@ -80,16 +89,20 @@ public class ServerBrowseMultiplayer : MonoBehaviour
             (string json) =>
             {
                 Debug.Log("Success: " + json);
-                Server server = JsonUtility.FromJson<Server>(json);
-                if (server == null) return;
-
-                if (server.status == ServerStatus.ONLINE.ToString()
-                    || server.status == ServerStatus.ALLOCATED.ToString())
+                ListServers listServers = JsonUtility.FromJson<ListServers>("{\"serverList\":" + json + "}");
+                foreach (var server in listServers.serverList)
                 {
-                    mainMenuUI.SetOnlineServerParams(server.ip, (ushort)server.port);
+                    if (server.status == ServerStatus.ONLINE.ToString() || server.status == ServerStatus.ALLOCATED.ToString())
+                    {
+                        mainMenuUI.SetOnlineServerParams(server.ip, (ushort)server.port);
+                        Debug.Log("IP: " + server.ip);
+                        Debug.Log("PORT: " + server.port);
+                        break;
+                    }
                 }
             }
         );
+#endif
     }
 
 

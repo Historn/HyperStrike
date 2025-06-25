@@ -29,16 +29,30 @@ public class LobbyManager : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        if (IsServer) NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
-
         NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
 
         if (!IsServer) return;
+
+        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+
+        NetworkManager.Singleton.ConnectionApprovalCallback += ConnectionApproval;
 
         GameObject ball = Instantiate(ballPrefab, new Vector3(0, 1, 0), Quaternion.identity);
         ball.GetComponent<NetworkObject>().Spawn(true);
 
         SetLobbyState(LobbyState.CONNECTING);
+    }
+
+    private void ConnectionApproval(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
+    {
+        if (NetworkManager.Singleton.ConnectedClientsIds.Count >= 6)
+        {
+            response.Approved = false;
+        }
+        else
+        {
+            response.Approved = true;
+        }
     }
 
     void OnClientConnected(ulong clientId)
@@ -47,7 +61,7 @@ public class LobbyManager : NetworkBehaviour
         var character = (byte)UnityEngine.Random.Range(0, (enumValues.Length - 1));
         //var character = (byte)Characters.CRASHWALL;
 
-        if(character != (byte)Characters.NONE)
+        if (character != (byte)Characters.NONE)
         {
             GameObject player = Instantiate(charactersPrefabs[character], Vector3.zero, Quaternion.identity);
             player.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
@@ -57,12 +71,8 @@ public class LobbyManager : NetworkBehaviour
         {
             SetLobbyState(LobbyState.WAIT);
         }
-        else if (NetworkManager.Singleton.ConnectedClientsIds.Count > 6)
-        {
-            NetworkManager.DisconnectClient(clientId, "Server is full");
-        }
     }
-    
+
     void OnClientDisconnected(ulong clientId)
     {
         if (IsClient)
@@ -93,10 +103,17 @@ public class LobbyManager : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
+#if DEV_CLIENT
         if (Input.GetKeyDown(KeyCode.P) && State.Value != LobbyState.WAIT)
         {
-            SetLobbyState(LobbyState.WAIT);
+            SetLobbyStateRpc(LobbyState.WAIT);
         }
+#endif
+
+        //if (Input.GetKeyDown(KeyCode.P) && State.Value != LobbyState.WAIT)
+        //{
+        //    SetLobbyState(LobbyState.WAIT);
+        //}
     }
 
     void LobbyStateBehaviour()
@@ -144,6 +161,12 @@ public class LobbyManager : NetworkBehaviour
         }
     }
 
+    [Rpc(SendTo.Server)]
+    public void SetLobbyStateRpc(LobbyState state)
+    {
+        SetLobbyState(state);
+    }
+
     private IEnumerator LobbyCompletedTimer()
     {
         while (currentWaitTime.Value >= 0.0f)
@@ -159,9 +182,12 @@ public class LobbyManager : NetworkBehaviour
     {
         base.OnNetworkDespawn();
 
-        if (NetworkManager.Singleton == null) return;
+        NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
+
+        if (!IsServer) return;
 
         NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
-        NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
+
+        NetworkManager.Singleton.ConnectionApprovalCallback -= ConnectionApproval;
     }
 }

@@ -11,9 +11,9 @@ public class ExplosiveProjectile : Projectile
     [SerializeField] protected bool isForwardDirection = true;
     [SerializeField] protected Vector3 direction;
 
-    public override void Activate(Vector3 position, Quaternion rotation, ulong ownerId)
+    public override void Activate(Vector3 position, Quaternion rotation, ulong ownerId, Player ownerProj)
     {
-        base.Activate(position, rotation, ownerId);
+        base.Activate(position, rotation, ownerId, ownerProj);
         rigidBody.AddForce(transform.forward * speed, ForceMode.Impulse);
     }
 
@@ -40,7 +40,7 @@ public class ExplosiveProjectile : Projectile
 
                     if (player.IsProtected) return;
 
-                    if (player.OwnerClientId != playerOwnerId)
+                    if (player.OwnerClientId != playerOwnerId && player.Team.Value != owner.Team.Value)
                         player.ApplyEffect(EffectType.DAMAGE, effectQuantity);
                 }
                 if (collider.CompareTag("Shield")) continue;

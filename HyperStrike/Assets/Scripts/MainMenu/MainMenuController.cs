@@ -217,11 +217,15 @@ public class MainMenuController : MonoBehaviour
         if (isPaused && pauseMenuContainer.activeSelf)
         {
             pauseMenuContainer.SetActive(false);
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
             isPaused = false;
         }
         else if (!isPaused && !pauseMenuContainer.activeSelf)
         {
             pauseMenuContainer.SetActive(true);
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
             isPaused = true;
         }
     }

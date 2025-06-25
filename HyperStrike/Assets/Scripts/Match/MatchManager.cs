@@ -54,7 +54,11 @@ public class MatchManager : NetworkBehaviour
     [SerializeField] private List<Transform> visitantSpawnPositions;
     public NetworkList<byte> LocalCharacterSelected;
     public NetworkList<byte> VisitantCharacterSelected;
-    public NetworkVariable<float> characterSelectionTime = new NetworkVariable<float>(90.0f);
+    public NetworkVariable<float> currentCharacterSelectionTime = new NetworkVariable<float>(90.0f);
+    public float characterSelectionTime = 90f;
+
+    bool localsReady = false;
+    bool visitantsReady = false;
     #endregion
 
     #region "WAIT TIME"
@@ -81,8 +85,10 @@ public class MatchManager : NetworkBehaviour
         // SYNCHRONIZATION EVENT PROCESS
         if (IsServer)
         {
+            NetworkManager.Singleton.ConnectionApprovalCallback += ConnectionApproval;
             NetworkManager.Singleton.SceneManager.OnLoadComplete += OnSceneLoaded;
-            //NetworkManager.Singleton.ConnectionApprovalCallback += OnClientConnectedDuringMatch;
+            LocalCharacterSelected.OnListChanged += OnCharacterSelectedReadyCheck;
+            VisitantCharacterSelected.OnListChanged += OnCharacterSelectedReadyCheck;
         }
         else if (IsClient) NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
 
@@ -112,6 +118,18 @@ public class MatchManager : NetworkBehaviour
         }
     }
 
+    private void ConnectionApproval(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
+    {
+        if (SceneManager.GetActiveScene().name == "ArenaRoom")
+        {
+            response.Approved = false;
+        }
+        else
+        {
+            response.Approved = true;
+        }
+    }
+
     private void OnClientDisconnected(ulong obj)
     {
         SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
@@ -134,10 +152,24 @@ public class MatchManager : NetworkBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.P) && State.Value != MatchState.CHARACTER_SELECTION)
+#if DEV_CLIENT
+        if (Input.GetKeyDown(KeyCode.P))
         {
-            SetMatchState(MatchState.CHARACTER_SELECTION);
+            if (State.Value == MatchState.CHARACTER_SELECTION)
+            {
+                LowerCharacterSelectionTimeRpc();
+            }
+            else if (State.Value != MatchState.CHARACTER_SELECTION)
+            {
+                SetMatchStateRpc(MatchState.CHARACTER_SELECTION);
+            }
         }
+#endif
+
+        //if (Input.GetKeyDown(KeyCode.P) && State.Value != MatchState.CHARACTER_SELECTION)
+        //{
+        //    SetMatchState(MatchState.CHARACTER_SELECTION);
+        //}
     }
 
     void MatchStateBehavior()
@@ -147,10 +179,22 @@ public class MatchManager : NetworkBehaviour
             case MatchState.NONE:
             case MatchState.CHARACTER_SELECTION:
                 {
+                    StopAllCoroutines();
+
+                    LocalCharacterSelected.Clear();
+                    VisitantCharacterSelected.Clear();
+                    LocalPlayersID.Clear();
+                    VisitantPlayersID.Clear();
+
                     /*DESPAWN EACH TEAM PLAYER PREFABS TO SPAWN POSITIONS*/
                     foreach (var clientId in NetworkManager.Singleton.ConnectedClients.Keys)
                     {
-                        NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject?.Despawn();
+                        NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject?.Despawn(true);
+                    }
+
+                    if (currentBall != null)
+                    {
+                        currentBall.GetComponent<NetworkObject>().Despawn(true);
                     }
 
                     GameObject ball = Instantiate(ballPrefab, new Vector3(0, 5, 0), Quaternion.identity);
@@ -158,6 +202,9 @@ public class MatchManager : NetworkBehaviour
                     ball.GetComponent<NetworkObject>().Spawn(true);
                     ball.GetComponent<Rigidbody>().isKinematic = true;
                     currentBall = ball;
+
+                    // DISPLAY CHARACTER SELECTION WHEN ALL PLAYERS ARE CONNECTED AND SYNCED
+                    OnDisplayCharacterSelection?.Invoke();
 
                     // ASSIGN PLAYERS TO A TEAM HARDCODED NOW
                     for (int i = 0; i < NetworkManager.Singleton.ConnectedClientsList.Count; i++)
@@ -174,9 +221,6 @@ public class MatchManager : NetworkBehaviour
                         if (LocalCharacterSelected.Count < 3) LocalCharacterSelected.Add((byte)Characters.NONE);
                         if (VisitantCharacterSelected.Count < 3) VisitantCharacterSelected.Add((byte)Characters.NONE);
                     }
-
-                    // DISPLAY CHARACTER SELECTION WHEN ALL PLAYERS ARE CONNECTED AND SYNCED
-                    OnDisplayCharacterSelection?.Invoke();
 
                     characterSelectTimerCoroutine = CharacterSelectionTimer();
 
@@ -334,12 +378,25 @@ public class MatchManager : NetworkBehaviour
         }
     }
 
+    [Rpc(SendTo.Server)]
+    public void SetMatchStateRpc(MatchState state)
+    {
+        SetMatchState(state);
+    }
+    
+    [Rpc(SendTo.Server)]
+    public void LowerCharacterSelectionTimeRpc()
+    {
+        currentCharacterSelectionTime.Value = 10f;
+    }
+
     private IEnumerator CharacterSelectionTimer()
     {
-        while (characterSelectionTime.Value >= 0.0f)
+        currentCharacterSelectionTime.Value = characterSelectionTime;
+        while (currentCharacterSelectionTime.Value >= 0.0f)
         {
             yield return new WaitForSeconds(1f);
-            characterSelectionTime.Value--;
+            currentCharacterSelectionTime.Value--;
         }
 
         SetMatchState(MatchState.RESET);
@@ -367,6 +424,30 @@ public class MatchManager : NetworkBehaviour
             {
                 VisitantCharacterSelected[i] = (byte)character;
             }
+        }
+    }
+
+    private void OnCharacterSelectedReadyCheck(NetworkListEvent<byte> changeEvent)
+    {
+        if (State.Value != MatchState.CHARACTER_SELECTION || !IsServer) return;
+
+        if (!LocalCharacterSelected.Contains((byte)Characters.NONE)) localsReady = true;
+        else localsReady = false;
+        
+        if (!VisitantCharacterSelected.Contains((byte)Characters.NONE)) visitantsReady = true;
+        else visitantsReady = false;
+
+        if (localsReady && visitantsReady && currentCharacterSelectionTime.Value > 10f)
+        {
+            if (characterSelectTimerCoroutine != null)
+                StopCoroutine(characterSelectTimerCoroutine);
+
+            currentCharacterSelectionTime.Value = 10f;
+
+            characterSelectTimerCoroutine = CharacterSelectionTimer();
+
+            if (characterSelectTimerCoroutine != null)
+                StartCoroutine(characterSelectTimerCoroutine);
         }
     }
 
@@ -452,7 +533,7 @@ public class MatchManager : NetworkBehaviour
 
     public float GetCurrentCharSelectTime()
     {
-        return characterSelectionTime.Value;
+        return currentCharacterSelectionTime.Value;
     }
 
     public float GetCurrentWaitTime()
@@ -471,7 +552,13 @@ public class MatchManager : NetworkBehaviour
 
         if (NetworkManager.Singleton == null) return;
 
-        NetworkManager.Singleton.SceneManager.OnLoadComplete -= OnSceneLoaded;
-        NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
+        if (IsServer)
+        {
+            NetworkManager.Singleton.ConnectionApprovalCallback -= ConnectionApproval;
+            NetworkManager.Singleton.SceneManager.OnLoadComplete -= OnSceneLoaded;
+            LocalCharacterSelected.OnListChanged -= OnCharacterSelectedReadyCheck;
+            VisitantCharacterSelected.OnListChanged -= OnCharacterSelectedReadyCheck;
+        }
+        else if (IsClient) NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
     }
 }

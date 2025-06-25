@@ -22,8 +22,8 @@ public class CharacterSelectUI : NetworkBehaviour
         if (!IsClient) return;
         MatchManager.Instance.LocalCharacterSelected.OnListChanged += OnClientSelectCharacterLocal;
         MatchManager.Instance.VisitantCharacterSelected.OnListChanged += OnClientSelectCharacterVisitant;
-        MatchManager.Instance.characterSelectionTime.OnValueChanged += UpdateCharSelectTimerAsText;
-        MatchManager.Instance.characterSelectionTime.OnValueChanged += (previous, current) => { if (MatchManager.Instance.GetCurrentCharSelectTime() < 0.0f) gameObject.SetActive(false); };
+        MatchManager.Instance.currentCharacterSelectionTime.OnValueChanged += UpdateCharSelectTimerAsText;
+        MatchManager.Instance.currentCharacterSelectionTime.OnValueChanged += SetCharacterSelectActive;
     }
 
     private void Awake()
@@ -49,10 +49,15 @@ public class CharacterSelectUI : NetworkBehaviour
             if (characterSelectButtons[i])
             {
                 Characters character = enumValues[i];
-
+                characterSelectButtons[i].enabled = true;
                 characterSelectButtons[i].onClick.AddListener(() => MatchManager.Instance.SelectCharacter(character));
             }
         }
+    }
+
+    private void SetCharacterSelectActive(float previousValue, float newValue)
+    {
+        if (MatchManager.Instance.GetCurrentCharSelectTime() < 0.0f) gameObject.SetActive(false);
     }
 
     void UpdateCharSelectTimerAsText(float previous, float current)
@@ -97,6 +102,11 @@ public class CharacterSelectUI : NetworkBehaviour
             case 2:
                 characterSelectButtons[2].interactable = false;
                 break;
+            case 3:
+                characterSelectButtons[0].interactable = true;
+                characterSelectButtons[1].interactable = true;
+                characterSelectButtons[2].interactable = true;
+                break;
             default:
                 break;
         }
@@ -134,6 +144,11 @@ public class CharacterSelectUI : NetworkBehaviour
             case 2:
                 characterSelectButtons[2].interactable = false;
                 break;
+            case 3:
+                characterSelectButtons[0].interactable = true;
+                characterSelectButtons[1].interactable = true;
+                characterSelectButtons[2].interactable = true;
+                break;
             default:
                 break;
         }
@@ -141,10 +156,12 @@ public class CharacterSelectUI : NetworkBehaviour
         
     }
 
-    private void OnDisable()
+    public override void OnNetworkDespawn()
     {
-        if (!IsOwner) return;
+        if (!IsClient) return;
         MatchManager.Instance.LocalCharacterSelected.OnListChanged -= OnClientSelectCharacterLocal;
         MatchManager.Instance.VisitantCharacterSelected.OnListChanged -= OnClientSelectCharacterVisitant;
+        MatchManager.Instance.currentCharacterSelectionTime.OnValueChanged -= UpdateCharSelectTimerAsText;
+        MatchManager.Instance.currentCharacterSelectionTime.OnValueChanged -= SetCharacterSelectActive;
     }
 }

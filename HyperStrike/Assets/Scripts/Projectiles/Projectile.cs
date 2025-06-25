@@ -13,6 +13,7 @@ public abstract class Projectile : NetworkBehaviour
     protected bool isActive;
 
     [HideInInspector] public GameObject projectilePrefabUsed;
+    [HideInInspector] public Player owner;
 
     public override void OnNetworkSpawn()
     {
@@ -20,11 +21,12 @@ public abstract class Projectile : NetworkBehaviour
         rigidBody = GetComponent<Rigidbody>();
     }
 
-    public virtual void Activate(Vector3 position, Quaternion rotation, ulong ownerId)
+    public virtual void Activate(Vector3 position, Quaternion rotation, ulong ownerId, Player ownerProj)
     {
         if (isActive) return; // Prevent double-activation
 
         playerOwnerId = ownerId;
+        owner = ownerProj;
         transform.SetPositionAndRotation(position, rotation);
         isActive = true;
 

@@ -8,9 +8,9 @@ public class EffectProjectile : Projectile
     [SerializeField] protected float effectTime;
     
 
-    public override void Activate(Vector3 position, Quaternion rotation, ulong ownerId)
+    public override void Activate(Vector3 position, Quaternion rotation, ulong ownerId, Player ownerProj)
     {
-        base.Activate(position, rotation, ownerId);
+        base.Activate(position, rotation, ownerId, ownerProj);
         rigidBody.AddForce(transform.forward * speed, ForceMode.Impulse);
     }
 

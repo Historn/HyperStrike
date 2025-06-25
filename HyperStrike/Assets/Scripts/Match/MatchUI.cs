@@ -1,7 +1,5 @@
-using System;
 using TMPro;
 using Unity.Netcode;
-using UnityEditor.PackageManager;
 using UnityEngine;
 
 public class MatchUI : NetworkBehaviour
@@ -61,6 +59,7 @@ public class MatchUI : NetworkBehaviour
     [Rpc(SendTo.NotServer)]
     void DisplayCharacterSelectionRpc()
     {
+        characterSelection.SetActive(true);
         Cursor.lockState = CursorLockMode.Confined;
         Cursor.visible = true;
     }

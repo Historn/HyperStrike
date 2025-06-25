@@ -2598,6 +2598,7 @@ MonoBehaviour:
   deadTime:
     m_InternalValue: 5
   Character: {fileID: 11400000, guid: 9d4e3ba57a1756c44ac3868b3c2b2ba0, type: 2}
+  CastTransform: {fileID: 5722620188708603574}
 --- !u!114 &6459366816758444367
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2649,7 +2650,6 @@ MonoBehaviour:
   - {fileID: 4951063768619024614}
   - {fileID: 8055175971901904565}
   - {fileID: 3751195441790900428}
-  CastTransform: {fileID: 5722620188708603574}
 --- !u!114 &4951063768619024614
 MonoBehaviour:
   m_ObjectHideFlags: 0

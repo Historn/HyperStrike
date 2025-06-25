@@ -15,10 +15,10 @@ MonoBehaviour:
   characterName: Speed
   health: 100
   maxHealth: 100
-  speed: 30
+  speed: 35
   sprintSpeed: 60
   wallRunSpeed: 100
-  maxSpeed: 15
+  maxSpeed: 16
   maxSlidingSpeed: 30
   projectilePrefab: {fileID: 4480140288178342511, guid: 4bb923ba4b889c64da67ffff59974caa, type: 3}
   shootDamage: 35
@@ -27,7 +27,3 @@ MonoBehaviour:
   meleeDamage: 25
   meleeForce: 25
   meleeOffset: 1.5
-  abilities:
-  - {fileID: 11400000, guid: 5f790c7d76bdd8a42880c959f4feb73e, type: 2}
-  - {fileID: 11400000, guid: c63efe8cb4f7fb8489cb63f4eca8c40f, type: 2}
-  - {fileID: 11400000, guid: 20bda653ad971264e926e1092e8d83f6, type: 2}

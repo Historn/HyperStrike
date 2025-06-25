@@ -64,13 +64,12 @@ public class MainMenuUI : MonoBehaviour
 
     void FindMatch()
     {
-#if UNITY_EDITOR
-        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("127.0.0.1", 8100);
-#elif ONLINE_SERVER
+
+#if ONLINE_SERVER
 
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(m_ServerIP, m_ServerPort); //Set Online Server IP
 #else
-        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("90.170.224.218", 8100); //Set Port Forwarded Server IP
+        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("127.0.0.1", 8100); //Set Port Forwarded Server IP
         if (m_InputField.text != "") { NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(m_InputField.text, 8100); }
 #endif
 
@@ -87,26 +86,17 @@ public class MainMenuUI : MonoBehaviour
 
     void StartServer()
     {
+#if DEDICATED_SERVER
+        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("0.0.0.0", 8100, "0.0.0.0");
+#else
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("0.0.0.0", 8100);
-        NetworkManager.Singleton.ConnectionApprovalCallback += ConnectionApproval;
+#endif
         NetworkManager.Singleton.StartServer();
         var status = NetworkManager.Singleton.SceneManager.LoadScene("LobbyRoom", LoadSceneMode.Single);
         if (status != SceneEventProgressStatus.Started)
         {
             Debug.LogWarning($"Failed to load Lobby" +
                   $"with a {nameof(SceneEventProgressStatus)}: {status}");
-        }
-    }
-
-    private void ConnectionApproval(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
-    {
-        if (SceneManager.GetActiveScene().name == "ArenaRoom")
-        {
-            response.Approved = false;
-        }
-        else
-        {
-            response.Approved = true;
         }
     }
 

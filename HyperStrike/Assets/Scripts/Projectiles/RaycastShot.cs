@@ -15,9 +15,9 @@ public class RaycastShot : Projectile
         lineRenderer = GetComponent<LineRenderer>();
     }
 
-    public override void Activate(Vector3 position, Quaternion rotation, ulong ownerId)
+    public override void Activate(Vector3 position, Quaternion rotation, ulong ownerId, Player ownerProj)
     {
-        base.Activate(position, rotation, ownerId);
+        base.Activate(position, rotation, ownerId, ownerProj);
         lineRenderer.SetPosition(0, position);
         CastTheRay(position);
     }

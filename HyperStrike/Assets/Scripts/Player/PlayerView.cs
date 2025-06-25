@@ -17,8 +17,7 @@ public class PlayerView : MonoBehaviour
 
     public void UpdateView(Player player)
     {
-        //scoreText.text = "Score: " + player.Score;
-        //characterNameText.text = "Character: " + player.CharacterName;
+        
     }
     
     public void UpdateLeaderboard()

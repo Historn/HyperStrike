@@ -87,8 +87,9 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  characterSelectionTime:
-    m_InternalValue: 30
+  currentCharacterSelectionTime:
+    m_InternalValue: 90
+  characterSelectionTime: 90
   currentWaitTime:
     m_InternalValue: 5
   maxTime: 300

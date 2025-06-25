@@ -30,7 +30,7 @@ public class ProjectileAbility : Ability
 
             var projectile = projectileNO.GetComponent<Projectile>();
             projectile.projectilePrefabUsed = projectilePrefab;
-            projectile.Activate(owner.GetCastTransform().position + owner.GetCastTransform().forward, owner.GetCastTransform().rotation, owner.OwnerClientId);
+            projectile.Activate(owner.GetCastTransform().position + owner.GetCastTransform().forward, owner.GetCastTransform().rotation, owner.OwnerClientId, owner);
 
             yield return new WaitForSeconds(maxCastTime);
         }

@@ -41,7 +41,6 @@ public class PlayerController : NetworkBehaviour
 
     #region "Model-View Player"
     private Player player;
-    private PlayerView view;
     private PlayerAbilityController abilityController;
     #endregion
 
@@ -116,10 +115,7 @@ public class PlayerController : NetworkBehaviour
     {
         // Init Player MVC
         player = GetComponent<Player>();
-        view = GetComponent<PlayerView>();
         abilityController = GetComponent<PlayerAbilityController>();
-
-        view.UpdateView(player);
 
         // Init Physics variables
         rb = GetComponent<Rigidbody>();
@@ -494,7 +490,7 @@ public class PlayerController : NetworkBehaviour
             var projectile = projectileNO.GetComponent<Projectile>();
             projectile.projectilePrefabUsed = player.ProjectilePrefab;
             projectile.effectQuantity = player.ShootDamage.Value;
-            projectile.Activate(projectileSpawnOffset.position + cameraWeaponTransform.forward * player.ShootOffset, cameraWeaponTransform.rotation, OwnerClientId);
+            projectile.Activate(projectileSpawnOffset.position + cameraWeaponTransform.forward * player.ShootOffset, cameraWeaponTransform.rotation, OwnerClientId, player);
 
             Invoke(nameof(ResetShoot), player.ShootCooldown);    //Delay for attack to reset
             animator?.Animator.SetTrigger(ShootHash);

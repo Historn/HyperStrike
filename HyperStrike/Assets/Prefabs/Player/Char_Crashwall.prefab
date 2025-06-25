@@ -1627,7 +1627,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4220784000810643060}
   serializedVersion: 4
-  m_Mass: 1.9
+  m_Mass: 1.75
   m_Drag: 0.2
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: -1, z: 0}
@@ -1714,6 +1714,7 @@ MonoBehaviour:
   deadTime:
     m_InternalValue: 5
   Character: {fileID: 11400000, guid: 2f0c4e359d9f4dd45a13b45055c01c44, type: 2}
+  CastTransform: {fileID: 3855824972258302075}
 --- !u!114 &809806070144721770
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1765,7 +1766,6 @@ MonoBehaviour:
   - {fileID: 3421329912362593132}
   - {fileID: 2384662295944519307}
   - {fileID: 2450083458394727191}
-  CastTransform: {fileID: 3855824972258302075}
 --- !u!114 &3421329912362593132
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -23,10 +23,10 @@ public abstract class Ability : NetworkBehaviour
     
 
     // Reference to the player who owns this ability instance
-    protected PlayerAbilityController owner;
+    protected Player owner;
 
     // Called when ability is assigned to a player
-    public virtual void Initialize(PlayerAbilityController player)
+    public virtual void Initialize(Player player)
     {
         owner = player;
         isOnCooldown = false;

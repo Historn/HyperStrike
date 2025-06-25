@@ -13,7 +13,7 @@ public class TargetLockAbility : Ability
 
     [SerializeField] protected Transform currentTarget;
 
-    public override void Initialize(PlayerAbilityController player)
+    public override void Initialize(Player player)
     {
         base.Initialize(player);
         requiresTarget = true;
@@ -29,19 +29,21 @@ public class TargetLockAbility : Ability
     {
         castTime = 0;
 
+        currentTarget = FindClosestTarget();
+
+        if (fixCameraToTarget && currentTarget != null)
+        {
+            var targetNetObj = currentTarget.GetComponent<NetworkObject>();
+            if (targetNetObj != null)
+            {
+                LookAtTargetClientRPC(targetNetObj);
+            }
+        }
+
         while (castTime < maxCastTime)
         {
             castTime += Time.deltaTime;
-            currentTarget = FindClosestTarget();
-
-            if (fixCameraToTarget && currentTarget != null)
-            {
-                var targetNetObj = currentTarget.GetComponent<NetworkObject>();
-                if (targetNetObj != null)
-                {
-                    LookAtTargetClientRPC(targetNetObj);
-                }
-            }
+            
             yield return null;
         }
 
