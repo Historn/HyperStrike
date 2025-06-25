@@ -7,6 +7,7 @@ public class Goal : NetworkBehaviour
     [SerializeField] private GameObject goalVfx;
     
     [SerializeField] private AudioClip goalSFX;
+    [SerializeField] private AudioClip airHornSFX;
     private AudioSource goalAudioSource;
 
     private GoalEventSubscriber goalEventSubscriber;
@@ -63,6 +64,7 @@ public class Goal : NetworkBehaviour
             
             // Play Goal SFX
             goalAudioSource.PlayOneShot(goalSFX);
+            goalAudioSource.PlayOneShot(airHornSFX);
         }
     }
 }
