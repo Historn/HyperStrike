@@ -23,15 +23,17 @@ public class ProjectileAbility : Ability
         {
             var projectileNO = NetworkObjectPool.Singleton.GetNetworkObject(projectilePrefab, owner.GetCastTransform().position + owner.GetCastTransform().forward, owner.GetCastTransform().rotation);
 
-            if (!projectileNO.IsSpawned)
+            if (projectileNO != null)
             {
-                projectileNO.Spawn();
+                if (!projectileNO.IsSpawned)
+                {
+                    projectileNO.Spawn();
+                }
+
+                var projectile = projectileNO.GetComponent<Projectile>();
+                projectile.projectilePrefabUsed = projectilePrefab;
+                projectile.Activate(owner.GetCastTransform().position + owner.GetCastTransform().forward, owner.GetCastTransform().rotation, owner.OwnerClientId, owner);
             }
-
-            var projectile = projectileNO.GetComponent<Projectile>();
-            projectile.projectilePrefabUsed = projectilePrefab;
-            projectile.Activate(owner.GetCastTransform().position + owner.GetCastTransform().forward, owner.GetCastTransform().rotation, owner.OwnerClientId, owner);
-
             yield return new WaitForSeconds(maxCastTime);
         }
     }

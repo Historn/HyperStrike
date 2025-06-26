@@ -216,8 +216,11 @@ public class PlayerController : NetworkBehaviour
         }
         else if (!IsOwner && !IsServer)
         {
+            GetComponentInChildren<Player>().enabled = false;
+            GetComponentInChildren<PlayerView>().enabled = false;
             GetComponentInChildren<PlayerController>().enabled = false;
             GetComponentInChildren<PlayerAbilityController>().enabled = false;
+            Debug.Log("Disable player thingies");
         }
 
     }
@@ -254,11 +257,11 @@ public class PlayerController : NetworkBehaviour
 
     private void InitInputs()
     {
-        input.Player.MeleeAttack.started += ctx => MeleeAttackServerRPC();
-        input.Player.Attack.started += ctx => ShootServerRPC();
-        input.Player.Ability1.started += ctx => ActivateAbility1ServerRPC();
-        input.Player.Ability2.started += ctx => ActivateAbility2ServerRPC();
-        input.Player.Ultimate.started += ctx => ActivateUltimateServerRPC();
+        input.Player.MeleeAttack.started += ctx => MeleeAttackServer();
+        input.Player.Attack.started += ctx => ShootServer();
+        input.Player.Ability1.started += ctx => ActivateAbility1Server();
+        input.Player.Ability2.started += ctx => ActivateAbility2Server();
+        input.Player.Ultimate.started += ctx => ActivateUltimateServer();
         input.Player.Emote1.started += ctx => Emote1ServerRPC();
         input.Player.Emote2.started += ctx => Emote2ServerRPC();
     }
@@ -284,9 +287,6 @@ public class PlayerController : NetworkBehaviour
     {
         isGrounded = hyperStrikeUtils.CheckGrounded(transform, characterHeight);
         animator?.Animator?.SetBool(GroundHash, isGrounded);
-
-        //if (isGrounded) rb.linearDamping = 5f;
-        //else rb.linearDamping = 0;
 
         isWallRunning = hyperStrikeUtils.CheckWalls(transform, ref wallHit, ref refCameraTilt);
 
@@ -437,6 +437,14 @@ public class PlayerController : NetworkBehaviour
     #endregion
 
     #region "Attacks and Abilities"
+
+    void MeleeAttackServer()
+    {
+        if (MatchManager.Instance && !MatchManager.Instance.allowMovement.Value) return;
+        if (GameManager.Instance && GameManager.Instance.isPaused) return;
+        MeleeAttackServerRPC();
+    }
+
     [ServerRpc]
     void MeleeAttackServerRPC()
     {
@@ -473,6 +481,13 @@ public class PlayerController : NetworkBehaviour
         meleeReady = true;
     }
 
+    void ShootServer()
+    {
+        if (MatchManager.Instance && !MatchManager.Instance.allowMovement.Value) return;
+        if (GameManager.Instance && GameManager.Instance.isPaused) return;
+        ShootServerRPC();
+    }
+
     [ServerRpc]
     void ShootServerRPC()
     {
@@ -506,27 +521,42 @@ public class PlayerController : NetworkBehaviour
         shootReady = true;
     }
 
-    [ServerRpc]
-    void ActivateAbility1ServerRPC()
+    void ActivateAbility1Server()
     {
         if (MatchManager.Instance && !MatchManager.Instance.allowMovement.Value) return;
         if (GameManager.Instance && GameManager.Instance.isPaused) return;
+        ActivateAbility1ServerRPC();
+    }
+
+    [ServerRpc]
+    void ActivateAbility1ServerRPC()
+    {
         abilityController.TryCastAbility(0);
+    }
+
+    void ActivateAbility2Server()
+    {
+        if (MatchManager.Instance && !MatchManager.Instance.allowMovement.Value) return;
+        if (GameManager.Instance && GameManager.Instance.isPaused) return;
+        ActivateAbility2ServerRPC();
     }
 
     [ServerRpc]
     void ActivateAbility2ServerRPC()
     {
+        abilityController.TryCastAbility(1);
+    }
+
+    void ActivateUltimateServer()
+    {
         if (MatchManager.Instance && !MatchManager.Instance.allowMovement.Value) return;
         if (GameManager.Instance && GameManager.Instance.isPaused) return;
-        abilityController.TryCastAbility(1);
+        ActivateUltimateServerRPC();
     }
 
     [ServerRpc]
     void ActivateUltimateServerRPC()
     {
-        if (MatchManager.Instance && !MatchManager.Instance.allowMovement.Value) return;
-        if (GameManager.Instance && GameManager.Instance.isPaused) return;
         abilityController.TryCastAbility(2);
     }
     #endregion

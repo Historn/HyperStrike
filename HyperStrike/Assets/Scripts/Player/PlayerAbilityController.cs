@@ -41,6 +41,7 @@ public class PlayerAbilityController : NetworkBehaviour
         // Start cooldown timer
         if (ability.isOnCooldown)
         {
+            ability.currentCooldownTime.Value = 0;
             StopCoroutine(StartReloading(abilityIndex));
             StartCoroutine(StartCooldown(abilityIndex));
         }
@@ -61,33 +62,25 @@ public class PlayerAbilityController : NetworkBehaviour
         }
         ability.currentCharges.Value = ability.maxCharges;
         ability.isOnCooldown = false;
-        ability.currentCooldownTime.Value = 0;
     }
     private IEnumerator StartReloading(int index)
     {
         var ability = abilities[index];
 
-        while (ability.currentReloadTime.Value < ability.chargeReloadTime)
-        {
-            ability.currentReloadTime.Value++;
-            yield return new WaitForSeconds(1f);
-        }
-
-        ability.currentCharges.Value++;
-        ability.currentReloadTime.Value = 0;
-
-        if (ability.currentCharges.Value < ability.maxCharges)
+        while (ability.currentCharges.Value < ability.maxCharges)
         {
             while (ability.currentReloadTime.Value < ability.chargeReloadTime)
             {
                 ability.currentReloadTime.Value++;
                 yield return new WaitForSeconds(1f);
             }
+
+            ability.currentCharges.Value++;
+            ability.currentReloadTime.Value = 0;
+            yield return null;
         }
-        else
-        {
-            ability.isReloading = false;
-        }
+
+        ability.isReloading = false;
     }
 
     public void TryCastAbility(int index)
