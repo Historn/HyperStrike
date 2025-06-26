@@ -2747,7 +2747,7 @@ MonoBehaviour:
   chargeReloadTime: 0
   fullCooldown: 60
   castTime: 0
-  maxCastTime: 0
+  maxCastTime: 0.2
   maxCharges: 1
   isReloading: 0
   requiresTarget: 0
@@ -2771,7 +2771,8 @@ MonoBehaviour:
   useForce: 1
   useDamage: 1
   useHeal: 0
-  affectSelf: 0
+  useProtection: 0
+  selfAffect: 0
   affectAllies: 0
   affectEnemies: 1
   radius: 30
@@ -2779,6 +2780,9 @@ MonoBehaviour:
   setManualForceDir: 1
   forceDir: {x: 0, y: 1, z: 0}
   heal: 0
+  useAreaPrefab: 0
+  parentAreaToOwner: 0
+  areaObjectPrefab: {fileID: 0}
 --- !u!114 &4326943606440057839
 MonoBehaviour:
   m_ObjectHideFlags: 0

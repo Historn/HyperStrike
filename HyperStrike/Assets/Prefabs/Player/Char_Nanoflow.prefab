@@ -1498,7 +1498,7 @@ MonoBehaviour:
   abilityName: Team Heal
   icon: {fileID: 0}
   chargeReloadTime: 0
-  fullCooldown: 2
+  fullCooldown: 60
   castTime: 0
   maxCastTime: 0.1
   maxCharges: 1
@@ -2866,8 +2866,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6572253354404910553}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.5361984, y: 1.3749998, z: -0.55452484}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.375, z: 0.135}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
