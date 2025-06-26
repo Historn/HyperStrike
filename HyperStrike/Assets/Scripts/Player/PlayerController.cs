@@ -61,6 +61,8 @@ public class PlayerController : NetworkBehaviour
     #endregion
 
     PlayerInput input;
+    private InputData lastSentInput;
+    private bool hasLastSentInput = false;
 
     #region "Movement Variables"
     [Header("Cinemachine Settings")]
@@ -229,7 +231,7 @@ public class PlayerController : NetworkBehaviour
 
         if (IsClient && IsOwner)
         {
-            InputData data = new InputData
+            InputData currentInput = new InputData
             {
                 move = input.Player.Move.ReadValue<Vector2>(),
                 moveInProgress = input.Player.Move.IsInProgress(),
@@ -238,7 +240,13 @@ public class PlayerController : NetworkBehaviour
                 jump = input.Player.Jump.IsPressed(),
                 slide = input.Player.Slide.IsPressed(),
             };
-            SendInputServerRPC(data);
+
+            if (!hasLastSentInput || !InputEquals(lastSentInput, currentInput))
+            {
+                SendInputServerRPC(currentInput);
+                lastSentInput = currentInput;
+                hasLastSentInput = true;
+            }
         }
     }
 
@@ -260,6 +268,16 @@ public class PlayerController : NetworkBehaviour
         input.Player.Ultimate.started += ctx => ActivateUltimateServerRPC();
         input.Player.Emote1.started += ctx => Emote1ServerRPC();
         input.Player.Emote2.started += ctx => Emote2ServerRPC();
+    }
+
+    private bool InputEquals(InputData a, InputData b)
+    {
+        return a.move == b.move &&
+               a.moveInProgress == b.moveInProgress &&
+               a.look == b.look &&
+               a.sprint == b.sprint &&
+               a.jump == b.jump &&
+               a.slide == b.slide;
     }
 
     void InitAnimatorHashes()
@@ -439,6 +457,8 @@ public class PlayerController : NetworkBehaviour
     [ServerRpc]
     void MeleeAttackServerRPC()
     {
+        if (MatchManager.Instance && !MatchManager.Instance.allowMovement.Value) return;
+
         if (meleeReady)
         {
             meleeReady = false;
@@ -472,6 +492,8 @@ public class PlayerController : NetworkBehaviour
     [ServerRpc]
     void ShootServerRPC()
     {
+        if (MatchManager.Instance && !MatchManager.Instance.allowMovement.Value) return;
+
         if (shootReady && (projectileSpawnOffset != null && player.ProjectilePrefab != null) && NetworkObjectPool.Singleton != null)
         {
             shootReady = false;
@@ -502,22 +524,22 @@ public class PlayerController : NetworkBehaviour
     [ServerRpc]
     void ActivateAbility1ServerRPC()
     {
+        if (MatchManager.Instance && !MatchManager.Instance.allowMovement.Value) return;
         abilityController.TryCastAbility(0);
-        return;
     }
 
     [ServerRpc]
     void ActivateAbility2ServerRPC()
     {
+        if (MatchManager.Instance && !MatchManager.Instance.allowMovement.Value) return;
         abilityController.TryCastAbility(1);
-        return;
     }
 
     [ServerRpc]
     void ActivateUltimateServerRPC()
     {
+        if (MatchManager.Instance && !MatchManager.Instance.allowMovement.Value) return;
         abilityController.TryCastAbility(2);
-        return;
     }
     #endregion
 
