@@ -1,74 +1,128 @@
+using System.Collections;
+using Unity.Netcode;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Movement Ability", menuName = "HyperStrike/Movement Ability")]
 public class MovementAbility : Ability
 {
     [Header("Movement Settings")]
     public float dashDistance;
     public float dashSpeed;
     public bool canDamageEnemies;
-    public float damageAmount;
+    public int damage;
+    public Vector3 dashDirection;
+    public bool isForwardDirection;
     public LayerMask collisionLayers;
+    public bool smoothTransition;
 
-    private Vector3 dashDirection;
-    private float dashProgress;
+    protected bool isDashing = false;
+    private Vector3 dashEndPosition;
 
-    public override bool CanUseAbility(AbilityHolder user)
+    public override void ServerCast(ulong clientId, Vector3 initPos, Vector3 dir)
     {
-        // Check for obstacles, valid direction, etc.
-        // Could trace the path to ensure it's valid
-        return true;
+        base.ServerCast(clientId, initPos, dir);
+
+        if (isDashing) return;
+
+        dashDirection = isForwardDirection ? dir : dashDirection.normalized;
+
+        dashEndPosition = CalculateDashEndPosition(initPos, dashDirection, dashDistance);
+
+        owner.StartCoroutine(PerformDash());
+
+        PlayEffects(initPos);
     }
 
-    public override void InitiateAbility(AbilityHolder user)
+    private Vector3 CalculateDashEndPosition(Vector3 startPos, Vector3 direction, float distance)
     {
-        // Store the direction to dash in
-        dashDirection = user.transform.forward;
-        dashProgress = 0f;
-    }
-
-    public override void ExecuteAbility(AbilityHolder user)
-    {
-        // This will be called if it's an instant ability,
-        // but for movement, we usually want to use UpdateAbility
-    }
-
-    public override void UpdateAbility(AbilityHolder user)
-    {
-        // Move the character over time during cast time
-        CharacterController controller = user.GetComponent<CharacterController>();
-        if (controller != null)
+        RaycastHit hit;
+        if (Physics.Raycast(startPos, direction, out hit, distance, collisionLayers))
         {
-            float distanceThisFrame = dashSpeed * Time.deltaTime;
-            controller.Move(dashDirection * distanceThisFrame);
+            return startPos + direction * (hit.distance - 0.5f);
+        }
+        Vector3 endPos = startPos + direction * distance;
 
-            dashProgress += distanceThisFrame;
+        if (Physics.OverlapSphere(endPos, 0.5f, LayerMask.GetMask("Boundary")).Length > 0 || endPos.y < 0)
+        {
+            Vector3 returnPos = (startPos - endPos).normalized;
+            endPos = returnPos;
+        }
 
-            // Check for enemies to damage
-            if (canDamageEnemies)
-            {
-                Collider[] hits = Physics.OverlapSphere(
-                    user.transform.position,
-                    1.0f,
-                    collisionLayers
-                );
+        return endPos;
+    }
 
-                foreach (var hit in hits)
-                {
-                    // Apply damage or effects to hit objects
-                    Player target = hit.GetComponent<Player>();
-                    if (target != null)
-                    {
-                        Debug.Log("Hit a Player has to take damage!");
-                        //target.TakeDamage(damageAmount);
-                    }
-                }
-            }
+    private IEnumerator PerformDash()
+    {
+        isDashing = true;
+        castTime = 0f;
+        Rigidbody rb = owner.GetComponent<Rigidbody>();
+        Vector3 startPosition = owner.transform.position;
+
+        rb.useGravity = false;
+        Vector3 originalVelocity = rb.linearVelocity;
+        rb.linearVelocity = Vector3.zero;
+
+        while (castTime < maxCastTime)
+        {
+            castTime += Time.deltaTime;
+            float progress = Mathf.Clamp01(castTime / maxCastTime);
+
+            float smoothedProgress = Mathf.Sin(progress * Mathf.PI * 0.5f);
+
+            Vector3 newPosition = Vector3.zero;
+            if (smoothTransition) newPosition = Vector3.Lerp(startPosition, dashEndPosition, smoothedProgress);
+            else newPosition = Vector3.Lerp(startPosition, dashEndPosition, 1);
+
+            rb.MovePosition(newPosition);
+
+            yield return null;
+        }
+
+        // Restore physics
+        rb.useGravity = true;
+        rb.linearVelocity = originalVelocity * 0.5f;
+        isDashing = false;
+
+        yield return new WaitForEndOfFrame();
+
+        // Final boundary check
+        if (!IsPositionInArena(owner.transform.position))
+        {
+            owner.transform.position = GetNearestArenaPoint(owner.transform.position);
         }
     }
 
-    public override void EndAbility(AbilityHolder user)
+    private bool IsPositionInArena(Vector3 pos)
     {
-        // Apply ending effects, momentum reduction, etc.
+        return pos.x > -50 && pos.x < 50 && pos.z > -50 && pos.z < 50;
+    }
+
+    private Vector3 GetNearestArenaPoint(Vector3 outOfBoundsPosition)
+    {
+        Vector3 arenaCenter = Vector3.zero;
+
+        Vector3 directionToCenter = (arenaCenter - outOfBoundsPosition).normalized;
+
+        if (Physics.Raycast(outOfBoundsPosition,
+                           directionToCenter,
+                           out RaycastHit hit,
+                           Mathf.Infinity,
+                           LayerMask.GetMask("Boundary")))
+        {
+            return hit.point - (directionToCenter * 1f);
+        }
+
+        return arenaCenter;
+    }
+
+    public override void PlayEffects(Vector3 position)
+    {
+        // Play VFX/SFX on all clients
+        PlayEffectsClientRpc(position);
+    }
+
+    [ClientRpc]
+    private void PlayEffectsClientRpc(Vector3 position)
+    {
+        // Instantiate visual/audio effects
     }
 }

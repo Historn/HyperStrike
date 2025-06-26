@@ -1,3 +1,5 @@
+using System.Collections;
+using TMPro;
 using Unity.Multiplayer;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
@@ -19,9 +21,15 @@ public class MainMenuUI : MonoBehaviour
     Button m_StartServerButton;
     [SerializeField]
     Button m_FindMatchButton;
+    
+    [SerializeField]
+    TextMeshProUGUI m_FindStatusText;
 
     [SerializeField]
-    TMPro.TMP_InputField m_InputField;
+    TMP_InputField m_InputField;
+
+    string m_ServerIP;
+    ushort m_ServerPort;
 
     void Awake()
     {
@@ -48,20 +56,28 @@ public class MainMenuUI : MonoBehaviour
         if (MultiplayerRolesManager.ActiveMultiplayerRoleMask == MultiplayerRoleFlags.Server) StartServer();
     }
 
+    public void SetOnlineServerParams(string ip, ushort port)
+    {
+        m_ServerIP = ip;
+        m_ServerPort = port;
+    }
+
     void FindMatch()
     {
-#if UNITY_EDITOR
-        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("127.0.0.1", 8100);
+
+#if ONLINE_SERVER
+
+        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(m_ServerIP, m_ServerPort); //Set Online Server IP
 #else
-        if(m_InputField.text != "") { NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(m_InputField.text, 8100); }
-        //NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("192.168.1.22", 8100); //Set Online Server IP
+        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("127.0.0.1", 9000); //Set Port Forwarded Server IP
+        if (m_InputField.text != "") { NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(m_InputField.text, 8100); }
 #endif
-        var success = NetworkManager.Singleton.StartClient();
-        if (success)
-        {
-            NetworkManager.Singleton.SceneManager.OnSynchronize += SceneManager_OnSynchronize; // Must be here, before loading the NetworkObjects from next scene
-        }
-        DeactivateButtons();
+
+        m_FindStatusText.color = Color.white;
+        m_FindStatusText.text = "Joining Server";
+
+        StartCoroutine(WaitFullSync());
+        if (m_FindMatchButton) m_FindMatchButton.interactable = false;
     }
     private void SceneManager_OnSynchronize(ulong clientId)
     {
@@ -70,7 +86,11 @@ public class MainMenuUI : MonoBehaviour
 
     void StartServer()
     {
-        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("0.0.0.0", 8100);
+#if DEDICATED_SERVER
+        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("0.0.0.0", 9000, "0.0.0.0");
+#else
+        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("0.0.0.0", 9000);
+#endif
         NetworkManager.Singleton.StartServer();
         var status = NetworkManager.Singleton.SceneManager.LoadScene("LobbyRoom", LoadSceneMode.Single);
         if (status != SceneEventProgressStatus.Started)
@@ -78,7 +98,6 @@ public class MainMenuUI : MonoBehaviour
             Debug.LogWarning($"Failed to load Lobby" +
                   $"with a {nameof(SceneEventProgressStatus)}: {status}");
         }
-        DeactivateButtons();
     }
 
     void DeactivateButtons()
@@ -86,5 +105,25 @@ public class MainMenuUI : MonoBehaviour
         if (m_StartServerButton) m_StartServerButton.interactable = false;
         if (m_FindMatchButton) m_FindMatchButton.interactable = false;
         gameObject.SetActive(false);
+    }
+
+    private IEnumerator WaitFullSync()
+    {
+        yield return new WaitForSeconds(2);
+
+        var success = NetworkManager.Singleton.StartClient();
+        NetworkManager.Singleton.OnClientDisconnectCallback += OnDisconnect;
+        if (success && NetworkManager.Singleton.IsApproved)
+        {
+            NetworkManager.Singleton.SceneManager.OnSynchronize += SceneManager_OnSynchronize; // Must be here, before loading the NetworkObjects from next scene
+            DeactivateButtons();
+        }
+    }
+
+    void OnDisconnect(ulong obj)
+    {
+        if (m_FindMatchButton) m_FindMatchButton.interactable = true;
+        m_FindStatusText.color = Color.red;
+        m_FindStatusText.text = "Unable to join the server, please try again or check server status.";
     }
 }

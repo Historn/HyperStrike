@@ -1,4 +1,3 @@
-using HyperStrike;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -32,6 +31,7 @@ public class MatchManager : NetworkBehaviour
 
     public event Action OnDisplayCharacterSelection;
     public event Action OnUpdateMatchScore;
+    public event Action<Team> OnMatchEnded;
 
     public NetworkVariable<MatchState> State { get; private set; } = new NetworkVariable<MatchState>(MatchState.NONE);
     public NetworkVariable<bool> allowMovement = new NetworkVariable<bool>(false);
@@ -50,9 +50,15 @@ public class MatchManager : NetworkBehaviour
     #region "Character Selection"
     [Header("Character Selection")]
     public List<GameObject> charactersPrefabs;
-    [SerializeField] private List<Transform> spawnPositions;
-    public NetworkList<byte> CharacterSelected;
-    public NetworkVariable<float> characterSelectionTime = new NetworkVariable<float>(90.0f);
+    [SerializeField] private List<Transform> localSpawnPositions;
+    [SerializeField] private List<Transform> visitantSpawnPositions;
+    public NetworkList<byte> LocalCharacterSelected;
+    public NetworkList<byte> VisitantCharacterSelected;
+    public NetworkVariable<float> currentCharacterSelectionTime = new NetworkVariable<float>(90.0f);
+    public float characterSelectionTime = 90f;
+
+    bool localsReady = false;
+    bool visitantsReady = false;
     #endregion
 
     #region "WAIT TIME"
@@ -67,16 +73,26 @@ public class MatchManager : NetworkBehaviour
     public NetworkVariable<float> currentMatchTime = new NetworkVariable<float>(300.0f);
     public NetworkVariable<int> localGoals = new NetworkVariable<int>(0);
     public NetworkVariable<int> visitantGoals = new NetworkVariable<int>(0);
+    public NetworkVariable<Team> winnerTeam = new NetworkVariable<Team>(0);
     #endregion
 
+    [Header("Ball")]
     [SerializeField] private GameObject ballPrefab;
     private GameObject currentBall;
-
+    bool first = true; 
     public override void OnNetworkSpawn()
     {
         // SYNCHRONIZATION EVENT PROCESS
-        NetworkManager.Singleton.SceneManager.OnLoadComplete += OnSceneLoaded;
-        if (IsClient) NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
+        if (NetworkManager.Singleton == null) return;
+
+        if (IsServer)
+        {
+            NetworkManager.Singleton.ConnectionApprovalCallback += ConnectionApproval;
+            NetworkManager.Singleton.SceneManager.OnLoadComplete += OnSceneLoaded;
+            //LocalCharacterSelected.OnListChanged += OnCharacterSelectedReadyCheck;
+            //VisitantCharacterSelected.OnListChanged += OnCharacterSelectedReadyCheck;
+        }
+        else if (IsClient) NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
 
     }
 
@@ -92,7 +108,8 @@ public class MatchManager : NetworkBehaviour
             Destroy(gameObject);
         }
 
-        CharacterSelected = new NetworkList<byte>();
+        LocalCharacterSelected = new NetworkList<byte>();
+        VisitantCharacterSelected = new NetworkList<byte>();
         LocalPlayersID = new NetworkList<ulong>();
         VisitantPlayersID = new NetworkList<ulong>();
 
@@ -103,17 +120,60 @@ public class MatchManager : NetworkBehaviour
         }
     }
 
+    private void ConnectionApproval(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
+    {
+        if (SceneManager.GetActiveScene().name == "ArenaRoom")
+        {
+            response.Approved = false;
+        }
+        else
+        {
+            response.Approved = true;
+        }
+    }
+
     private void OnClientDisconnected(ulong obj)
     {
+        StartCoroutine(LoadMenuDelayed());
+    }
+
+    private IEnumerator LoadMenuDelayed()
+    {
+        yield return new WaitForSeconds(1.0f);
         SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
     }
 
     private void OnSceneLoaded(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
     {
-        if (NetworkManager.Singleton?.ConnectedClientsList.Count > 1)
+#if UNITY_EDITOR
+        if (NetworkManager.Singleton?.ConnectedClientsList.Count > 0)
         {
             SetMatchState(MatchState.CHARACTER_SELECTION);
         }
+#else
+        if (NetworkManager.Singleton?.ConnectedClientsList.Count > 5 && first)
+        {
+            SetMatchState(MatchState.CHARACTER_SELECTION);
+            first = false;
+        }
+#endif
+    }
+
+    void Update()
+    {
+#if DEV_CLIENT
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            if (State.Value == MatchState.CHARACTER_SELECTION)
+            {
+                LowerCharacterSelectionTimeRpc();
+            }
+            else if (State.Value != MatchState.CHARACTER_SELECTION)
+            {
+                SetMatchStateRpc(MatchState.CHARACTER_SELECTION);
+            }
+        }
+#endif
     }
 
     void MatchStateBehavior()
@@ -123,11 +183,32 @@ public class MatchManager : NetworkBehaviour
             case MatchState.NONE:
             case MatchState.CHARACTER_SELECTION:
                 {
+                    StopAllCoroutines();
+
+                    LocalCharacterSelected.Clear();
+                    VisitantCharacterSelected.Clear();
+                    LocalPlayersID.Clear();
+                    VisitantPlayersID.Clear();
+
                     /*DESPAWN EACH TEAM PLAYER PREFABS TO SPAWN POSITIONS*/
                     foreach (var clientId in NetworkManager.Singleton.ConnectedClients.Keys)
                     {
-                        NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.Despawn();
+                        NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject?.Despawn(true);
                     }
+
+                    if (currentBall != null)
+                    {
+                        currentBall.GetComponent<NetworkObject>().Despawn(true);
+                    }
+
+                    GameObject ball = Instantiate(ballPrefab, new Vector3(0, 5, 0), Quaternion.identity);
+                    ball.transform.localScale = new Vector3(3, 3, 3);
+                    ball.GetComponent<NetworkObject>().Spawn(true);
+                    ball.GetComponent<Rigidbody>().isKinematic = true;
+                    currentBall = ball;
+
+                    // DISPLAY CHARACTER SELECTION WHEN ALL PLAYERS ARE CONNECTED AND SYNCED
+                    OnDisplayCharacterSelection?.Invoke();
 
                     // ASSIGN PLAYERS TO A TEAM HARDCODED NOW
                     for (int i = 0; i < NetworkManager.Singleton.ConnectedClientsList.Count; i++)
@@ -141,12 +222,11 @@ public class MatchManager : NetworkBehaviour
                             VisitantPlayersID.Add(NetworkManager.Singleton.ConnectedClientsList[i].ClientId);
                         }
 
-                        if (CharacterSelected.Count < 6) CharacterSelected.Add((byte)Characters.NONE);
+                        if (LocalCharacterSelected.Count < 3) LocalCharacterSelected.Add((byte)Characters.NONE);
+                        if (VisitantCharacterSelected.Count < 3) VisitantCharacterSelected.Add((byte)Characters.NONE);
                     }
 
-                    // DISPLAY CHARACTER SELECTION WHEN ALL PLAYERS ARE CONNECTED AND SYNCED
-                    OnDisplayCharacterSelection?.Invoke();
-
+                    currentCharacterSelectionTime.Value = characterSelectionTime;
                     characterSelectTimerCoroutine = CharacterSelectionTimer();
 
                     if (characterSelectTimerCoroutine != null)
@@ -158,20 +238,47 @@ public class MatchManager : NetworkBehaviour
                     if (characterSelectTimerCoroutine != null)
                         StopCoroutine(characterSelectTimerCoroutine);
 
-                    /*SPAWN EACH TEAM PLAYER PREFABS TO SPAWN POSITIONS*/
-                    for (int i = 0; i < CharacterSelected.Count; i++)
+                    for (int i = 0; i < LocalCharacterSelected.Count; i++)
                     {
-                        var character = CharacterSelected[i];
+                        var character = LocalCharacterSelected[i];
 
                         Characters[] enumValues = (Characters[])System.Enum.GetValues(typeof(Characters));
 
-                        if (character == (byte)Characters.NONE && i < NetworkManager.Singleton.ConnectedClientsList.Count)
-                            character = (byte)UnityEngine.Random.Range(0, (enumValues.Length - 2));
+                        if (character == (byte)Characters.NONE && i < LocalPlayersID.Count)
+                            character = (byte)UnityEngine.Random.Range(0, (enumValues.Length - 1));
 
-                        if (character != (byte)Characters.NONE && charactersPrefabs[character] != null && spawnPositions[i] != null)
+                        if (character != (byte)Characters.NONE && charactersPrefabs[character] != null)
                         {
-                            GameObject player = Instantiate(charactersPrefabs[character], spawnPositions[i].position, spawnPositions[i].rotation);
-                            player.GetComponent<NetworkObject>().SpawnAsPlayerObject(NetworkManager.Singleton.ConnectedClientsList[i].ClientId, true);
+                            ulong id = LocalPlayersID[i];
+
+                            GameObject playerGO = Instantiate(charactersPrefabs[character], localSpawnPositions[i].position, localSpawnPositions[i].rotation);
+                            if (playerGO.TryGetComponent<Player>(out Player player))
+                            {
+                                player.Team.Value = Team.LOCAL;
+                            }
+                            playerGO.GetComponent<NetworkObject>().SpawnAsPlayerObject(id, true);
+                        }
+                    }
+
+                    for (int i = 0; i < VisitantCharacterSelected.Count; i++)
+                    {
+                        var character = VisitantCharacterSelected[i];
+
+                        Characters[] enumValues = (Characters[])System.Enum.GetValues(typeof(Characters));
+
+                        if (character == (byte)Characters.NONE && i < VisitantPlayersID.Count)
+                            character = (byte)UnityEngine.Random.Range(0, (enumValues.Length - 1));
+
+                        if (character != (byte)Characters.NONE && charactersPrefabs[character] != null)
+                        {
+                            ulong id = VisitantPlayersID[i];
+
+                            GameObject playerGO = Instantiate(charactersPrefabs[character], visitantSpawnPositions[i].position, visitantSpawnPositions[i].rotation);
+                            if (playerGO.TryGetComponent<Player>(out Player player))
+                            {
+                                player.Team.Value = Team.VISITANT;
+                            }
+                            playerGO.GetComponent<NetworkObject>().SpawnAsPlayerObject(id, true);
                         }
                     }
 
@@ -196,40 +303,48 @@ public class MatchManager : NetworkBehaviour
                     currentWaitTime.Value = waitTime;
 
                     initTimerCoroutine = PlayMatch(); // recreate the IEnumerator
-
+                    Debug.Log("Init the Match with Wait Timer");
                     if (initTimerCoroutine != null)
                         StartCoroutine(initTimerCoroutine);
                 }
                 break;
             case MatchState.PLAY:
                 {
-                    for (int i = 0; i < NetworkManager.Singleton.ConnectedClientsIds.Count; i++)
+                    foreach (var player in NetworkManager.Singleton.SpawnManager.PlayerObjects)
                     {
-                        var player = NetworkManager.Singleton.SpawnManager.PlayerObjects[i];
-                        player.GetComponent<Rigidbody>().isKinematic = false;
+                        if (player.TryGetComponent<Rigidbody>(out var rb))
+                        {
+                            rb.isKinematic = false;
+                        }
                     }
 
                     allowMovement.Value = true;
 
-                    currentBall.GetComponent<Rigidbody>().isKinematic = false;
+                    if (currentBall != null && currentBall.TryGetComponent<Rigidbody>(out var ballRb))
+                    {
+                        ballRb.isKinematic = false;
+                    }
 
                     if (initTimerCoroutine != null)
                         StopCoroutine(initTimerCoroutine);
 
                     matchTimerCoroutine = MatchTimer();
 
-                    // Starts timer
                     if (matchTimerCoroutine != null)
                         StartCoroutine(matchTimerCoroutine);
-
-                    // HANDLE PLAY BEHAVIOR --> GOALS
                 }
                 break;
             case MatchState.GOAL:
                 {
-                    Debug.Log($"Local: {localGoals.Value} - {visitantGoals.Value} :Visitant");
                     OnUpdateMatchScore?.Invoke();
-                    SetMatchState(MatchState.WAIT);
+                    if (localGoals.Value != visitantGoals.Value && currentMatchTime.Value < 0.0f)
+                    {
+                        SetMatchState(MatchState.FINALIZED);
+                    }
+                    else
+                    {
+                        SetMatchState(MatchState.WAIT);
+                    }
                 }
                 break;
             case MatchState.FINALIZED:
@@ -242,16 +357,19 @@ public class MatchManager : NetworkBehaviour
 
                     allowMovement.Value = false;
 
-                    closeMatchGameTime.Value = 3f;
+                    ResetPositions();
+
+                    if (visitantGoals.Value > localGoals.Value) winnerTeam.Value = Team.VISITANT;
+
+                    closeMatchGameTime.Value = 5f;
                     closeMatchGameTimerCoroutine = CloseMatchGameTimer();
 
                     if (closeMatchGameTimerCoroutine != null)
                         StartCoroutine(closeMatchGameTimerCoroutine);
 
+                    OnMatchEnded?.Invoke(winnerTeam.Value);
                     Debug.Log("Match Ended!");
                     Debug.Log($"Final Score: Local {localGoals.Value} - {visitantGoals.Value} Visitant");
-                    // STOP THE PLAYERS AND BALL
-                    // Show UI to the players depending if they won or lost
                 }
                 break;
             default:
@@ -268,12 +386,24 @@ public class MatchManager : NetworkBehaviour
         }
     }
 
+    [Rpc(SendTo.Server)]
+    public void SetMatchStateRpc(MatchState state)
+    {
+        SetMatchState(state);
+    }
+
+    [Rpc(SendTo.Server)]
+    public void LowerCharacterSelectionTimeRpc()
+    {
+        currentCharacterSelectionTime.Value = 10f;
+    }
+
     private IEnumerator CharacterSelectionTimer()
     {
-        while (characterSelectionTime.Value >= 0.0f)
+        while (currentCharacterSelectionTime.Value >= 0.0f)
         {
             yield return new WaitForSeconds(1f);
-            characterSelectionTime.Value--;
+            currentCharacterSelectionTime.Value--;
         }
 
         SetMatchState(MatchState.RESET);
@@ -287,12 +417,44 @@ public class MatchManager : NetworkBehaviour
     [Rpc(SendTo.Server)]
     public void SelectCharacterRpc(Characters character, ulong clientID)
     {
-        for (int i = 0; i < NetworkManager.Singleton.ConnectedClientsList.Count; i++)
+        for (int i = 0; i < LocalPlayersID.Count; i++)
         {
-            if (NetworkManager.Singleton.ConnectedClientsList[i].ClientId.Equals(clientID))
+            if (LocalPlayersID[i].Equals(clientID))
             {
-                CharacterSelected[i] = (byte)character;
+                LocalCharacterSelected[i] = (byte)character;
             }
+        }
+
+        for (int i = 0; i < VisitantPlayersID.Count; i++)
+        {
+            if (VisitantPlayersID[i].Equals(clientID))
+            {
+                VisitantCharacterSelected[i] = (byte)character;
+            }
+        }
+    }
+
+    private void OnCharacterSelectedReadyCheck(NetworkListEvent<byte> changeEvent)
+    {
+        if (State.Value != MatchState.CHARACTER_SELECTION || !IsServer) return;
+
+        if (!LocalCharacterSelected.Contains((byte)Characters.NONE)) localsReady = true;
+        else localsReady = false;
+
+        if (!VisitantCharacterSelected.Contains((byte)Characters.NONE)) visitantsReady = true;
+        else visitantsReady = false;
+
+        if (localsReady && visitantsReady && currentCharacterSelectionTime.Value > 10f)
+        {
+            if (characterSelectTimerCoroutine != null)
+                StopCoroutine(characterSelectTimerCoroutine);
+
+            currentCharacterSelectionTime.Value = 10f;
+
+            characterSelectTimerCoroutine = CharacterSelectionTimer();
+
+            if (characterSelectTimerCoroutine != null)
+                StartCoroutine(characterSelectTimerCoroutine);
         }
     }
 
@@ -320,18 +482,37 @@ public class MatchManager : NetworkBehaviour
     {
         allowMovement.Value = false;
 
-        for (int i = 0; i < NetworkManager.Singleton.ConnectedClientsIds.Count; i++)
+        int spawnIndexLocal = 0;
+        int spawnIndexVisitant = 0;
+
+        foreach (var playerNO in NetworkManager.Singleton.SpawnManager.PlayerObjects)
         {
-            var player = NetworkManager.Singleton.SpawnManager.PlayerObjects[i];
-            player.GetComponent<Rigidbody>().isKinematic = true;
-            player.gameObject.transform.SetPositionAndRotation(spawnPositions[i].position, spawnPositions[i].rotation);
+            if (playerNO.TryGetComponent<Player>(out Player p) && playerNO.TryGetComponent<Rigidbody>(out Rigidbody rb) && playerNO.TryGetComponent<PlayerController>(out PlayerController playerController))
+            {
+                if (p.Team.Value == Team.LOCAL && spawnIndexLocal < localSpawnPositions.Count)
+                {
+                    rb.isKinematic = true;
+                    rb.position = localSpawnPositions[spawnIndexLocal].position;
+                    playerController.cinemachineCamera.transform.rotation = Quaternion.LookRotation(localSpawnPositions[spawnIndexLocal].forward);
+                    rb.rotation = Quaternion.LookRotation(localSpawnPositions[spawnIndexLocal].forward);
+                    spawnIndexLocal++;
+                }
+                else if (p.Team.Value == Team.VISITANT && spawnIndexVisitant < visitantSpawnPositions.Count)
+                {
+                    rb.isKinematic = true;
+                    rb.position = visitantSpawnPositions[spawnIndexVisitant].position;
+                    playerController.cinemachineCamera.transform.rotation = Quaternion.LookRotation(visitantSpawnPositions[spawnIndexVisitant].forward);
+                    rb.rotation = Quaternion.LookRotation(visitantSpawnPositions[spawnIndexVisitant].forward);
+                    spawnIndexVisitant++;
+                }
+            }
         }
 
-        GameObject ball = Instantiate(ballPrefab, new Vector3(0, 5, 0), Quaternion.identity);
-        ball.transform.localScale = new Vector3(3, 3, 3);
-        ball.GetComponent<NetworkObject>().Spawn(true);
-        ball.GetComponent<Rigidbody>().isKinematic = true;
-        currentBall = ball;
+        if (currentBall != null && currentBall.TryGetComponent<Rigidbody>(out var ballRb))
+        {
+            ballRb.isKinematic = true;
+            currentBall.transform.SetPositionAndRotation(new Vector3(0, 5, 0), Quaternion.identity);
+        }
     }
 
     private IEnumerator MatchTimer()
@@ -365,7 +546,7 @@ public class MatchManager : NetworkBehaviour
 
     public float GetCurrentCharSelectTime()
     {
-        return characterSelectionTime.Value;
+        return currentCharacterSelectionTime.Value;
     }
 
     public float GetCurrentWaitTime()
@@ -378,11 +559,19 @@ public class MatchManager : NetworkBehaviour
         return currentMatchTime.Value;
     }
 
-    //void OnDestroy()
-    //{
-    //    if (NetworkManager.Singleton == null) return;
+    public override void OnNetworkDespawn()
+    {
+        base.OnNetworkDespawn();
 
-    //    NetworkManager.Singleton.SceneManager.OnLoadComplete -= OnSceneLoaded;
-    //    NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
-    //}
+        if (NetworkManager.Singleton == null) return;
+
+        if (IsServer)
+        {
+            NetworkManager.Singleton.ConnectionApprovalCallback -= ConnectionApproval;
+            NetworkManager.Singleton.SceneManager.OnLoadComplete -= OnSceneLoaded;
+            //LocalCharacterSelected.OnListChanged -= OnCharacterSelectedReadyCheck;
+            //VisitantCharacterSelected.OnListChanged -= OnCharacterSelectedReadyCheck;
+        }
+        else if (IsClient) NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
+    }
 }

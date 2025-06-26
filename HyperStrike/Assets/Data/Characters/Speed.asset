@@ -15,14 +15,15 @@ MonoBehaviour:
   characterName: Speed
   health: 100
   maxHealth: 100
-  speed: 30
-  sprintSpeed: 50
+  speed: 70
+  sprintSpeed: 120
   wallRunSpeed: 100
-  maxSpeed: 15
+  maxSpeed: 17
   maxSlidingSpeed: 30
   projectilePrefab: {fileID: 4480140288178342511, guid: 4bb923ba4b889c64da67ffff59974caa, type: 3}
-  shootCooldown: 0.5
+  shootDamage: 35
+  shootCooldown: 1
   shootOffset: 0.5
-  ability1: {fileID: 11400000, guid: c63efe8cb4f7fb8489cb63f4eca8c40f, type: 2}
-  ability2: {fileID: 0}
-  ability3: {fileID: 0}
+  meleeDamage: 25
+  meleeForce: 25
+  meleeOffset: 1.5

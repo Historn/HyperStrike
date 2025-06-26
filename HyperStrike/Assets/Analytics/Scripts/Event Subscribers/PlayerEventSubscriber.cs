@@ -6,17 +6,20 @@ public class PlayerEventSubscriber : MonoBehaviour
 {
     public UnityEvent OnDeath;
     public UnityEvent OnReceiveDamage;
+    public UnityEvent OnHeal;
 
     private void OnEnable()
     {
         OnDeath.AddListener(SendOnDeathData);
         OnReceiveDamage.AddListener(SendOnReceiveDamageData);
+        OnHeal.AddListener(SendOnHealData);
     }
 
     private void OnDisable()
     {
         OnDeath.RemoveListener(SendOnDeathData);
         OnReceiveDamage.RemoveListener(SendOnReceiveDamageData);
+        OnHeal.RemoveListener(SendOnHealData);
     }
 
     private void SendOnDeathData()
@@ -53,6 +56,20 @@ public class PlayerEventSubscriber : MonoBehaviour
         };
 
         Debug.Log("Sending OnReceiveDamage() Position: " + transform.position.ToString());
+        SendDataToServer(data);
+    }
+    
+    private void SendOnHealData()
+    {
+        // Collect and send damage event data
+        EventData data = new EventData
+        {
+            EventType = "Heal",
+            Timestamp = System.DateTime.UtcNow.ToString("o"),
+            Position = transform.position.ToString()
+        };
+
+        Debug.Log("Sending OnHeal() Position: " + transform.position.ToString());
         SendDataToServer(data);
     }
 

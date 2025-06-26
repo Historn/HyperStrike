@@ -5,7 +5,6 @@ public class BallController : NetworkBehaviour
 {
     private Rigidbody rb;
 
-    [SerializeField] bool isGrounded;
     public bool IsGoal;
 
     HyperStrikeUtils hyperStrikeUtils;
@@ -13,8 +12,9 @@ public class BallController : NetworkBehaviour
     private ulong lastPlayerHitId = 0;
     public Vector3 lastPlayerHitPosition;
 
-    private void Awake()
+    public override void OnNetworkSpawn()
     {
+        base.OnNetworkSpawn();
         hyperStrikeUtils = new HyperStrikeUtils();
     }
 
@@ -27,8 +27,6 @@ public class BallController : NetworkBehaviour
 
     void FixedUpdate()
     {
-        //Ground Check
-        isGrounded = hyperStrikeUtils.CheckGrounded(transform);
         IsGoal = hyperStrikeUtils.CheckObjectInsideCollision(transform);
     }
 
@@ -40,7 +38,7 @@ public class BallController : NetworkBehaviour
         {
             GameObject obj = other.gameObject;
             // Check hit with players to detect the last hit for the score
-            if (obj.CompareTag("Player") && this.lastPlayerHitId != obj.GetComponent<NetworkObject>().NetworkObjectId)
+            if (obj.CompareTag("Player"))
             {
                 this.lastPlayerHitId = obj.GetComponent<NetworkObject>().NetworkObjectId;
                 lastPlayerHitPosition = other.GetContact(0).point;
