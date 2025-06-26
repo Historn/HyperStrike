@@ -54,14 +54,12 @@ public class MainMenuController : MonoBehaviour
     [Header("Pause")]
     [SerializeField] private GameObject pauseMenuContainer;
     [SerializeField] private bool canPause;
-    private bool isPaused = false;
 
     private void Start()
     {
         input = new PlayerInput();
         if (!input.Player.enabled) input?.Player.Enable();
         if (canPause) input.Player.OpenClosePause.started += ctx => OpenClosePause();
-        isPaused = false;
 
         resolutions = Screen.resolutions;
         resolutionDropdown.ClearOptions();

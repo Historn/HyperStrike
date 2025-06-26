@@ -174,11 +174,6 @@ public class MatchManager : NetworkBehaviour
             }
         }
 #endif
-
-        //if (Input.GetKeyDown(KeyCode.P) && State.Value != MatchState.CHARACTER_SELECTION)
-        //{
-        //    SetMatchState(MatchState.CHARACTER_SELECTION);
-        //}
     }
 
     void MatchStateBehavior()
@@ -231,6 +226,7 @@ public class MatchManager : NetworkBehaviour
                         if (VisitantCharacterSelected.Count < 3) VisitantCharacterSelected.Add((byte)Characters.NONE);
                     }
 
+                    currentCharacterSelectionTime.Value = characterSelectionTime;
                     characterSelectTimerCoroutine = CharacterSelectionTimer();
 
                     if (characterSelectTimerCoroutine != null)
@@ -374,8 +370,6 @@ public class MatchManager : NetworkBehaviour
                     OnMatchEnded?.Invoke(winnerTeam.Value);
                     Debug.Log("Match Ended!");
                     Debug.Log($"Final Score: Local {localGoals.Value} - {visitantGoals.Value} Visitant");
-                    // STOP THE PLAYERS AND BALL
-                    // Show UI to the players depending if they won or lost
                 }
                 break;
             default:
@@ -406,7 +400,6 @@ public class MatchManager : NetworkBehaviour
 
     private IEnumerator CharacterSelectionTimer()
     {
-        currentCharacterSelectionTime.Value = characterSelectionTime;
         while (currentCharacterSelectionTime.Value >= 0.0f)
         {
             yield return new WaitForSeconds(1f);
@@ -508,7 +501,7 @@ public class MatchManager : NetworkBehaviour
                 {
                     rb.isKinematic = true;
                     rb.position = visitantSpawnPositions[spawnIndexVisitant].position;
-                    playerController.cinemachineCamera.transform.rotation = Quaternion.LookRotation(localSpawnPositions[spawnIndexLocal].forward);
+                    playerController.cinemachineCamera.transform.rotation = Quaternion.LookRotation(visitantSpawnPositions[spawnIndexVisitant].forward);
                     rb.rotation = Quaternion.LookRotation(visitantSpawnPositions[spawnIndexVisitant].forward);
                     spawnIndexVisitant++;
                 }

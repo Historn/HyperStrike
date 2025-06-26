@@ -61,8 +61,6 @@ public class PlayerController : NetworkBehaviour
     #endregion
 
     PlayerInput input;
-    private InputData lastSentInput;
-    private bool hasLastSentInput = false;
 
     #region "Movement Variables"
     [Header("Cinemachine Settings")]
@@ -263,16 +261,6 @@ public class PlayerController : NetworkBehaviour
         input.Player.Ultimate.started += ctx => ActivateUltimateServerRPC();
         input.Player.Emote1.started += ctx => Emote1ServerRPC();
         input.Player.Emote2.started += ctx => Emote2ServerRPC();
-    }
-
-    private bool InputEquals(InputData a, InputData b)
-    {
-        return a.move == b.move &&
-               a.moveInProgress == b.moveInProgress &&
-               a.look == b.look &&
-               a.sprint == b.sprint &&
-               a.jump == b.jump &&
-               a.slide == b.slide;
     }
 
     void InitAnimatorHashes()
