@@ -27,6 +27,13 @@ public class RaycastShot : Projectile
         RaycastHit hit;
         if (Physics.Raycast(initPos, transform.forward, out hit, 100f)) // Add layers affected to make it more simple
         {
+            if (lineRenderer)
+            {
+                lineRenderer.SetPosition(1, hit.point);
+            }
+
+            ShowLineClientRPC(initPos, hit.point);
+
             Rigidbody rb = hit.rigidbody;
             if (rb)
             {
@@ -35,19 +42,14 @@ public class RaycastShot : Projectile
                     rb.AddForce(transform.forward * force, ForceMode.Impulse);
                 }
 
-                if (rb.gameObject.CompareTag("Player") && this.playerOwnerId != rb.gameObject.GetComponent<NetworkObject>().NetworkObjectId)
+                if (hit.collider.TryGetComponent<Player>(out Player otherPlayer) && this.playerOwnerId != rb.gameObject.GetComponent<NetworkObject>().NetworkObjectId)
                 {
-                    rb.gameObject.GetComponent<Player>()?.ApplyEffect(effectType, effectQuantity, effectTime, affectedBaseStats);
+                    if (effectType == EffectType.DAMAGE && otherPlayer.Team.Value == owner.Team.Value) return;
+
+                    otherPlayer.ApplyEffect(effectType, effectQuantity, effectTime, affectedBaseStats);
                 }
             }
         }
-
-        if (lineRenderer)
-        {
-            lineRenderer.SetPosition(1, hit.point);
-        }
-
-        ShowLineClientRPC(initPos, hit.point);
     }
 
     public override void Deactivate()
