@@ -89,7 +89,7 @@ public class MainMenuUI : MonoBehaviour
 #if DEDICATED_SERVER
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("0.0.0.0", 9000, "0.0.0.0");
 #else
-        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("0.0.0.0", 8100);
+        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("0.0.0.0", 9000);
 #endif
         NetworkManager.Singleton.StartServer();
         var status = NetworkManager.Singleton.SceneManager.LoadScene("LobbyRoom", LoadSceneMode.Single);

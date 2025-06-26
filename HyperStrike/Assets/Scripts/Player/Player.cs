@@ -4,7 +4,7 @@ using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
-public enum EffectType : byte
+public enum EffectType : byte // Convert to flags to be able to apply multiple effects like poison and boost or smth
 {
     NONE,
     DAMAGE,

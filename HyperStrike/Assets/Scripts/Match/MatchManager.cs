@@ -79,7 +79,7 @@ public class MatchManager : NetworkBehaviour
     [Header("Ball")]
     [SerializeField] private GameObject ballPrefab;
     private GameObject currentBall;
-
+    bool first = true; 
     public override void OnNetworkSpawn()
     {
         // SYNCHRONIZATION EVENT PROCESS
@@ -89,8 +89,8 @@ public class MatchManager : NetworkBehaviour
         {
             NetworkManager.Singleton.ConnectionApprovalCallback += ConnectionApproval;
             NetworkManager.Singleton.SceneManager.OnLoadComplete += OnSceneLoaded;
-            LocalCharacterSelected.OnListChanged += OnCharacterSelectedReadyCheck;
-            VisitantCharacterSelected.OnListChanged += OnCharacterSelectedReadyCheck;
+            //LocalCharacterSelected.OnListChanged += OnCharacterSelectedReadyCheck;
+            //VisitantCharacterSelected.OnListChanged += OnCharacterSelectedReadyCheck;
         }
         else if (IsClient) NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
 
@@ -151,9 +151,10 @@ public class MatchManager : NetworkBehaviour
             SetMatchState(MatchState.CHARACTER_SELECTION);
         }
 #else
-        if (NetworkManager.Singleton?.ConnectedClientsList.Count > 5)
+        if (NetworkManager.Singleton?.ConnectedClientsList.Count > 5 && first)
         {
             SetMatchState(MatchState.CHARACTER_SELECTION);
+            first = false;
         }
 #endif
     }
@@ -239,10 +240,7 @@ public class MatchManager : NetworkBehaviour
             case MatchState.RESET:
                 {
                     if (characterSelectTimerCoroutine != null)
-                    {
                         StopCoroutine(characterSelectTimerCoroutine);
-                        characterSelectTimerCoroutine = null;
-                    }
 
                     for (int i = 0; i < LocalCharacterSelected.Count; i++)
                     {
@@ -273,7 +271,7 @@ public class MatchManager : NetworkBehaviour
                         Characters[] enumValues = (Characters[])System.Enum.GetValues(typeof(Characters));
 
                         if (character == (byte)Characters.NONE && i < VisitantPlayersID.Count)
-                            character = (byte)UnityEngine.Random.Range(0, (enumValues.Length - 2));
+                            character = (byte)UnityEngine.Random.Range(0, (enumValues.Length - 1));
 
                         if (character != (byte)Characters.NONE && charactersPrefabs[character] != null)
                         {
@@ -309,7 +307,7 @@ public class MatchManager : NetworkBehaviour
                     currentWaitTime.Value = waitTime;
 
                     initTimerCoroutine = PlayMatch(); // recreate the IEnumerator
-
+                    Debug.Log("Init the Match with Wait Timer");
                     if (initTimerCoroutine != null)
                         StartCoroutine(initTimerCoroutine);
                 }
@@ -491,25 +489,28 @@ public class MatchManager : NetworkBehaviour
     {
         allowMovement.Value = false;
 
-        for (int i = 0; i < NetworkManager.Singleton.ConnectedClientsIds.Count; i++)
-        {
-            var playerNO = NetworkManager.Singleton.SpawnManager.PlayerObjects[i];
+        int spawnIndexLocal = 0;
+        int spawnIndexVisitant = 0;
 
-            if (playerNO.TryGetComponent<Player>(out Player p) && playerNO.TryGetComponent<Rigidbody>(out Rigidbody rb))
+        foreach (var playerNO in NetworkManager.Singleton.SpawnManager.PlayerObjects)
+        {
+            if (playerNO.TryGetComponent<Player>(out Player p) && playerNO.TryGetComponent<Rigidbody>(out Rigidbody rb) && playerNO.TryGetComponent<PlayerController>(out PlayerController playerController))
             {
-                if (p.Team.Value == Team.LOCAL)
+                if (p.Team.Value == Team.LOCAL && spawnIndexLocal < localSpawnPositions.Count)
                 {
-                    int index = LocalPlayersID.IndexOf(NetworkManager.Singleton.ConnectedClientsIds[i]);
                     rb.isKinematic = true;
-                    rb.position = localSpawnPositions[i].position;
-                    rb.rotation = Quaternion.LookRotation(localSpawnPositions[i].forward);
+                    rb.position = localSpawnPositions[spawnIndexLocal].position;
+                    playerController.cinemachineCamera.transform.rotation = Quaternion.LookRotation(localSpawnPositions[spawnIndexLocal].forward);
+                    rb.rotation = Quaternion.LookRotation(localSpawnPositions[spawnIndexLocal].forward);
+                    spawnIndexLocal++;
                 }
-                else
+                else if (p.Team.Value == Team.VISITANT && spawnIndexVisitant < visitantSpawnPositions.Count)
                 {
-                    int index = VisitantPlayersID.IndexOf(NetworkManager.Singleton.ConnectedClientsIds[i]);
                     rb.isKinematic = true;
-                    rb.position = visitantSpawnPositions[i].position;
-                    rb.rotation = Quaternion.LookRotation(visitantSpawnPositions[i].forward);
+                    rb.position = visitantSpawnPositions[spawnIndexVisitant].position;
+                    playerController.cinemachineCamera.transform.rotation = Quaternion.LookRotation(localSpawnPositions[spawnIndexLocal].forward);
+                    rb.rotation = Quaternion.LookRotation(visitantSpawnPositions[spawnIndexVisitant].forward);
+                    spawnIndexVisitant++;
                 }
             }
         }
@@ -575,8 +576,8 @@ public class MatchManager : NetworkBehaviour
         {
             NetworkManager.Singleton.ConnectionApprovalCallback -= ConnectionApproval;
             NetworkManager.Singleton.SceneManager.OnLoadComplete -= OnSceneLoaded;
-            LocalCharacterSelected.OnListChanged -= OnCharacterSelectedReadyCheck;
-            VisitantCharacterSelected.OnListChanged -= OnCharacterSelectedReadyCheck;
+            //LocalCharacterSelected.OnListChanged -= OnCharacterSelectedReadyCheck;
+            //VisitantCharacterSelected.OnListChanged -= OnCharacterSelectedReadyCheck;
         }
         else if (IsClient) NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
     }

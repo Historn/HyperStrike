@@ -228,10 +228,11 @@ public class PlayerController : NetworkBehaviour
     private void FixedUpdate()
     {
         if (MatchManager.Instance && !MatchManager.Instance.allowMovement.Value) return;
+        if (GameManager.Instance && GameManager.Instance.isPaused) return;
 
         if (IsClient && IsOwner)
         {
-            InputData currentInput = new InputData
+            InputData data = new InputData
             {
                 move = input.Player.Move.ReadValue<Vector2>(),
                 moveInProgress = input.Player.Move.IsInProgress(),
@@ -240,13 +241,7 @@ public class PlayerController : NetworkBehaviour
                 jump = input.Player.Jump.IsPressed(),
                 slide = input.Player.Slide.IsPressed(),
             };
-
-            if (!hasLastSentInput || !InputEquals(lastSentInput, currentInput))
-            {
-                SendInputServerRPC(currentInput);
-                lastSentInput = currentInput;
-                hasLastSentInput = true;
-            }
+            SendInputServerRPC(data);
         }
     }
 
@@ -458,6 +453,7 @@ public class PlayerController : NetworkBehaviour
     void MeleeAttackServerRPC()
     {
         if (MatchManager.Instance && !MatchManager.Instance.allowMovement.Value) return;
+        if (GameManager.Instance && GameManager.Instance.isPaused) return;
 
         if (meleeReady)
         {
@@ -493,6 +489,7 @@ public class PlayerController : NetworkBehaviour
     void ShootServerRPC()
     {
         if (MatchManager.Instance && !MatchManager.Instance.allowMovement.Value) return;
+        if (GameManager.Instance && GameManager.Instance.isPaused) return;
 
         if (shootReady && (projectileSpawnOffset != null && player.ProjectilePrefab != null) && NetworkObjectPool.Singleton != null)
         {
@@ -525,6 +522,7 @@ public class PlayerController : NetworkBehaviour
     void ActivateAbility1ServerRPC()
     {
         if (MatchManager.Instance && !MatchManager.Instance.allowMovement.Value) return;
+        if (GameManager.Instance && GameManager.Instance.isPaused) return;
         abilityController.TryCastAbility(0);
     }
 
@@ -532,6 +530,7 @@ public class PlayerController : NetworkBehaviour
     void ActivateAbility2ServerRPC()
     {
         if (MatchManager.Instance && !MatchManager.Instance.allowMovement.Value) return;
+        if (GameManager.Instance && GameManager.Instance.isPaused) return;
         abilityController.TryCastAbility(1);
     }
 
@@ -539,6 +538,7 @@ public class PlayerController : NetworkBehaviour
     void ActivateUltimateServerRPC()
     {
         if (MatchManager.Instance && !MatchManager.Instance.allowMovement.Value) return;
+        if (GameManager.Instance && GameManager.Instance.isPaused) return;
         abilityController.TryCastAbility(2);
     }
     #endregion

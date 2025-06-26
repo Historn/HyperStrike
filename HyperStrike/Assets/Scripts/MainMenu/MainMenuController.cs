@@ -11,7 +11,7 @@ public class MainMenuController : MonoBehaviour
 {
     [Header("Audio Settings")]
     [SerializeField] private AudioMixer mixer;
-    
+
     [Space(10)]
 
     [SerializeField] private TMP_Text musicTextValue = null;
@@ -48,7 +48,7 @@ public class MainMenuController : MonoBehaviour
     [Header("Confirmation Icon")]
     [SerializeField] private GameObject confirmationPrompt = null;
 
-    
+
     PlayerInput input;
 
     [Header("Pause")]
@@ -90,7 +90,7 @@ public class MainMenuController : MonoBehaviour
         Resolution resolution = resolutions[resolutionIndex];
         Screen.SetResolution(resolution.width, resolution.height, Screen.fullScreen);
     }
-  
+
     public void SetMusic(float music)
     {
         //AudioListener.volume = music;
@@ -121,9 +121,9 @@ public class MainMenuController : MonoBehaviour
         sensitivityTextValue.text = sensitivity.ToString("0");
     }
 
-    public void GameplayApply() 
+    public void GameplayApply()
     {
-        if(invertYToggle.isOn)
+        if (invertYToggle.isOn)
         {
             PlayerPrefs.SetInt("masterInvertY", 1);
             // invert y with Arnau's method
@@ -157,7 +157,7 @@ public class MainMenuController : MonoBehaviour
 
         PlayerPrefs.SetInt("masterFullscreen", (_isFullscreen ? 1 : 0));
         Screen.fullScreen = _isFullscreen;
-        
+
         StartCoroutine(ConfirmationBox());
     }
 
@@ -214,19 +214,21 @@ public class MainMenuController : MonoBehaviour
 
     public void OpenClosePause()
     {
-        if (isPaused && pauseMenuContainer.activeSelf)
+        if (!GameManager.Instance) return;
+
+        if (GameManager.Instance.isPaused && pauseMenuContainer.activeSelf)
         {
             pauseMenuContainer.SetActive(false);
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
-            isPaused = false;
+            GameManager.Instance.isPaused = false;
         }
-        else if (!isPaused && !pauseMenuContainer.activeSelf)
+        else if (!GameManager.Instance.isPaused && !pauseMenuContainer.activeSelf)
         {
             pauseMenuContainer.SetActive(true);
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
-            isPaused = true;
+            GameManager.Instance.isPaused = true;
         }
     }
 
