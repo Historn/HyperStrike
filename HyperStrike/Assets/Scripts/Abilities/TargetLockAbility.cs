@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using Unity.Cinemachine;
 using Unity.Netcode;
 using UnityEngine;
@@ -36,18 +37,24 @@ public class TargetLockAbility : Ability
             var targetNetObj = currentTarget.GetComponent<NetworkObject>();
             if (targetNetObj != null)
             {
-                LookAtTargetClientRPC(targetNetObj);
+                NetworkObjectReference targetRef = new NetworkObjectReference(targetNetObj);
+                LookAtTargetClientRPC(targetRef, new ClientRpcParams
+                {
+                    Send = new ClientRpcSendParams { TargetClientIds = new List<ulong> { owner.OwnerClientId } }
+                });
             }
         }
 
         while (castTime < maxCastTime)
         {
-            castTime += Time.deltaTime;
-            
-            yield return null;
+            castTime++;
+            yield return new WaitForSeconds(1f);
         }
 
-        ResetLookAtTargetClientRPC();
+        ResetLookAtTargetClientRPC(new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams { TargetClientIds = new List<ulong> { owner.OwnerClientId } }
+        });
     }
 
     private Transform FindClosestTarget()
@@ -61,9 +68,9 @@ public class TargetLockAbility : Ability
         {
             Player player = target.GetComponent<Player>();
 
-            if (player.OwnerClientId == owner.OwnerClientId) continue;
+            if (player == null || player.OwnerClientId == owner.OwnerClientId) continue;
 
-            //if (!targetOwnerTeam && player.Team.Value == owner.GetComponent<Player>().Team.Value) continue;
+            if (!targetOwnerTeam && player.Team.Value == owner.Team.Value) continue;
             Debug.Log("Found " + target.name);
             float distance = Vector3.Distance(owner.transform.position, target.transform.position);
             if (distance < closestDistance)
@@ -77,10 +84,9 @@ public class TargetLockAbility : Ability
     }
 
     [ClientRpc]
-    void LookAtTargetClientRPC(NetworkObjectReference targetRef)
+    void LookAtTargetClientRPC(NetworkObjectReference targetRef, ClientRpcParams clientRpcParams)
     {
         if (!targetRef.TryGet(out NetworkObject targetObj)) return;
-
 
         currentTarget = targetObj.transform;
 
@@ -92,7 +98,7 @@ public class TargetLockAbility : Ability
     }
 
     [ClientRpc]
-    void ResetLookAtTargetClientRPC()
+    void ResetLookAtTargetClientRPC(ClientRpcParams clientRpcParams)
     {
         var cinemachineCamera = owner.GetComponentInChildren<CinemachineCamera>();
         if (cinemachineCamera == null) return;

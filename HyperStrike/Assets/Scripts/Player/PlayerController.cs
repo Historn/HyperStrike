@@ -148,6 +148,8 @@ public class PlayerController : NetworkBehaviour
 
             rb.isKinematic = true;
             rb.interpolation = RigidbodyInterpolation.Interpolate;
+
+            NetworkManager.NetworkTickSystem.Tick += OnNetworkTick;
         }
         else
         {
@@ -182,6 +184,7 @@ public class PlayerController : NetworkBehaviour
         {
             input?.Player.Disable();
             cameraTilt.OnValueChanged -= OnCameraTiltChanged;
+            NetworkManager.NetworkTickSystem.Tick -= OnNetworkTick;
         }
     }
 
@@ -201,6 +204,27 @@ public class PlayerController : NetworkBehaviour
                 cinemachineCamera.Lens.Dutch = -10;
                 break;
         }
+    }
+
+    private void OnNetworkTick()
+    {
+        if (MatchManager.Instance && !MatchManager.Instance.allowMovement.Value) return;
+        if (GameManager.Instance && GameManager.Instance.isPaused) return;
+        if (player && player.Health.Value <= 0f) return;
+
+        if (!IsClient || !IsOwner) return;
+
+        InputData data = new InputData
+        {
+            move = input.Player.Move.ReadValue<Vector2>(),
+            moveInProgress = input.Player.Move.IsInProgress(),
+            look = new Vector2(input.Player.Look.ReadValue<Vector2>().x, invertY != 0 ? input.Player.Look.ReadValue<Vector2>().y : -input.Player.Look.ReadValue<Vector2>().y),
+            sprint = input.Player.Sprint.IsPressed(),
+            jump = input.Player.Jump.IsPressed(),
+            slide = input.Player.Slide.IsPressed(),
+        };
+
+        SendInputServerRPC(data);
     }
 
     private void Start()
@@ -223,27 +247,6 @@ public class PlayerController : NetworkBehaviour
             GetComponentInChildren<PlayerController>().enabled = false;
         }
 
-    }
-
-    // Physics-based + Rigidbody Actions
-    private void FixedUpdate()
-    {
-        if (MatchManager.Instance && !MatchManager.Instance.allowMovement.Value) return;
-        if (GameManager.Instance && GameManager.Instance.isPaused) return;
-
-        if (IsClient && IsOwner)
-        {
-            InputData data = new InputData
-            {
-                move = input.Player.Move.ReadValue<Vector2>(),
-                moveInProgress = input.Player.Move.IsInProgress(),
-                look = new Vector2(input.Player.Look.ReadValue<Vector2>().x, invertY != 0 ? input.Player.Look.ReadValue<Vector2>().y : -input.Player.Look.ReadValue<Vector2>().y),
-                sprint = input.Player.Sprint.IsPressed(),
-                jump = input.Player.Jump.IsPressed(),
-                slide = input.Player.Slide.IsPressed(),
-            };
-            SendInputServerRPC(data);
-        }
     }
 
     void HideMeshRenderer()
