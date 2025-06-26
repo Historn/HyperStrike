@@ -12,28 +12,33 @@ public class StickExplosiveProjectile : ExplosiveProjectile
 
     void Stick(Collision collision)
     {
-        if (firstHit)
-        {
-            NetworkObject netObj = collision.gameObject.GetComponent<NetworkObject>();
-            SphereCollider sphereCollider = GetComponent<SphereCollider>();
+        if (!firstHit) return;
 
-            if (netObj && netObj.OwnerClientId != this.playerOwnerId)
-            {
-                sphereCollider.isTrigger = true;
-                rigidBody.isKinematic = true;
-                transform.SetParent(collision.transform);
-            }
-            else
-            {
-                rigidBody.isKinematic = true;
-            }
-            firstHit = false;
+        NetworkObject netObj = collision.gameObject.GetComponent<NetworkObject>();
+        SphereCollider sphereCollider = GetComponent<SphereCollider>();
+
+        rigidBody.isKinematic = true;
+
+        if (netObj && netObj.OwnerClientId != this.playerOwnerId)
+        {
+            if (sphereCollider != null) sphereCollider.isTrigger = true;
+            transform.SetParent(collision.transform);
         }
+
+        firstHit = false;
     }
 
     public override void Deactivate()
     {
-        base.Deactivate();
         firstHit = true;
+        transform.SetParent(null);
+
+        rigidBody.isKinematic = false;
+
+        SphereCollider sphereCollider = GetComponent<SphereCollider>();
+        if (sphereCollider != null)
+            sphereCollider.isTrigger = false;
+
+        base.Deactivate();
     }
 }

@@ -125,7 +125,7 @@ MultiplayerRolesData:
   - m_Object: {fileID: 749475131074918778}
     m_RolesMask: 2
   - m_Object: {fileID: 1066547957085744111}
-    m_RolesMask: 2
+    m_RolesMask: 3
   - m_Object: {fileID: 7993181829852889582}
     m_RolesMask: 2
   - m_Object: {fileID: 6128847657972199326}
@@ -144,7 +144,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2255939048
+  GlobalObjectIdHash: 61260264
   InScenePlacedSourceGlobalObjectIdHash: 1552259670
   DeferredDespawnTick: 0
   Ownership: 1
@@ -170,9 +170,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  isLocalGoal: 1
   goalVfx: {fileID: 1546897667432260974, guid: fe8a487245448f640925f8455a9ff42b, type: 3}
-  isLocalGoal: 0
   goalSFX: {fileID: 8300000, guid: 81374131791f3d048b730e361b29bd08, type: 3}
+  airHornSFX: {fileID: 8300000, guid: a62af432354edd14886499cad1f97b1c, type: 3}
 --- !u!114 &8772677395519443276
 MonoBehaviour:
   m_ObjectHideFlags: 0

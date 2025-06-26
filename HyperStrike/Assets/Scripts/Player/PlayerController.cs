@@ -214,13 +214,13 @@ public class PlayerController : NetworkBehaviour
             GetComponentInChildren<AudioListener>().enabled = false;
             GetComponentInChildren<CinemachineBrain>().enabled = false;
         }
-        else if (!IsOwner && !IsServer)
+        else if (!IsOwner && !IsServer) // Doesnt work dk why
         {
             GetComponentInChildren<Player>().enabled = false;
             GetComponentInChildren<PlayerView>().enabled = false;
-            GetComponentInChildren<PlayerController>().enabled = false;
             GetComponentInChildren<PlayerAbilityController>().enabled = false;
             Debug.Log("Disable player thingies");
+            GetComponentInChildren<PlayerController>().enabled = false;
         }
 
     }
@@ -442,15 +442,13 @@ public class PlayerController : NetworkBehaviour
     {
         if (MatchManager.Instance && !MatchManager.Instance.allowMovement.Value) return;
         if (GameManager.Instance && GameManager.Instance.isPaused) return;
+        if (player && player.Health.Value <= 0f) return;
         MeleeAttackServerRPC();
     }
 
     [ServerRpc]
     void MeleeAttackServerRPC()
     {
-        if (MatchManager.Instance && !MatchManager.Instance.allowMovement.Value) return;
-        if (GameManager.Instance && GameManager.Instance.isPaused) return;
-
         if (meleeReady)
         {
             meleeReady = false;
@@ -485,15 +483,13 @@ public class PlayerController : NetworkBehaviour
     {
         if (MatchManager.Instance && !MatchManager.Instance.allowMovement.Value) return;
         if (GameManager.Instance && GameManager.Instance.isPaused) return;
+        if (player && player.Health.Value <= 0f) return;
         ShootServerRPC();
     }
 
     [ServerRpc]
     void ShootServerRPC()
     {
-        if (MatchManager.Instance && !MatchManager.Instance.allowMovement.Value) return;
-        if (GameManager.Instance && GameManager.Instance.isPaused) return;
-
         if (shootReady && (projectileSpawnOffset != null && player.ProjectilePrefab != null) && NetworkObjectPool.Singleton != null)
         {
             shootReady = false;
@@ -525,6 +521,7 @@ public class PlayerController : NetworkBehaviour
     {
         if (MatchManager.Instance && !MatchManager.Instance.allowMovement.Value) return;
         if (GameManager.Instance && GameManager.Instance.isPaused) return;
+        if (player && player.Health.Value <= 0f) return;
         ActivateAbility1ServerRPC();
     }
 
@@ -538,6 +535,7 @@ public class PlayerController : NetworkBehaviour
     {
         if (MatchManager.Instance && !MatchManager.Instance.allowMovement.Value) return;
         if (GameManager.Instance && GameManager.Instance.isPaused) return;
+        if (player && player.Health.Value <= 0f) return;
         ActivateAbility2ServerRPC();
     }
 
@@ -551,6 +549,7 @@ public class PlayerController : NetworkBehaviour
     {
         if (MatchManager.Instance && !MatchManager.Instance.allowMovement.Value) return;
         if (GameManager.Instance && GameManager.Instance.isPaused) return;
+        if (player && player.Health.Value <= 0f) return;
         ActivateUltimateServerRPC();
     }
 
