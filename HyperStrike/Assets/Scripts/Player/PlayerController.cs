@@ -86,8 +86,10 @@ public class PlayerController : NetworkBehaviour
 
     // Wall run
     [SerializeField] bool isWallRunning;
+    [SerializeField] LayerMask wallMask;
     RaycastHit wallHit;
     float stickWallForce = 10f;
+    
 
     // Checkers
     private bool wasJumpPressed;
@@ -218,7 +220,7 @@ public class PlayerController : NetworkBehaviour
         {
             move = input.Player.Move.ReadValue<Vector2>(),
             moveInProgress = input.Player.Move.IsInProgress(),
-            look = new Vector2(input.Player.Look.ReadValue<Vector2>().x, invertY != 0 ? input.Player.Look.ReadValue<Vector2>().y : -input.Player.Look.ReadValue<Vector2>().y),
+            look = new Vector2(input.Player.Look.ReadValue<Vector2>().x * GameManager.Instance.mainSensitivity, (GameManager.Instance.invertY != 0 ? input.Player.Look.ReadValue<Vector2>().y : -input.Player.Look.ReadValue<Vector2>().y) * GameManager.Instance.mainSensitivity),
             sprint = input.Player.Sprint.IsPressed(),
             jump = input.Player.Jump.IsPressed(),
             slide = input.Player.Slide.IsPressed(),
@@ -291,7 +293,7 @@ public class PlayerController : NetworkBehaviour
         isGrounded = hyperStrikeUtils.CheckGrounded(transform, characterHeight);
         animator?.Animator?.SetBool(GroundHash, isGrounded);
 
-        isWallRunning = hyperStrikeUtils.CheckWalls(transform, ref wallHit, ref refCameraTilt);
+        isWallRunning = hyperStrikeUtils.CheckWalls(transform, ref wallHit, ref refCameraTilt, wallMask);
 
         // Only send when changed
         if (input.look != Vector2.zero && cinemachineCamera?.Target.TrackingTarget == null)
@@ -334,8 +336,8 @@ public class PlayerController : NetworkBehaviour
     void RotatePlayerWithCamera(Vector2 lookValue)
     {
         // Get mouse input
-        float mouseX = lookValue.x * sensitivity * Time.fixedDeltaTime;
-        float mouseY = lookValue.y * sensitivity * Time.fixedDeltaTime;
+        float mouseX = lookValue.x * Time.fixedDeltaTime;
+        float mouseY = lookValue.y * Time.fixedDeltaTime;
 
         // Adjust xRotation for vertical rotation and clamp it
         xRotation -= -mouseY;

@@ -115,7 +115,7 @@ public class MainMenuController : MonoBehaviour
 
     public void SetSensitivity(float sensitivity)
     {
-        mainSensitivity = Mathf.RoundToInt(sensitivity);
+        GameManager.Instance.mainSensitivity = Mathf.RoundToInt(sensitivity);
         sensitivityTextValue.text = sensitivity.ToString("0");
     }
 
@@ -124,15 +124,17 @@ public class MainMenuController : MonoBehaviour
         if (invertYToggle.isOn)
         {
             PlayerPrefs.SetInt("masterInvertY", 1);
+            if (GameManager.Instance) GameManager.Instance.invertY = 1;
             // invert y with Arnau's method
         }
         else
         {
             PlayerPrefs.SetInt("masterInvertY", 0);
+            if (GameManager.Instance) GameManager.Instance.invertY = 0;
             // not invert y with Arnau's method
         }
 
-        PlayerPrefs.SetFloat("masterSen", mainSensitivity);
+        if (GameManager.Instance) PlayerPrefs.SetFloat("masterSen", GameManager.Instance.mainSensitivity);
         // set sensitivity with Arnau's method
 
         StartCoroutine(ConfirmationBox());
@@ -192,7 +194,7 @@ public class MainMenuController : MonoBehaviour
         {
             sensitivityTextValue.text = defaultSensitivity.ToString("0");
             sensitivitySlider.value = defaultSensitivity;
-            mainSensitivity = defaultSensitivity;
+            if (GameManager.Instance) GameManager.Instance.mainSensitivity = defaultSensitivity;
             invertYToggle.isOn = false;
             GameplayApply();
         }
