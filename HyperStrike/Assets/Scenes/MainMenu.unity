@@ -829,6 +829,10 @@ PrefabInstance:
       value: SM_LockerRoomStructure
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 4e70af5a9d77dce4db28b5a9233d9fe4, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4e70af5a9d77dce4db28b5a9233d9fe4, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
@@ -16613,6 +16617,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPaused: 0
+  mainSensitivity: 0
+  invertY: 0
   gameState: 2
 --- !u!1652712579 &1868233599
 MultiplayerRolesData:
