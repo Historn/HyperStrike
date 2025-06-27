@@ -38,6 +38,7 @@ public struct InputData : INetworkSerializable
 public class PlayerController : NetworkBehaviour
 {
     Rigidbody rb;
+    CapsuleCollider capsuleCollider;
 
     #region "Model-View Player"
     private Player player;
@@ -90,7 +91,13 @@ public class PlayerController : NetworkBehaviour
     [SerializeField] LayerMask wallMask;
     RaycastHit wallHit;
     float stickWallForce = 10f;
-    
+
+    // Slide
+    [SerializeField] float slideForce = 25f;
+    [SerializeField] float slideDuration = 1.2f;
+    [SerializeField] float slideDrag = 0.5f;
+    private bool isSliding = false;
+    private float slideTimer = 0f;
 
     // Checkers
     private bool wasJumpPressed;
@@ -125,7 +132,6 @@ public class PlayerController : NetworkBehaviour
         rb.freezeRotation = true;
         rb.maxLinearVelocity = player.MaxSpeed;
         dragCoefficient = rb.linearDamping;
-
         if (IsClient && IsOwner)
         {
             Cursor.lockState = CursorLockMode.Locked;
@@ -161,7 +167,8 @@ public class PlayerController : NetworkBehaviour
 
             rb.isKinematic = false;
             rb.interpolation = RigidbodyInterpolation.None;
-            characterHeight = GetComponent<CapsuleCollider>().height;
+            capsuleCollider = GetComponent<CapsuleCollider>();
+            characterHeight = capsuleCollider.height;
         }
 
         if (IsServer)
@@ -289,6 +296,21 @@ public class PlayerController : NetworkBehaviour
         BackflipHash = Animator.StringToHash("Backflip");
     }
 
+    private void FixedUpdate()
+    {
+        if (!IsServer) return;
+
+        if (isSliding)
+        {
+            slideTimer -= Time.fixedDeltaTime;
+            if (slideTimer <= 0f || !isGrounded)
+            {
+                StopSliding();
+            }
+        }
+    }
+
+
     [ServerRpc]
     void SendInputServerRPC(InputData input)
     {
@@ -306,10 +328,10 @@ public class PlayerController : NetworkBehaviour
             {
                 if (isFalling)
                     rb.AddForce(Physics.gravity * 10f, ForceMode.Acceleration);
-                else if(wasJumpPressed)
+                else if (wasJumpPressed)
                     rb.AddForce(Physics.gravity * 4f, ForceMode.Acceleration);
             }
-                
+
         }
         else
             rb.linearDamping = dragCoefficient;
@@ -411,20 +433,40 @@ public class PlayerController : NetworkBehaviour
         animator?.Animator?.SetTrigger(WalkingHash);
     }
 
-    void Slide(bool isSliding)
+    void Slide(bool startSlide)
     {
-        if (isSliding)
+        if (startSlide && !isSliding && isGrounded && rb.linearVelocity.magnitude > 1f)
         {
+            isSliding = true;
+            slideTimer = slideDuration;
+
+            capsuleCollider.height = characterHeight / 2f;
+            capsuleCollider.center = new Vector3(0, capsuleCollider.height / 2f, 0);
+
             rb.maxLinearVelocity = player.MaxSlidingSpeed;
-            rb.linearDamping = 0.1f;
+            rb.linearDamping = slideDrag;
+
+            Vector3 slideDirection = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z).normalized;
+            rb.AddForce(slideDirection * slideForce * rb.mass, ForceMode.Impulse);
+
             animator?.Animator?.SetTrigger(SlidingHash);
         }
-        else
+        else if (!startSlide && isSliding)
         {
-            rb.maxLinearVelocity = player.MaxSpeed;
-            rb.linearDamping = 0.2f;
-            animator?.Animator?.ResetTrigger(SlidingHash);
+            StopSliding();
         }
+    }
+
+    void StopSliding()
+    {
+        isSliding = false;
+        capsuleCollider.height = characterHeight;
+        capsuleCollider.center = new Vector3(0, characterHeight / 2f, 0);
+
+        rb.maxLinearVelocity = player.MaxSpeed;
+        rb.linearDamping = dragCoefficient;
+
+        animator?.Animator?.ResetTrigger(SlidingHash);
     }
 
     void Jump(bool isJumping, Vector3 jumpDir, float forceAdd = 0f)
