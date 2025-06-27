@@ -273,8 +273,10 @@ MonoBehaviour:
   projectileFX: {fileID: 0}
   rigidBody: {fileID: 0}
   projectilePrefabUsed: {fileID: 8027826101285448113}
+  owner: {fileID: 0}
+  range: 13
   force: 25
   lineRenderer: {fileID: 0}
   effectType: 1
   affectedBaseStats: 0
-  quantity: 0
+  effectTime: 0

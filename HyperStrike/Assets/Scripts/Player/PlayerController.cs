@@ -77,12 +77,13 @@ public class PlayerController : NetworkBehaviour
     // Jump Vars
     bool readyToJump;
     float jumpCooldown = 0.5f;
-    float jumpForce = 10.0f;
+    float jumpForce = 30.0f;
 
     // Ground Vars
     [Header("Ground Check")]
     [SerializeField] bool isGrounded;
     float characterHeight; // Change to character Data
+    float dragCoefficient = 5.0f;
 
     // Wall run
     [SerializeField] bool isWallRunning;
@@ -123,6 +124,7 @@ public class PlayerController : NetworkBehaviour
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
         rb.maxLinearVelocity = player.MaxSpeed;
+        dragCoefficient = rb.linearDamping;
 
         if (IsClient && IsOwner)
         {
@@ -295,6 +297,26 @@ public class PlayerController : NetworkBehaviour
 
         isWallRunning = hyperStrikeUtils.CheckWalls(transform, ref wallHit, ref refCameraTilt, wallMask);
 
+        bool isFalling = rb.linearVelocity.y < 50f;
+
+        if (!isGrounded)
+        {
+            rb.linearDamping = 0f;
+            if (!isWallRunning)
+            {
+                if (isFalling)
+                    rb.AddForce(Physics.gravity * 10f, ForceMode.Acceleration);
+                else if(wasJumpPressed)
+                    rb.AddForce(Physics.gravity * 4f, ForceMode.Acceleration);
+            }
+                
+        }
+        else
+            rb.linearDamping = dragCoefficient;
+
+        // Reset
+        wasJumpPressed = false;
+
         // Only send when changed
         if (input.look != Vector2.zero && cinemachineCamera?.Target.TrackingTarget == null)
         {
@@ -327,6 +349,7 @@ public class PlayerController : NetworkBehaviour
         if (input.jump && isGrounded && !isWallRunning)
         {
             Jump(input.jump, Vector3.zero);
+            wasJumpPressed = true;
         }
 
         animator?.Animator?.SetFloat(VelocityHash, rb.linearVelocity.magnitude);
