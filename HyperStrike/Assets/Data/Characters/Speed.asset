@@ -15,9 +15,9 @@ MonoBehaviour:
   characterName: Speed
   health: 100
   maxHealth: 100
-  speed: 70
-  sprintSpeed: 120
-  wallRunSpeed: 100
+  speed: 150
+  sprintSpeed: 250
+  wallRunSpeed: 280
   maxSpeed: 17
   maxSlidingSpeed: 30
   projectilePrefab: {fileID: 4480140288178342511, guid: 4bb923ba4b889c64da67ffff59974caa, type: 3}

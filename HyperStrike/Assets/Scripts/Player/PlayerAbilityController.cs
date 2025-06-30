@@ -41,7 +41,6 @@ public class PlayerAbilityController : NetworkBehaviour
         // Start cooldown timer
         if (ability.isOnCooldown)
         {
-            ability.currentCooldownTime.Value = 0;
             StopCoroutine(StartReloading(abilityIndex));
             StartCoroutine(StartCooldown(abilityIndex));
         }
@@ -54,7 +53,7 @@ public class PlayerAbilityController : NetworkBehaviour
     private IEnumerator StartCooldown(int index)
     {
         var ability = abilities[index];
-
+        ability.currentCooldownTime.Value = 0;
         while (ability.currentCooldownTime.Value < ability.fullCooldown) 
         {
             ability.currentCooldownTime.Value++;
@@ -69,6 +68,7 @@ public class PlayerAbilityController : NetworkBehaviour
 
         while (ability.currentCharges.Value < ability.maxCharges)
         {
+            ability.currentReloadTime.Value = 0;
             while (ability.currentReloadTime.Value < ability.chargeReloadTime)
             {
                 ability.currentReloadTime.Value++;
@@ -76,8 +76,6 @@ public class PlayerAbilityController : NetworkBehaviour
             }
 
             ability.currentCharges.Value++;
-            ability.currentReloadTime.Value = 0;
-            yield return null;
         }
 
         ability.isReloading = false;

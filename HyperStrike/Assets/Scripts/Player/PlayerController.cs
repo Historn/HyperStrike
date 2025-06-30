@@ -38,6 +38,7 @@ public struct InputData : INetworkSerializable
 public class PlayerController : NetworkBehaviour
 {
     Rigidbody rb;
+    CapsuleCollider capsuleCollider;
 
     #region "Model-View Player"
     private Player player;
@@ -77,17 +78,26 @@ public class PlayerController : NetworkBehaviour
     // Jump Vars
     bool readyToJump;
     float jumpCooldown = 0.5f;
-    float jumpForce = 10.0f;
+    float jumpForce = 30.0f;
 
     // Ground Vars
     [Header("Ground Check")]
     [SerializeField] bool isGrounded;
     float characterHeight; // Change to character Data
+    float dragCoefficient = 5.0f;
 
     // Wall run
     [SerializeField] bool isWallRunning;
+    [SerializeField] LayerMask wallMask;
     RaycastHit wallHit;
     float stickWallForce = 10f;
+
+    // Slide
+    [SerializeField] float slideForce = 25f;
+    [SerializeField] float slideDuration = 1.2f;
+    [SerializeField] float slideDrag = 0.5f;
+    private bool isSliding = false;
+    private float slideTimer = 0f;
 
     // Checkers
     private bool wasJumpPressed;
@@ -121,7 +131,7 @@ public class PlayerController : NetworkBehaviour
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
         rb.maxLinearVelocity = player.MaxSpeed;
-
+        dragCoefficient = rb.linearDamping;
         if (IsClient && IsOwner)
         {
             Cursor.lockState = CursorLockMode.Locked;
@@ -157,7 +167,8 @@ public class PlayerController : NetworkBehaviour
 
             rb.isKinematic = false;
             rb.interpolation = RigidbodyInterpolation.None;
-            characterHeight = GetComponent<CapsuleCollider>().height;
+            capsuleCollider = GetComponent<CapsuleCollider>();
+            characterHeight = capsuleCollider.height;
         }
 
         if (IsServer)
@@ -218,7 +229,7 @@ public class PlayerController : NetworkBehaviour
         {
             move = input.Player.Move.ReadValue<Vector2>(),
             moveInProgress = input.Player.Move.IsInProgress(),
-            look = new Vector2(input.Player.Look.ReadValue<Vector2>().x, invertY != 0 ? input.Player.Look.ReadValue<Vector2>().y : -input.Player.Look.ReadValue<Vector2>().y),
+            look = new Vector2(input.Player.Look.ReadValue<Vector2>().x * GameManager.Instance.mainSensitivity, (GameManager.Instance.invertY != 0 ? input.Player.Look.ReadValue<Vector2>().y : -input.Player.Look.ReadValue<Vector2>().y) * GameManager.Instance.mainSensitivity),
             sprint = input.Player.Sprint.IsPressed(),
             jump = input.Player.Jump.IsPressed(),
             slide = input.Player.Slide.IsPressed(),
@@ -285,13 +296,33 @@ public class PlayerController : NetworkBehaviour
         BackflipHash = Animator.StringToHash("Backflip");
     }
 
+    private void FixedUpdate()
+    {
+        if (!IsServer) return;
+
+        if (isSliding)
+        {
+            slideTimer -= Time.fixedDeltaTime;
+            if (slideTimer <= 0f || !isGrounded)
+            {
+                StopSliding();
+            }
+        }
+    }
+
+
     [ServerRpc]
     void SendInputServerRPC(InputData input)
     {
         isGrounded = hyperStrikeUtils.CheckGrounded(transform, characterHeight);
         animator?.Animator?.SetBool(GroundHash, isGrounded);
 
-        isWallRunning = hyperStrikeUtils.CheckWalls(transform, ref wallHit, ref refCameraTilt);
+        isWallRunning = hyperStrikeUtils.CheckWalls(transform, ref wallHit, ref refCameraTilt, wallMask);
+
+        SetFriction();
+
+        // Reset
+        wasJumpPressed = false;
 
         // Only send when changed
         if (input.look != Vector2.zero && cinemachineCamera?.Target.TrackingTarget == null)
@@ -325,17 +356,38 @@ public class PlayerController : NetworkBehaviour
         if (input.jump && isGrounded && !isWallRunning)
         {
             Jump(input.jump, Vector3.zero);
+            wasJumpPressed = true;
         }
 
         animator?.Animator?.SetFloat(VelocityHash, rb.linearVelocity.magnitude);
     }
 
     #region "Movement Mechanics Methods"
+    private void SetFriction()
+    {
+        bool isFalling = rb.linearVelocity.y < 50f;
+
+        if (!isGrounded)
+        {
+            rb.linearDamping = 0f;
+            if (!isWallRunning)
+            {
+                if (isFalling)
+                    rb.AddForce(Physics.gravity * 10f, ForceMode.Acceleration);
+                else if (wasJumpPressed)
+                    rb.AddForce(Physics.gravity * 4f, ForceMode.Acceleration);
+            }
+
+        }
+        else
+            rb.linearDamping = dragCoefficient;
+    }
+
     void RotatePlayerWithCamera(Vector2 lookValue)
     {
         // Get mouse input
-        float mouseX = lookValue.x * sensitivity * Time.fixedDeltaTime;
-        float mouseY = lookValue.y * sensitivity * Time.fixedDeltaTime;
+        float mouseX = lookValue.x * Time.fixedDeltaTime;
+        float mouseY = lookValue.y * Time.fixedDeltaTime;
 
         // Adjust xRotation for vertical rotation and clamp it
         xRotation -= -mouseY;
@@ -357,8 +409,8 @@ public class PlayerController : NetworkBehaviour
         Vector3 targetDirection = (cinemachineCamera.Target.TrackingTarget.position - transform.position).normalized;
 
         // Allow some camera movement while locked (reduced sensitivity)
-        float mouseXx = lookValue.x * (sensitivity * 0.2f) * Time.fixedDeltaTime;
-        float mouseYy = lookValue.y * (sensitivity * 0.2f) * Time.fixedDeltaTime;
+        float mouseXx = lookValue.x * Time.fixedDeltaTime;
+        float mouseYy = lookValue.y * Time.fixedDeltaTime;
 
         // Apply limited camera rotation
         xRotation -= mouseYy;
@@ -386,20 +438,40 @@ public class PlayerController : NetworkBehaviour
         animator?.Animator?.SetTrigger(WalkingHash);
     }
 
-    void Slide(bool isSliding)
+    void Slide(bool startSlide)
     {
-        if (isSliding)
+        if (startSlide && !isSliding && isGrounded && rb.linearVelocity.magnitude > 1f)
         {
+            isSliding = true;
+            slideTimer = slideDuration;
+
+            capsuleCollider.height = characterHeight / 2f;
+            capsuleCollider.center = new Vector3(0, capsuleCollider.height / 2f, 0);
+
             rb.maxLinearVelocity = player.MaxSlidingSpeed;
-            rb.linearDamping = 0.1f;
+            rb.linearDamping = slideDrag;
+
+            Vector3 slideDirection = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z).normalized;
+            rb.AddForce(slideDirection * slideForce * rb.mass, ForceMode.Impulse);
+
             animator?.Animator?.SetTrigger(SlidingHash);
         }
-        else
+        else if (!startSlide && isSliding)
         {
-            rb.maxLinearVelocity = player.MaxSpeed;
-            rb.linearDamping = 0.2f;
-            animator?.Animator?.ResetTrigger(SlidingHash);
+            StopSliding();
         }
+    }
+
+    void StopSliding()
+    {
+        isSliding = false;
+        capsuleCollider.height = characterHeight;
+        capsuleCollider.center = new Vector3(0, characterHeight / 2f, 0);
+
+        rb.maxLinearVelocity = player.MaxSpeed;
+        rb.linearDamping = dragCoefficient;
+
+        animator?.Animator?.ResetTrigger(SlidingHash);
     }
 
     void Jump(bool isJumping, Vector3 jumpDir, float forceAdd = 0f)

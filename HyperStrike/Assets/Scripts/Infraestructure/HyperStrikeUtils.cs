@@ -42,7 +42,7 @@ public class HyperStrikeUtils
         return wallChecked.Contains(true);
     }
 
-    public bool CheckWalls(Transform transform, ref RaycastHit wallHit, ref CameraTilt cameraTilt)
+    public bool CheckWalls(Transform transform, ref RaycastHit wallHit, ref CameraTilt cameraTilt, LayerMask wallMask)
     {
         bool[] wallChecked = new bool[]
         {
@@ -60,7 +60,7 @@ public class HyperStrikeUtils
             RaycastHit hit;
             Vector3 og = new Vector3(transform.position.x, transform.position.y + (transform.localScale.y), transform.position.z);
             Debug.DrawLine(og, og + (directions[i] * (transform.localScale.x * 0.5f + 0.01f)), UnityEngine.Color.green);
-            wallChecked[i] = Physics.Raycast(og, directions[i], out hit, transform.localScale.x * 0.5f + 0.05f);
+            wallChecked[i] = Physics.Raycast(og, directions[i], out hit, transform.localScale.x * 0.5f + 0.05f, wallMask);
             if (wallChecked[i])
             {
                 wallHit = hit;

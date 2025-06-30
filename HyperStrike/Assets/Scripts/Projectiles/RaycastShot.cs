@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class RaycastShot : Projectile
 {
+    [SerializeField] protected float range;
     [SerializeField] protected float force;
     [SerializeField] protected LineRenderer lineRenderer;
 
@@ -25,15 +26,12 @@ public class RaycastShot : Projectile
     public void CastTheRay(Vector3 initPos)
     {
         RaycastHit hit;
-        if (Physics.Raycast(initPos, transform.forward, out hit, 100f)) // Add layers affected to make it more simple
+        if (Physics.Raycast(initPos, transform.forward, out hit, range)) // Add layers affected to make it more simple
         {
             if (lineRenderer)
             {
                 lineRenderer.SetPosition(1, hit.point);
             }
-
-            ShowLineClientRPC(initPos, hit.point);
-
             Rigidbody rb = hit.rigidbody;
             if (rb)
             {
@@ -50,6 +48,7 @@ public class RaycastShot : Projectile
                 }
             }
         }
+        ShowLineClientRPC(initPos, initPos+transform.forward*range);
     }
 
     public override void Deactivate()

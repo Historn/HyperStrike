@@ -7,20 +7,26 @@ public class Bouncer : NetworkBehaviour
     public string[] allowedTags;
     private void OnCollisionEnter(Collision other)
     {
-        if (other == null) return;
-        
-        // Check all the tags the object can impulse
-        for (int i = 0; i < allowedTags.Length; i++)
+        if (other == null && !IsServer) return;
+
+        foreach (var tag in allowedTags)
         {
-            if (other.gameObject.CompareTag(allowedTags[i]))
+            if (other.gameObject.CompareTag(tag))
             {
                 Rigidbody rb = other.gameObject.GetComponent<Rigidbody>();
 
                 if (rb != null)
                 {
                     Vector3 dir = rb.position - transform.position;
+                    float finalForce = force;
 
-                    rb.AddForce(dir.normalized * force, ForceMode.Impulse);
+                    if (tag == "Player")
+                    {
+                        finalForce *= 3f;
+                        Debug.Log("Bouncer on Player");
+                    }
+                    rb.linearVelocity = Vector3.zero;
+                    rb.AddForce(dir.normalized * finalForce, ForceMode.Impulse);
                 }
             }
         }

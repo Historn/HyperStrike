@@ -15,7 +15,8 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
     public bool isPaused = false;
-
+    public int mainSensitivity;
+    public int invertY;
     private void Awake()
     {
         if (Instance == null)

@@ -125,8 +125,8 @@ GameObject:
   - component: {fileID: 5496693550754285636}
   - component: {fileID: 6626440046734023120}
   - component: {fileID: 4227015264546652421}
-  - component: {fileID: 3617829514769685705}
   - component: {fileID: 4856232224675675026}
+  - component: {fileID: 3617829514769685705}
   - component: {fileID: 9035245812400127922}
   - component: {fileID: 4273061715997264505}
   - component: {fileID: 4284417717198246814}
@@ -261,21 +261,6 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 1
---- !u!114 &3617829514769685705
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3057295474076285659}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 091083a5d8a577d45af5c4a74117809b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  leaderboardPanel: {fileID: 0}
-  scoreText: {fileID: 0}
-  characterNameText: {fileID: 0}
 --- !u!114 &4856232224675675026
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -301,6 +286,26 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
+--- !u!114 &3617829514769685705
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3057295474076285659}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 091083a5d8a577d45af5c4a74117809b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  playerCanvas: {fileID: 0}
+  abilities: []
+  healthBar: {fileID: 0}
+  deathPanel: {fileID: 0}
+  ability1CooldownFill: {fileID: 0}
+  ability2CooldownFill: {fileID: 0}
+  ultimateCooldownFill: {fileID: 0}
 --- !u!114 &9035245812400127922
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -319,6 +324,12 @@ MonoBehaviour:
   cameraWeaponTransform: {fileID: 2381903384639404792}
   isGrounded: 0
   isWallRunning: 0
+  wallMask:
+    serializedVersion: 2
+    m_Bits: 0
+  slideForce: 25
+  slideDuration: 1.2
+  slideDrag: 0.5
   projectileSpawnOffset: {fileID: 3935416128287498826}
 --- !u!114 &4273061715997264505
 MonoBehaviour:
