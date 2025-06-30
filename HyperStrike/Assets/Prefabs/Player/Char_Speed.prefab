@@ -2644,6 +2644,9 @@ MonoBehaviour:
   wallMask:
     serializedVersion: 2
     m_Bits: 64
+  slideForce: 25
+  slideDuration: 1.2
+  slideDrag: 0.5
   projectileSpawnOffset: {fileID: 5722620188708603574}
 --- !u!114 &5850214212879513311
 MonoBehaviour:

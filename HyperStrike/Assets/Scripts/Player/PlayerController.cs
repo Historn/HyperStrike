@@ -319,22 +319,7 @@ public class PlayerController : NetworkBehaviour
 
         isWallRunning = hyperStrikeUtils.CheckWalls(transform, ref wallHit, ref refCameraTilt, wallMask);
 
-        bool isFalling = rb.linearVelocity.y < 50f;
-
-        if (!isGrounded)
-        {
-            rb.linearDamping = 0f;
-            if (!isWallRunning)
-            {
-                if (isFalling)
-                    rb.AddForce(Physics.gravity * 10f, ForceMode.Acceleration);
-                else if (wasJumpPressed)
-                    rb.AddForce(Physics.gravity * 4f, ForceMode.Acceleration);
-            }
-
-        }
-        else
-            rb.linearDamping = dragCoefficient;
+        SetFriction();
 
         // Reset
         wasJumpPressed = false;
@@ -378,6 +363,26 @@ public class PlayerController : NetworkBehaviour
     }
 
     #region "Movement Mechanics Methods"
+    private void SetFriction()
+    {
+        bool isFalling = rb.linearVelocity.y < 50f;
+
+        if (!isGrounded)
+        {
+            rb.linearDamping = 0f;
+            if (!isWallRunning)
+            {
+                if (isFalling)
+                    rb.AddForce(Physics.gravity * 10f, ForceMode.Acceleration);
+                else if (wasJumpPressed)
+                    rb.AddForce(Physics.gravity * 4f, ForceMode.Acceleration);
+            }
+
+        }
+        else
+            rb.linearDamping = dragCoefficient;
+    }
+
     void RotatePlayerWithCamera(Vector2 lookValue)
     {
         // Get mouse input
@@ -404,8 +409,8 @@ public class PlayerController : NetworkBehaviour
         Vector3 targetDirection = (cinemachineCamera.Target.TrackingTarget.position - transform.position).normalized;
 
         // Allow some camera movement while locked (reduced sensitivity)
-        float mouseXx = lookValue.x * (sensitivity * 0.2f) * Time.fixedDeltaTime;
-        float mouseYy = lookValue.y * (sensitivity * 0.2f) * Time.fixedDeltaTime;
+        float mouseXx = lookValue.x * Time.fixedDeltaTime;
+        float mouseYy = lookValue.y * Time.fixedDeltaTime;
 
         // Apply limited camera rotation
         xRotation -= mouseYy;
