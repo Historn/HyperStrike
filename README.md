@@ -42,8 +42,8 @@ The game blends high-mobility hero shooter mechanics with ball-based objectives 
 
 ## 🫂 Team Members:
 
-- [@Historn](https://github.com/AdriaPm)
-- [@AdriaPm](https://github.com/Historn)
+- [@Historn](https://github.com/Historn)
+- [@AdriaPm](https://github.com/AdriaPm)
 - [@JoeyCM](https://github.com/JoeyCM)
 
 ---
