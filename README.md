@@ -27,6 +27,11 @@ The game blends high-mobility hero shooter mechanics with ball-based objectives 
 - 💾 **Save/Load Settings**, **Pause Menu**, and **In-Match UI**.
 - 🌐 **UDP Multiplayer Server** with Unity Netcode and Game Services.
 
+
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/5d41e9ae-8bf5-4637-aef9-59f807959612"/>
+</div>
+
 ---
 
 ## 🛠️ Built With
